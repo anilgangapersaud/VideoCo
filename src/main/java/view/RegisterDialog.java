@@ -1,10 +1,13 @@
 package view;
 
 import model.UserService;
+import model.UserServiceImpl;
+import model.user.User;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class RegisterDialog extends JDialog implements ActionListener {
 
@@ -19,7 +22,7 @@ public class RegisterDialog extends JDialog implements ActionListener {
 
     UserService userService;
 
-    RegisterDialog(JFrame owner) {
+    RegisterDialog(JFrame owner) throws IOException {
         super(owner);
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setSize(windowWidth, windowHeight);
@@ -28,6 +31,7 @@ public class RegisterDialog extends JDialog implements ActionListener {
         createView();
 
         this.setVisible(true);
+        userService = new UserServiceImpl();
     }
 
 
@@ -35,9 +39,12 @@ public class RegisterDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(registerCommand)) {
             if (passwordField.getPassword() != null) {
-                // TODO: add user service
-//                userService.register(usernameInput.getText(), new String(passwordField.getPassword()), emailInput.getText());
-                System.out.println(usernameInput.getText() + "Registered!");
+                User newUser = new User(usernameInput.getText(), new String(passwordField.getPassword()), emailInput.getText());
+                try {
+                    userService.register(newUser);
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
             }
         }
     }

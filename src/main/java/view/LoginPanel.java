@@ -5,6 +5,8 @@ import model.UserService;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.EOFException;
+import java.io.IOException;
 
 public class LoginPanel extends JPanel implements ActionListener {
 
@@ -42,7 +44,11 @@ public class LoginPanel extends JPanel implements ActionListener {
     }
 
     private void register() {
-        RegisterDialog rd = new RegisterDialog((JFrame)this.getTopLevelAncestor());
+        try {
+            RegisterDialog rd = new RegisterDialog((JFrame)this.getTopLevelAncestor());
+        } catch (Exception e) {
+            System.out.println("Exception");
+        }
     }
 
     private void createView() {
