@@ -1,7 +1,5 @@
 package view;
 
-import model.UserService;
-import model.UserServiceImpl;
 import model.user.User;
 
 import javax.swing.*;
@@ -12,18 +10,20 @@ import java.io.IOException;
 public class RegisterDialog extends JDialog implements ActionListener {
 
     private static final int windowHeight = 500;
-    private static final int windowWidth = 400;
+    private static final int windowWidth = 800;
     private static final String windowName = "Register";
     private static final String registerCommand = "register";
+    private static final String registerFailed = "Registration failed. Enter unique credentials.";
+    private static final String registerSuccess = "Registration successful. Login with credentials to shop.";
 
-    JTextField usernameInput;
-    JPasswordField passwordField;
-    JTextField emailInput;
-
-    UserService userService;
+    private JTextField usernameInput;
+    private JPasswordField passwordField;
+    private JTextField emailInput;
+    private JFrame owner;
 
     RegisterDialog(JFrame owner) throws IOException {
         super(owner);
+        this.owner = owner;
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setSize(windowWidth, windowHeight);
         this.setTitle(windowName);
@@ -31,22 +31,29 @@ public class RegisterDialog extends JDialog implements ActionListener {
         createView();
 
         this.setVisible(true);
-        userService = new UserServiceImpl();
     }
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(registerCommand)) {
-            if (passwordField.getPassword() != null) {
-                User newUser = new User(usernameInput.getText(), new String(passwordField.getPassword()), emailInput.getText());
-                try {
-                    userService.register(newUser);
-                } catch (Exception ex) {
-                    System.out.println(ex);
-                }
+            User u = new User(
+                    usernameInput.getText(),
+                    new String(passwordField.getPassword()),
+                    emailInput.getText()
+            );
+            boolean registerResult = register(u);
+            if (!registerResult) {
+                JOptionPane.showMessageDialog(this, registerFailed, "Registration Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, registerSuccess);
             }
+            dispose();
         }
+    }
+
+    private boolean register(User u) {
+        return App.getUserService().register(u);
     }
 
     private void createView() {

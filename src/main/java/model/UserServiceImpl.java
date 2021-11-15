@@ -1,27 +1,23 @@
 package model;
 
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import database.UserRepository;
 import model.user.User;
-
-import java.io.IOException;
 
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
 
-    public UserServiceImpl() throws IOException {
+    public UserServiceImpl() {
         userRepository = new UserRepository();
     }
 
     @Override
     public boolean login(String username, String password) {
-        return false;
+        return userRepository.login(username, password);
     }
 
     @Override
-    public boolean register(User user) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
+    public boolean register(User user) {
         return userRepository.register(user);
     }
 

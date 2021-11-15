@@ -1,11 +1,8 @@
 package view;
 
-import model.UserService;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.EOFException;
 import java.io.IOException;
 
 public class LoginPanel extends JPanel implements ActionListener {
@@ -14,10 +11,10 @@ public class LoginPanel extends JPanel implements ActionListener {
     private static final String passwordLabel = "Password:";
     private static final String loginCommand = "login";
     private static final String registerCommand = "register";
+    private static final String loginUnsuccessful = "Credentials are invalid";
     private final JTextField usernameInput;
     private final JPasswordField passwordInput;
 
-    UserService userService;
 
     public LoginPanel() {
         this.usernameInput = new JTextField(20);
@@ -27,28 +24,27 @@ public class LoginPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        boolean loginResult;
         if (e.getActionCommand().equals(loginCommand)) {
-            login();
+            loginResult = login();
+            if (!loginResult) {
+                JOptionPane.showMessageDialog(this, "Login Failed", loginUnsuccessful, JOptionPane.ERROR_MESSAGE);
+            } else {
+                new Shop((JFrame)this.getTopLevelAncestor());
+            }
         }
         if (e.getActionCommand().equals(registerCommand)) {
-            register();
+            try {
+                new RegisterDialog((JFrame)this.getTopLevelAncestor());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
+
     }
 
-    private void login() {
-        if (passwordInput.getPassword() != null) {
-            //TODO: add user service
-//            userService.login(usernameInput.getText(), new String(passwordInput.getPassword()));
-            System.out.println(usernameInput + "logged in!");
-        }
-    }
-
-    private void register() {
-        try {
-            RegisterDialog rd = new RegisterDialog((JFrame)this.getTopLevelAncestor());
-        } catch (Exception e) {
-            System.out.println("Exception");
-        }
+    private boolean login() {
+        return App.getUserService().login(usernameInput.getText(), new String(passwordInput.getPassword()));
     }
 
     private void createView() {
@@ -56,8 +52,8 @@ public class LoginPanel extends JPanel implements ActionListener {
         JLabel password = new JLabel(passwordLabel);
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
-        loginButton.setActionCommand("login");
-        registerButton.setActionCommand("register");
+        loginButton.setActionCommand(loginCommand);
+        registerButton.setActionCommand(registerCommand);
         loginButton.addActionListener(this);
         registerButton.addActionListener(this);
         this.add(username);

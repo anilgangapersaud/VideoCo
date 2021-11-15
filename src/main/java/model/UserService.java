@@ -1,16 +1,12 @@
 package model;
 
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import model.user.User;
-
-import java.io.IOException;
 
 public interface UserService {
 
     boolean login(String username, String password);
 
-    boolean register(User user) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException;
+    boolean register(User user);
 
     User getUser(String username);
 
