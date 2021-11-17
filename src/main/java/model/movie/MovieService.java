@@ -1,4 +1,6 @@
-package model;
+package model.movie;
+
+import model.movie.Movie;
 
 import java.util.List;
 

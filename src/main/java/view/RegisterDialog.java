@@ -5,6 +5,7 @@ import model.user.User;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class RegisterDialog extends JDialog implements ActionListener {
@@ -19,17 +20,16 @@ public class RegisterDialog extends JDialog implements ActionListener {
     private JTextField usernameInput;
     private JPasswordField passwordField;
     private JTextField emailInput;
-    private JFrame owner;
+    private JRadioButton customerOption;
+    private JRadioButton employeeOption;
+    private ButtonGroup accountTypes;
 
     RegisterDialog(JFrame owner) throws IOException {
         super(owner);
-        this.owner = owner;
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setSize(windowWidth, windowHeight);
         this.setTitle(windowName);
-
         createView();
-
         this.setVisible(true);
     }
 
@@ -40,7 +40,8 @@ public class RegisterDialog extends JDialog implements ActionListener {
             User u = new User(
                     usernameInput.getText(),
                     new String(passwordField.getPassword()),
-                    emailInput.getText()
+                    emailInput.getText(),
+                    accountTypes.getSelection().getActionCommand()
             );
             boolean registerResult = register(u);
             if (!registerResult) {
@@ -67,6 +68,17 @@ public class RegisterDialog extends JDialog implements ActionListener {
         JButton register = new JButton("Register");
         register.setActionCommand(registerCommand);
         register.addActionListener(this);
+        accountTypes = new ButtonGroup();
+
+        customerOption = new JRadioButton("Customer");
+        employeeOption = new JRadioButton("Employee");
+        customerOption.setMnemonic(KeyEvent.VK_C);
+        employeeOption.setMnemonic(KeyEvent.VK_C);
+        customerOption.setActionCommand("customer");
+        employeeOption.setActionCommand("employee");
+        customerOption.setSelected(true);
+        accountTypes.add(employeeOption);
+        accountTypes.add(customerOption);
 
         registrationPanel.add(usernameLabel);
         registrationPanel.add(usernameInput);
@@ -75,6 +87,8 @@ public class RegisterDialog extends JDialog implements ActionListener {
         registrationPanel.add(emailLabel);
         registrationPanel.add(emailInput);
         registrationPanel.add(register);
+        registrationPanel.add(customerOption);
+        registrationPanel.add(employeeOption);
 
         this.add(registrationPanel);
     }

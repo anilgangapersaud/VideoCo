@@ -1,5 +1,7 @@
 package view;
 
+import model.user.User;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,13 +26,12 @@ public class LoginPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean loginResult;
         if (e.getActionCommand().equals(loginCommand)) {
-            loginResult = login();
-            if (!loginResult) {
-                JOptionPane.showMessageDialog(this, "Login Failed", loginUnsuccessful, JOptionPane.ERROR_MESSAGE);
+            User user = login();
+            if (user == null) {
+                JOptionPane.showMessageDialog(this, loginUnsuccessful, "Login Failed", JOptionPane.ERROR_MESSAGE);
             } else {
-                new Shop((JFrame)this.getTopLevelAncestor());
+                new Shop((JFrame)this.getTopLevelAncestor(), user);
             }
         }
         if (e.getActionCommand().equals(registerCommand)) {
@@ -40,10 +41,10 @@ public class LoginPanel extends JPanel implements ActionListener {
                 ex.printStackTrace();
             }
         }
-
+        clearInputs();
     }
 
-    private boolean login() {
+    private User login() {
         return App.getUserService().login(usernameInput.getText(), new String(passwordInput.getPassword()));
     }
 
@@ -62,5 +63,10 @@ public class LoginPanel extends JPanel implements ActionListener {
         this.add(passwordInput);
         this.add(loginButton);
         this.add(registerButton);
+    }
+
+    private void clearInputs() {
+        usernameInput.setText("");
+        passwordInput.setText("");
     }
 }

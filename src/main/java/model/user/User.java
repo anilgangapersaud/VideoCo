@@ -5,12 +5,13 @@ public class User {
     private String username;
     private String password;
     private String emailAddress;
-    private boolean loginStatus;
+    private String accountType;
 
-    public User(String username, String password, String emailAddress) {
+    public User(String username, String password, String emailAddress, String accountType) {
         this.username = username;
         this.password = password;
         this.emailAddress = emailAddress;
+        this.accountType = accountType;
     }
 
     public User() {}
@@ -39,18 +40,16 @@ public class User {
         this.emailAddress = emailAddress;
     }
 
-    public boolean isLoggedIn() {
-        return loginStatus;
+    public String getAccountType() {
+        return accountType;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
-                ", loginStatus=" + loginStatus +
-                '}';
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public boolean isAdmin() {
+        return accountType.equals("admin");
     }
 
     @Override
@@ -58,6 +57,6 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return username.equals(user.username) && emailAddress.equals(user.emailAddress);
+        return username.equals(user.username) && emailAddress.equals(user.emailAddress) && password.equals(user.password);
     }
 }

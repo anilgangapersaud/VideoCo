@@ -1,6 +1,6 @@
 package database;
 
-import model.Movie;
+import model.movie.Movie;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
