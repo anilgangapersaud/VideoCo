@@ -1,17 +1,8 @@
-package view;
-
 import model.movie.MovieService;
 import model.movie.MovieServiceImpl;
 import model.user.UserService;
 import model.user.UserServiceImpl;
-import view.accountpanels.LoginPanel;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import view.StoreFront;
 
 public class App {
 

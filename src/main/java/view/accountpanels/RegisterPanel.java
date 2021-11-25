@@ -1,11 +1,10 @@
 package view.accountpanels;
 
+import model.Model;
 import model.user.User;
-import view.App;
 import view.cards.LoginCards;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -71,7 +70,7 @@ public class RegisterPanel extends JPanel implements ActionListener {
                         emailInput.getText(),
                         accountTypes.getSelection().getActionCommand()
                 );
-                if (!App.getUserService().register(u)) {
+                if (!Model.getUserService().register(u)) {
                     JOptionPane.showMessageDialog(this, registerFailed, "Registration Failed", JOptionPane.ERROR_MESSAGE);
                     clearInputs();
                 } else {

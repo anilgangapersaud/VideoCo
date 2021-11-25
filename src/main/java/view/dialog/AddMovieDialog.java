@@ -1,7 +1,7 @@
 package view.dialog;
 
+import model.Model;
 import model.movie.Movie;
-import view.App;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -92,12 +92,11 @@ public class AddMovieDialog extends JDialog implements ActionListener {
             Movie m = new Movie();
             m.setBarcode(barcodeInput.getText());
             m.setTitle(movieTitleInput.getText());
-            m.setDescription(descriptionInput.getText());
             m.setGenre((String) categoryList.getSelectedItem());
             m.setCost(Double.parseDouble(costInput.getText()));
             m.setQuantity(Integer.parseInt(quantityInput.getText()));
             m.setReleaseDate(releaseDate.getText());
-            if (App.getMovieService().addMovie(m)) {
+            if (Model.getMovieService().addMovie(m)) {
                 JOptionPane.showMessageDialog(this, "Added Movie!");
                 clearInputs();
             } else {

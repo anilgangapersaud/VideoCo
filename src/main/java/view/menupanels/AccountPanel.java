@@ -1,6 +1,6 @@
 package view.menupanels;
 
-import view.App;
+import model.Model;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -49,19 +49,19 @@ public class AccountPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("saveUsername")) {
-            if (App.getUserService().changeUsername(changeUsernameInput.getText())) {
+            if (Model.getUserService().changeUsername(changeUsernameInput.getText())) {
                 JOptionPane.showMessageDialog(this, "Changed Username!");
             } else {
                 JOptionPane.showMessageDialog(this, "Enter a valid and unique username", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getActionCommand().equals("savePassword")) {
-            if (App.getUserService().changePassword(new String(changePasswordInput.getPassword()))) {
+            if (Model.getUserService().changePassword(new String(changePasswordInput.getPassword()))) {
                 JOptionPane.showMessageDialog(this, "Changed Password!");
             } else {
                 JOptionPane.showMessageDialog(this, "Enter a valid password", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else if (e.getActionCommand().equals("saveEmail")) {
-            if (App.getUserService().changeEmail(changeEmailInput.getText())) {
+            if (Model.getUserService().changeEmail(changeEmailInput.getText())) {
                 JOptionPane.showMessageDialog(this, "Changed Email!");
             } else {
                 JOptionPane.showMessageDialog(this, "Enter a valid email", "Error", JOptionPane.ERROR_MESSAGE);

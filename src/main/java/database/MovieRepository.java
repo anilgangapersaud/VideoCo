@@ -9,10 +9,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Maintain the movie database and provide common operations on movies
@@ -51,14 +48,13 @@ public class MovieRepository {
         try {
             CSVParser parser = new CSVParser(new FileReader(MovieRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
-                    .withHeader("barcode", "title", "description", "genre", "releaseDate",
+                    .withHeader("barcode", "title", "genre", "releaseDate",
                             "quantity", "cost"));
             List<CSVRecord> records = parser.getRecords();
             for (int i = 1; i < records.size(); i++) {
                 Movie movie = new Movie();
                 movie.setBarcode(records.get(i).get("barcode"));
                 movie.setTitle(records.get(i).get("title"));
-                movie.setDescription(records.get(i).get("description"));
                 movie.setCost(Double.parseDouble(records.get(i).get("cost")));
                 movie.setQuantity(Integer.parseInt(records.get(i).get("quantity")));
                 movie.setReleaseDate(records.get(i).get("releaseDate"));
@@ -81,14 +77,13 @@ public class MovieRepository {
                         .withHeader(
                                 "barcode",
                                 "title",
-                                "description",
                                 "genre",
                                 "releaseDate",
                                 "quantity",
                                 "cost"
                         ))) {
             for (Movie m : movies) {
-                printer.printRecord(m.getBarcode(), m.getTitle(), m.getDescription(), m.getGenre(), m.getReleaseDate(),
+                printer.printRecord(m.getBarcode(), m.getTitle(), m.getGenre(), m.getReleaseDate(),
                         m.getQuantity(), m.getCost());
             }
         } catch (Exception e) {
@@ -104,7 +99,7 @@ public class MovieRepository {
     public List<Movie> findMovieByTitle(String movieTitle) {
         List<Movie> titleMatches = new ArrayList<>();
         for (Movie m : movies) {
-            if (m.getTitle().equals(movieTitle)) {
+            if (m.getTitle().toLowerCase().matches(".*" + movieTitle.toLowerCase() + ".*")) {
                 titleMatches.add(m);
             }
         }

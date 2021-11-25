@@ -1,94 +1,148 @@
 package view.menupanels;
 
+import model.Model;
 import model.movie.Movie;
-import view.App;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The store panel for customers to browse movies and add to order
+ */
 public class StorePanel extends JPanel implements ActionListener {
 
-    private String[] categories = {"Horror", "Mystery", "Adventure", "Action", "Thriller", "Comedy"};
+    /**
+     * Movie categories
+     */
+    private String[] categories = {
+            "Horror", "Mystery", "Adventure", "Action", "Thriller", "Comedy", "Sci-fi", "Drama"
+    };
 
-    JLabel searchLabel;
-    JTextField searchInput;
-    JButton searchButton;
+    /**
+     * Components for searching
+     */
+    private final JLabel searchLabel;
+    private final JTextField searchInput;
+    private final JButton searchButton;
+    private final JLabel searchCategoryLabel;
+    private final JComboBox categoryList;
+    private final JButton searchMoviesButton;
 
-    JLabel searchCategoryLabel;
-    JComboBox categoryList;
-    JButton searchCategoryButton;
+    /**
+     * Components for displaying data
+     */
+    private final JTable table;
+    private final JScrollPane scrollPane;
 
-    JButton searchMoviesButton;
-
+    /**
+     * Components for adding movie to order
+     */
+    private final JButton addMovieButton;
 
     public StorePanel() {
-        searchLabel = new JLabel("Search Movies by Title:");
-        searchInput = new JTextField(20);
+        setLayout(new BorderLayout(20, 10));
+        JPanel north = new JPanel();
+        searchLabel = new JLabel("Title:");
+        searchInput = new JTextField(10);
 
-        searchCategoryLabel = new JLabel("Search Movies by Category:");
+        searchCategoryLabel = new JLabel("Category:");
         categoryList = new JComboBox(categories);
         categoryList.addActionListener(this);
+        categoryList.setSelectedItem("");
 
-        searchCategoryButton = new JButton("Search by Category");
-        searchCategoryButton.setActionCommand("searchCategory");
-        searchCategoryButton.addActionListener(this);
-
-        searchMoviesButton = new JButton("Search All Movies");
+        searchMoviesButton = new JButton("Reset");
         searchMoviesButton.setActionCommand("searchAll");
         searchMoviesButton.addActionListener(this);
 
-        searchButton = new JButton("Search by Title");
+        searchButton = new JButton("Search");
         searchButton.setActionCommand("searchTitle");
         searchButton.addActionListener(this);
 
-        this.add(searchLabel);
-        this.add(searchInput);
-        this.add(searchButton);
-        this.add(searchCategoryLabel);
-        this.add(categoryList);
-        this.add(searchCategoryButton);
-        this.add(searchMoviesButton);
+        addMovieButton = new JButton("Add to Cart");
+        addMovieButton.setActionCommand("addMovie");
+        addMovieButton.addActionListener(this);
 
-        this.setVisible(true);
+        north.add(searchLabel);
+        north.add(searchInput);
+        north.add(searchButton);
+        north.add(searchCategoryLabel);
+        north.add(categoryList);
+        north.add(searchMoviesButton);
+        north.add(addMovieButton);
+        add(north, BorderLayout.NORTH);
+
+
+        table = new JTable();
+        List<Movie> allMovies = Model.getMovieService().getAllMovies();
+        displayResultsInTable(allMovies);
+        scrollPane = new JScrollPane(table);
+
+        add(new JPanel(), BorderLayout.WEST);
+        add(new JPanel(), BorderLayout.SOUTH);
+        add(new JPanel(), BorderLayout.EAST);
+        add(scrollPane, BorderLayout.CENTER);
+        setVisible(true);
     }
 
     public void displayResultsInTable(List<Movie> movies) {
-        String column[] = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
-        String data[][] = {
-                {"aosidjaoi", "asoidjasidasd", "asoiudhaosd", "asioudhaosd", "aosuhdoasd", "aoushdoa"}
+        DefaultTableModel tmodel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
+        String data[][] = new String[movies.size()][6];
+        String column[] = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
 
-        JTable table = new JTable(data, column);
-        table.setBounds(100,100,800,300);
+        int i = 0;
+        for (Movie m : movies) {
+            data[i][0] = m.getBarcode();
+            data[i][1] = m.getTitle();
+            data[i][2] = m.getGenre();
+            data[i][3] = m.getReleaseDate();
+            data[i][4] = String.valueOf(m.getCost());
+            data[i][5] = String.valueOf(m.getQuantity());
+            i++;
+        }
 
-        JScrollPane sp=new JScrollPane(table);
-        add(sp);
-        table.setVisible(true);
-        add(table);
-        setVisible(true);
+        tmodel.setDataVector(data, column);
+        table.setModel(tmodel);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Movie> result = new ArrayList<>();
         if (e.getActionCommand().equals("searchTitle")) {
-            result = App.getMovieService().findMovieByTitle(searchInput.getText());
-            displayResultsInTable(result);
-        } else if (e.getActionCommand().equals("searchCategory")) {
+            result = Model.getMovieService().findMovieByTitle(searchInput.getText());
+        } else if (e.getActionCommand().equals("comboBoxChanged")) {
             String category = (String) categoryList.getSelectedItem();
             if (category != null) {
-                result = App.getMovieService().getMoviesByCategory(category.toLowerCase());
+                result = Model.getMovieService().getMoviesByCategory(category.toLowerCase());
             }
         } else if (e.getActionCommand().equals("searchAll")) {
-            result = App.getMovieService().getAllMovies();
+            result = Model.getMovieService().getAllMovies();
+            searchInput.setText("");
+        }
+        if (e.getActionCommand().equals("addMovie")) {
+                int[] selected = table.getSelectedRows();
+                if (selected.length == 0) {
+                    JOptionPane.showMessageDialog(this, "No movie selected");
+                } else {
+                    // TODO:add movie to users cart
+                    JOptionPane.showMessageDialog(this, "Added movie to cart");
+                }
+                return;
         }
         if (result.isEmpty()) {
-            displayResultsInTable(null);
             JOptionPane.showMessageDialog(this, "No movies match the desired search");
+        } else {
+            displayResultsInTable(result);
         }
     }
 }

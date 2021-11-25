@@ -1,7 +1,7 @@
 package view.accountpanels;
 
+import model.Model;
 import model.user.User;
-import view.App;
 import view.cards.LoginCards;
 
 import javax.swing.*;
@@ -44,7 +44,7 @@ public class LoginPanel extends JPanel implements ActionListener {
     }
 
     private User login() {
-        return App.getUserService().login(usernameInput.getText(), new String(passwordInput.getPassword()));
+        return Model.getUserService().login(usernameInput.getText(), new String(passwordInput.getPassword()));
     }
 
     private void createView() {

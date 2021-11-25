@@ -3,6 +3,7 @@ package view.menu;
 import view.cards.ShopCards;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,7 +13,6 @@ public class AdminMenuPanel extends MenuPanel implements ActionListener {
 
     public AdminMenuPanel(ShopCards cards) {
         super(cards);
-
         inventory = new JButton("Inventory");
         inventory.setActionCommand("inventory");
         inventory.addActionListener(this);

@@ -1,7 +1,6 @@
 package view.storefrontpanels;
 
-import view.App;
-import view.StoreFront;
+import model.Model;
 import view.cards.ShopCards;
 import view.cards.StoreFrontCards;
 import view.menu.AdminMenuPanel;
@@ -26,8 +25,8 @@ public class ShopPanel extends JPanel implements ActionListener {
         this.add(shopCards, BorderLayout.CENTER);
 
         // menu
-        if (App.getUserService().getLoggedInUser() != null) {
-            if (App.getUserService().getLoggedInUser().isAdmin()) {
+        if (Model.getUserService().getLoggedInUser() != null) {
+            if (Model.getUserService().getLoggedInUser().isAdmin()) {
                 this.add(new AdminMenuPanel(shopCards), BorderLayout.NORTH);
             } else {
                 this.add(new CustomerMenuPanel(shopCards), BorderLayout.NORTH);

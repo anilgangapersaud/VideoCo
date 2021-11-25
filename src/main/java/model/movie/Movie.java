@@ -7,7 +7,6 @@ public class Movie {
 
     private String barcode;
     private String title;
-    private String description;
     private String genre;
     private String releaseDate;
     private int quantity;
@@ -17,7 +16,6 @@ public class Movie {
         this.title = title;
         this.barcode = barcode;
         this.releaseDate = releaseDate;
-        this.description = description;
         this.genre = genre;
         this.quantity = quantity;
         this.cost = cost;
@@ -47,14 +45,6 @@ public class Movie {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getGenre() {

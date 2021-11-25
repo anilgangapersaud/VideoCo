@@ -3,24 +3,21 @@ package view.menu;
 import view.cards.ShopCards;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class CustomerMenuPanel extends MenuPanel implements ActionListener {
 
-    private JButton cart, orders;
+    private JButton orders;
 
     public CustomerMenuPanel(ShopCards cards) {
         super(cards);
-        cart = new JButton("Shopping Cart");
-        cart.setActionCommand("cart");
-        cart.addActionListener(this);
 
         orders = new JButton("Orders");
         orders.setActionCommand("orders");
         orders.addActionListener(this);
 
-        add(cart);
         add(orders);
         add(welcomeMessage);
     }

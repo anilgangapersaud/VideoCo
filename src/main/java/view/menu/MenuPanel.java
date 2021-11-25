@@ -1,7 +1,7 @@
 package view.menu;
 
+import model.Model;
 import view.cards.ShopCards;
-import view.App;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -28,12 +28,13 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         store.setActionCommand("store");
         store.addActionListener(this);
 
-        welcomeMessage = new JLabel("Welcome " + App.getUserService().getLoggedInUser().getUsername() + "!");
+        welcomeMessage = new JLabel("Welcome " + Model.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
         add(store);
         add(account);
 
+        cards.getLayout().show(cards, "sp");
         this.setVisible(true);
     }
 
