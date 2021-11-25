@@ -4,6 +4,7 @@ import model.movie.Movie;
 import view.App;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -55,12 +56,28 @@ public class StorePanel extends JPanel implements ActionListener {
         this.setVisible(true);
     }
 
+    public void displayResultsInTable(List<Movie> movies) {
+        String column[] = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
+        String data[][] = {
+                {"aosidjaoi", "asoidjasidasd", "asoiudhaosd", "asioudhaosd", "aosuhdoasd", "aoushdoa"}
+        };
+
+        JTable table = new JTable(data, column);
+        table.setBounds(100,100,800,300);
+
+        JScrollPane sp=new JScrollPane(table);
+        add(sp);
+        table.setVisible(true);
+        add(table);
+        setVisible(true);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Movie> result = new ArrayList<>();
         if (e.getActionCommand().equals("searchTitle")) {
             result = App.getMovieService().findMovieByTitle(searchInput.getText());
-
+            displayResultsInTable(result);
         } else if (e.getActionCommand().equals("searchCategory")) {
             String category = (String) categoryList.getSelectedItem();
             if (category != null) {
@@ -70,6 +87,7 @@ public class StorePanel extends JPanel implements ActionListener {
             result = App.getMovieService().getAllMovies();
         }
         if (result.isEmpty()) {
+            displayResultsInTable(null);
             JOptionPane.showMessageDialog(this, "No movies match the desired search");
         }
     }

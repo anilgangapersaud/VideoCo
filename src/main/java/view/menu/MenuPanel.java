@@ -1,12 +1,9 @@
 package view.menu;
 
 import view.cards.ShopCards;
-import view.menupanels.AccountPanel;
 import view.App;
-import view.storefrontpanels.ShopPanel;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -15,7 +12,6 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
     private JButton account, logout, store;
     protected JLabel welcomeMessage;
     protected JPanel cards;
-    protected CardLayout cl;
     ShopCards shopCards;
 
     public MenuPanel(ShopCards cards) {
@@ -32,11 +28,11 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         store.setActionCommand("store");
         store.addActionListener(this);
 
-        welcomeMessage = new JLabel("Welcome " + App.getUserService().getLoggedInUser().getUsername());
+        welcomeMessage = new JLabel("Welcome " + App.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
-        add(account);
         add(store);
+        add(account);
 
         this.setVisible(true);
     }
@@ -44,11 +40,11 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("account")) {
-            cl.show(cards, "ap");
+            shopCards.getLayout().show(shopCards, "ap");
         } else if (e.getActionCommand().equals("logout")) {
             shopCards.actionPerformed(e);
         } else if (e.getActionCommand().equals("store")) {
-            cl.show(cards, "sp");
+            shopCards.getLayout().show(shopCards, "sp");
         }
     }
 }
