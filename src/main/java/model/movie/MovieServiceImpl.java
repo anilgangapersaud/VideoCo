@@ -1,8 +1,6 @@
 package model.movie;
 
 import database.MovieRepository;
-import model.movie.Movie;
-import model.movie.MovieService;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public boolean addMovie(Movie movie) {
-        return false;
+        return movieRepository.addMovie(movie);
     }
 
     @Override

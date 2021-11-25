@@ -1,11 +1,12 @@
-package view;
+package view.accountpanels;
 
 import model.user.User;
+import view.App;
+import view.cards.LoginCards;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class LoginPanel extends JPanel implements ActionListener {
 
@@ -13,12 +14,13 @@ public class LoginPanel extends JPanel implements ActionListener {
     private static final String passwordLabel = "Password:";
     private static final String loginCommand = "login";
     private static final String registerCommand = "register";
-    private static final String loginUnsuccessful = "Credentials are invalid";
+    private static final String loginUnsuccessful = "Invalid Credentials";
     private final JTextField usernameInput;
     private final JPasswordField passwordInput;
+    private LoginCards cards;
 
-
-    public LoginPanel() {
+    public LoginPanel(LoginCards cards) {
+        this.cards = cards;
         this.usernameInput = new JTextField(20);
         this.passwordInput = new JPasswordField(20);
         createView();
@@ -29,17 +31,14 @@ public class LoginPanel extends JPanel implements ActionListener {
         if (e.getActionCommand().equals(loginCommand)) {
             User user = login();
             if (user == null) {
-                JOptionPane.showMessageDialog(this, loginUnsuccessful, "Login Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.getTopLevelAncestor(), loginUnsuccessful, "Login Failed", JOptionPane.ERROR_MESSAGE);
             } else {
-                new Shop((JFrame)this.getTopLevelAncestor(), user);
+                // tell store front to swap to shop panel
+                cards.actionPerformed(e);
             }
         }
         if (e.getActionCommand().equals(registerCommand)) {
-            try {
-                new RegisterDialog((JFrame)this.getTopLevelAncestor());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            cards.getLayout().show(cards, "rp");
         }
         clearInputs();
     }

@@ -1,19 +1,19 @@
 package model.movie;
 
-import java.util.Date;
-import java.util.List;
-
+/**
+ * POJO to represent a Movie
+ */
 public class Movie {
 
-    private int barcode;
+    private String barcode;
     private String title;
     private String description;
     private String genre;
-    private Date releaseDate;
+    private String releaseDate;
     private int quantity;
     private double cost;
 
-    public Movie(String title, int barcode, Date releaseDate, String description, String genre, int quantity, double cost, List<String> actors, List<String> directors) {
+    public Movie(String title, String barcode, String releaseDate, String description, String genre, int quantity, double cost) {
         this.title = title;
         this.barcode = barcode;
         this.releaseDate = releaseDate;
@@ -33,19 +33,19 @@ public class Movie {
         this.title = title;
     }
 
-    public int getBarcode() {
+    public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(int barcode) {
+    public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
 
-    public Date getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 

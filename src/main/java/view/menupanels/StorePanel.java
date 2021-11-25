@@ -1,6 +1,7 @@
-package view;
+package view.menupanels;
 
 import model.movie.Movie;
+import view.App;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

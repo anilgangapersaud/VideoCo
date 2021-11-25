@@ -11,24 +11,50 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Maintain the User database and provide common operations on Users
+ */
 public class UserRepository {
 
-    public List<User> users = new ArrayList<>();
-    public Set<String> adminEmails = new HashSet<>();
-    public Map<String, User> userAccounts = new HashMap<>();
+    /**
+     * Maintains the current list of users in the system
+     */
+    private final List<User> users;
 
+    /**
+     * Maintains a set of admin emails that correspond to admin accounts
+     */
+    private final Set<String> adminEmails;
+
+    /**
+     * A quick way to get a User by username
+     */
+    private final Map<String, User> userAccounts;
+
+    /**
+     * Configurations for the csv file
+     */
     private static final String USER_FILE_PATH = "/src/main/resources/users.csv";
     private static final String ADMIN_FILE_PATH = "/src/main/resources/admins.csv";
     private static final String adminPath = System.getProperty("user.dir") + ADMIN_FILE_PATH;
     private static final String path = System.getProperty("user.dir") + USER_FILE_PATH;
 
+    /**
+     * Construct a UserRepository class
+     */
     public UserRepository() {
-        load(path);
+        users = new ArrayList<>();
+        adminEmails = new HashSet<>();
+        userAccounts = new HashMap<>();
+        load();
     }
 
-    public void load (String path) {
+    /**
+     * Load the data from csvs to list and map data structures
+     */
+    private void load() {
         try {
-            CSVParser parser = new CSVParser(new FileReader(path), CSVFormat.RFC4180
+            CSVParser parser = new CSVParser(new FileReader(UserRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
                     .withHeader("email", "username", "password", "account"));
             List<CSVRecord> records = parser.getRecords();
@@ -52,20 +78,31 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Register a new user
+     * @param user the new user
+     * @return {@code true} if registration successful, otherwise {@code false}
+     */
     public boolean register(User user)  {
-        if (userAccounts.containsKey(user.getUsername())) {
+        if (!validateNewUserRegistration(user)) {
             return false;
         } else {
-            users.add(user);
             if (user.getAccountType().equals("employee") && adminEmails.contains(user.getEmailAddress())) {
                 user.setAccountType("admin");
             }
+            users.add(user);
             userAccounts.put(user.getUsername(), user);
             update();
             return true;
         }
     }
 
+    /**
+     * Check user's username and password to validate login
+     * @param username user's username
+     * @param password user's password
+     * @return {@code true} if the credentials match, {@code false} otherwise
+     */
     public User login(String username, String password) {
         User u = null;
         if (userAccounts.containsKey(username)) {
@@ -76,16 +113,25 @@ public class UserRepository {
         return u;
     }
 
+    /**
+     * Change the username of an existing user
+     * @param newUsername the new username
+     * @param user the existing user
+     * @return {@code true} if the username has been successfully changed, {@code false} otherwise
+     */
     public boolean changeUsername(String newUsername, User user) {
-        if (newUsername != null &&
-                !newUsername.equals("") &&
-                !userAccounts.containsKey(newUsername) &&
-                userAccounts.containsKey(user.getUsername())) {
+        if (validateUsername(newUsername) && userAccounts.containsKey(user.getUsername())) {
+            // remove old user
             users.remove(user);
             userAccounts.remove(user.getUsername());
+
+            // update the username
             user.setUsername(newUsername);
+
+            // add the new user
             users.add(user);
             userAccounts.put(newUsername, user);
+
             update();
             return true;
         } else {
@@ -93,12 +139,25 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Change the password of an existing user
+     * @param newPassword the new password
+     * @param user the existing user
+     * @return {@code true} if the password was changed successfully, {@code false} otherwise
+     */
     public boolean changePassword(String newPassword, User user) {
-        if (newPassword != null && !newPassword.equals("") && userAccounts.containsKey(user.getUsername())) {
-            userAccounts.get(user.getUsername()).setPassword(newPassword);
+        if (validatePassword(newPassword) && userAccounts.containsKey(user.getUsername())) {
+            // remove old user
+            userAccounts.remove(user.getUsername());
             users.remove(user);
+
+            // change password
             user.setPassword(newPassword);
+
+            // add user back
             users.add(user);
+            userAccounts.put(user.getUsername(), user);
+
             update();
             return true;
         } else {
@@ -106,12 +165,25 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Change the email of an existing user
+     * @param newEmail the new email
+     * @param user the existing user
+     * @return {@code true} if the email was changed successfully, {@code false} otherwise
+     */
     public boolean changeEmail(String newEmail, User user) {
-        if (newEmail != null && !newEmail.equals("")) {
-            userAccounts.get(user.getUsername()).setEmailAddress(newEmail);
+        if (validateEmail(newEmail)) {
+            // remove the old user
+            userAccounts.remove(user.getUsername());
             users.remove(user);
+
+            // update the email address
             user.setEmailAddress(newEmail);
+
+            // add the updated user
             users.add(user);
+            userAccounts.put(user.getUsername(), user);
+
             update();
             return true;
         } else {
@@ -119,7 +191,10 @@ public class UserRepository {
         }
     }
 
-    public void update() {
+    /**
+     * Update the csv file
+     */
+    private void update() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
                 CSVFormat.RFC4180
                         .withDelimiter(',')
@@ -135,5 +210,24 @@ public class UserRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean validateUsername(String username) {
+       return username != null &&
+                !username.equals("") &&
+                !userAccounts.containsKey(username);
+    }
+
+    private boolean validateNewUserRegistration(User newUser) {
+        return validateUsername(newUser.getUsername()) && validatePassword(newUser.getPassword())
+                && validateEmail(newUser.getEmailAddress());
+    }
+
+    private boolean validatePassword(String password) {
+        return password != null && !password.equals("");
+    }
+
+    private boolean validateEmail(String email) {
+        return email != null && !email.equals("");
     }
 }

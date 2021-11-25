@@ -1,4 +1,6 @@
-package view;
+package view.menupanels;
+
+import view.App;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

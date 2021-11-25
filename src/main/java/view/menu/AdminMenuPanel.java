@@ -1,10 +1,8 @@
 package view.menu;
 
-import view.AccountPanel;
-import view.App;
+import view.cards.ShopCards;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,8 +10,10 @@ public class AdminMenuPanel extends MenuPanel implements ActionListener {
 
     private JButton inventory, manageOrders, manageAccounts;
 
-    public AdminMenuPanel() {
-        super();
+    public AdminMenuPanel(ShopCards cards) {
+        super(cards);
+
+        super.cl = cards.getLayout();
         inventory = new JButton("Inventory");
         inventory.setActionCommand("inventory");
         inventory.addActionListener(this);
@@ -40,6 +40,10 @@ public class AdminMenuPanel extends MenuPanel implements ActionListener {
             super.actionPerformed(e);
         } else if (e.getActionCommand().equals("logout")) {
             super.actionPerformed(e);
+        } else if (e.getActionCommand().equals("store")) {
+            super.actionPerformed(e);
+        } else if (e.getActionCommand().equals("inventory")) {
+            cl.show(cards, "ip");
         }
     }
 }

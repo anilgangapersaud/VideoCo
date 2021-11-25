@@ -1,7 +1,5 @@
 package model.user;
 
-import model.user.User;
-
 public interface UserService {
 
     User login(String username, String password);
