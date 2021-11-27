@@ -1,11 +1,14 @@
 package model.user;
 
+import model.Cart;
+
 public class User {
 
     private String username;
     private String password;
     private String emailAddress;
     private String accountType;
+    private Cart cart;
 
     public User(String username, String password, String emailAddress, String accountType) {
         this.username = username;
@@ -46,6 +49,13 @@ public class User {
 
     public void setAccountType(String accountType) {
         this.accountType = accountType;
+    }
+
+    public Cart getCart() {
+        if (cart == null) {
+            cart = new Cart();
+        }
+        return cart;
     }
 
     public boolean isAdmin() {

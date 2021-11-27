@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 
 public class StoreFront extends JFrame implements ActionListener {
 
+    private static final String videocoLogoPath = System.getProperty("user.dir") + "/src/main/resources/videoco_logo.jpg";
     private static final String appName = "VideoCo Inc.";
     private static final int windowWidth = 1000;
     private static final int windowHeight = 500;
@@ -20,6 +21,8 @@ public class StoreFront extends JFrame implements ActionListener {
         setTitle(appName);
         getContentPane().setBackground(Color.WHITE);
         add(new StoreFrontCards(), BorderLayout.CENTER);
+        Image icon = Toolkit.getDefaultToolkit().getImage(videocoLogoPath);
+        setIconImage(icon);
         setVisible(true);
     }
 

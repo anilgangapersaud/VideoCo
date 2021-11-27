@@ -1,7 +1,9 @@
 package view.menupanels;
 
+import model.Cart;
 import model.Model;
 import model.movie.Movie;
+import model.user.User;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -130,14 +132,31 @@ public class StorePanel extends JPanel implements ActionListener {
             searchInput.setText("");
         }
         if (e.getActionCommand().equals("addMovie")) {
-                int[] selected = table.getSelectedRows();
-                if (selected.length == 0) {
-                    JOptionPane.showMessageDialog(this, "No movie selected");
-                } else {
-                    // TODO:add movie to users cart
-                    JOptionPane.showMessageDialog(this, "Added movie to cart");
+            int[] selected = table.getSelectedRows();
+            if (selected.length == 0) {
+                JOptionPane.showMessageDialog(this, "No movie selected");
+            } else {
+                User u = Model.getUserService().getLoggedInUser();
+                Cart cart = u.getCart();
+                for (int row : selected) {
+                    // check if stock is available
+                    int stock = Integer.parseInt((String) table.getValueAt(row, 5));
+                    Movie m = new Movie();
+                    m.setBarcode((String) table.getValueAt(row, 0));
+                    m.setTitle((String) table.getValueAt(row, 1));
+                    m.setGenre((String) table.getValueAt(row, 2));
+                    m.setReleaseDate((String) table.getValueAt(row, 3));
+                    m.setCost(Double.parseDouble((String) table.getValueAt(row, 4)));
+                    m.setQuantity(stock);
+                    int quantityInCart = cart.getQuantity(m);
+                    if ((stock - quantityInCart) <= 0) {
+                        JOptionPane.showMessageDialog(this, "No stock available for the selected movie.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        cart.addMovieToCart(m, 1);
+                    }
                 }
-                return;
+            }
+            return;
         }
         if (result.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No movies match the desired search");
