@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Map;
 
 public class CartPanel extends JPanel implements ActionListener {
@@ -18,6 +19,11 @@ public class CartPanel extends JPanel implements ActionListener {
     private JButton clearCart;
     private JButton checkout;
     private JLabel totalCost;
+
+    // payment
+    private ButtonGroup paymentServices;
+    private JRadioButton loyaltyPointsOption;
+    private JRadioButton paypalOption;
 
     /**
      * Components for displaying data
@@ -33,6 +39,17 @@ public class CartPanel extends JPanel implements ActionListener {
 
         JPanel north = new JPanel();
         north.setLayout(new BorderLayout());
+
+        JLabel paymentLabel = new JLabel("Choose your payment method:");
+        loyaltyPointsOption = new JRadioButton("Loyalty Points");
+        loyaltyPointsOption.setMnemonic(KeyEvent.VK_C);
+        loyaltyPointsOption.setActionCommand("loyaltyPoints");
+        paypalOption = new JRadioButton("Paypal");
+        paypalOption.setMnemonic(KeyEvent.VK_C);
+        paypalOption.setActionCommand("paypal");
+        paymentServices = new ButtonGroup();
+        paymentServices.add(loyaltyPointsOption);
+        paymentServices.add(paypalOption);
 
         removeItem = new JButton("Remove Item");
         removeItem.addActionListener(this);
@@ -56,16 +73,19 @@ public class CartPanel extends JPanel implements ActionListener {
         JPanel northBar = new JPanel();
         northBar.add(removeItem);
         northBar.add(clearCart);
-        northBar.add(checkout);
-        northBar.add(totalCost);
 
-        JPanel west = new JPanel();
-        west.setLayout(new BorderLayout());
-        west.add(new JPanel(), BorderLayout.WEST);
-        west.add(scrollPane, BorderLayout.CENTER);
-        west.add(northBar, BorderLayout.NORTH);
-        west.add(new JPanel(), BorderLayout.EAST);
-        add(west, BorderLayout.CENTER);
+        JPanel southBar = new JPanel();
+        southBar.add(paymentLabel);
+        southBar.add(paypalOption);
+        southBar.add(loyaltyPointsOption);
+        southBar.add(totalCost);
+        southBar.add(checkout);
+
+        add(scrollPane, BorderLayout.CENTER);
+        add(northBar, BorderLayout.NORTH);
+        add(new JPanel(), BorderLayout.WEST);
+        add(new JPanel(), BorderLayout.EAST);
+        add(southBar, BorderLayout.SOUTH);
         setVisible(true);
     }
 
@@ -116,6 +136,13 @@ public class CartPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("clearCart")) {
             Model.getUserService().getLoggedInUser().getCart().clearCart();
             updateCart();
+        } else if (e.getActionCommand().equals("checkout")) {
+            if (Model.getUserService().getLoggedInUser().getCart().getMoviesInCart().size() == 0) {
+                // empty cart
+                JOptionPane.showMessageDialog(this, "No items in the cart");
+            } else {
+
+            }
         }
     }
 }

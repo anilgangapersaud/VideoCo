@@ -9,12 +9,14 @@ public class User {
     private String emailAddress;
     private String accountType;
     private Cart cart;
+    private int loyaltyPoints;
 
     public User(String username, String password, String emailAddress, String accountType) {
         this.username = username;
         this.password = password;
         this.emailAddress = emailAddress;
         this.accountType = accountType;
+        loyaltyPoints = 0;
     }
 
     public User() {}
@@ -49,6 +51,14 @@ public class User {
 
     public void setAccountType(String accountType) {
         this.accountType = accountType;
+    }
+
+    public int getLoyaltyPoints() {
+        return loyaltyPoints;
+    }
+
+    public void setLoyaltyPoints(int loyaltyPoints) {
+        this.loyaltyPoints = loyaltyPoints;
     }
 
     public Cart getCart() {

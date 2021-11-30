@@ -17,11 +17,6 @@ import java.util.*;
 public class UserRepository {
 
     /**
-     * Maintains the current list of users in the system
-     */
-    private final List<User> users;
-
-    /**
      * Maintains a set of admin emails that correspond to admin accounts
      */
     private final Set<String> adminEmails;
@@ -43,7 +38,6 @@ public class UserRepository {
      * Construct a UserRepository class
      */
     public UserRepository() {
-        users = new ArrayList<>();
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
         load();
@@ -56,7 +50,7 @@ public class UserRepository {
         try {
             CSVParser parser = new CSVParser(new FileReader(UserRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
-                    .withHeader("email", "username", "password", "account"));
+                    .withHeader("email", "username", "password", "account", "loyaltyPoints"));
             List<CSVRecord> records = parser.getRecords();
             for (int i = 1; i < records.size(); i++) {
                 User user = new User();
@@ -64,7 +58,7 @@ public class UserRepository {
                 user.setEmailAddress(records.get(i).get("email"));
                 user.setPassword(records.get(i).get("password"));
                 user.setAccountType(records.get(i).get("account"));
-                users.add(user);
+                user.setLoyaltyPoints(Integer.parseInt(records.get(i).get("loyaltyPoints")));
                 userAccounts.put(records.get(i).get("username"), user);
             }
 
@@ -90,7 +84,6 @@ public class UserRepository {
             if (user.getAccountType().equals("employee") && adminEmails.contains(user.getEmailAddress())) {
                 user.setAccountType("admin");
             }
-            users.add(user);
             userAccounts.put(user.getUsername(), user);
             update();
             return true;
@@ -122,14 +115,12 @@ public class UserRepository {
     public boolean changeUsername(String newUsername, User user) {
         if (validateUsername(newUsername) && userAccounts.containsKey(user.getUsername())) {
             // remove old user
-            users.remove(user);
             userAccounts.remove(user.getUsername());
 
             // update the username
             user.setUsername(newUsername);
 
             // add the new user
-            users.add(user);
             userAccounts.put(newUsername, user);
 
             update();
@@ -149,13 +140,11 @@ public class UserRepository {
         if (validatePassword(newPassword) && userAccounts.containsKey(user.getUsername())) {
             // remove old user
             userAccounts.remove(user.getUsername());
-            users.remove(user);
 
             // change password
             user.setPassword(newPassword);
 
             // add user back
-            users.add(user);
             userAccounts.put(user.getUsername(), user);
 
             update();
@@ -175,13 +164,11 @@ public class UserRepository {
         if (validateEmail(newEmail)) {
             // remove the old user
             userAccounts.remove(user.getUsername());
-            users.remove(user);
 
             // update the email address
             user.setEmailAddress(newEmail);
 
             // add the updated user
-            users.add(user);
             userAccounts.put(user.getUsername(), user);
 
             update();
@@ -202,10 +189,12 @@ public class UserRepository {
                 "email",
                 "username",
                 "password",
-                "account"
+                "account",
+                                "loyaltyPoints"
         ))) {
-            for (User u : users) {
-                printer.printRecord(u.getEmailAddress(), u.getUsername(), u.getPassword(), u.getAccountType());
+            for (Map.Entry<String,User> entry : userAccounts.entrySet()) {
+                User u = entry.getValue();
+                printer.printRecord(u.getEmailAddress(), u.getUsername(), u.getPassword(), u.getAccountType(), u.getLoyaltyPoints());
             }
         } catch (Exception e) {
             e.printStackTrace();

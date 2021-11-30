@@ -34,7 +34,7 @@ public class LoginCards extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("login")) {
-            panel.getStoreFront().addShopPanel();
+            panel.getStoreFront(). addShopPanel();
             panel.actionPerformed(e);
         }
     }
