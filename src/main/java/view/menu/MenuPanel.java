@@ -20,7 +20,7 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         logout.setActionCommand("logout");
         logout.addActionListener(this);
 
-        account = new JButton("Account");
+        account = new JButton("Account Details");
         account.setActionCommand("account");
         account.addActionListener(this);
 
@@ -46,6 +46,8 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
             shopCards.actionPerformed(e);
         } else if (e.getActionCommand().equals("store")) {
             shopCards.getLayout().show(shopCards, "sp");
+        } else if (e.getActionCommand().equals("cart")) {
+            shopCards.getLayout().show(shopCards, "cp");
         }
     }
 }

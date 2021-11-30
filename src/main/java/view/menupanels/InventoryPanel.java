@@ -1,5 +1,6 @@
 package view.menupanels;
 
+import view.cards.ShopCards;
 import view.dialog.AddMovieDialog;
 
 import javax.swing.*;
@@ -8,7 +9,10 @@ import java.awt.event.ActionListener;
 
 public class InventoryPanel extends JPanel implements ActionListener {
 
-    public InventoryPanel() {
+    private ShopCards shopCards;
+
+    public InventoryPanel(ShopCards cards) {
+        shopCards = cards;
         JButton addMovieButton = new JButton("Add Movie");
         addMovieButton.setActionCommand("addMovie");
         addMovieButton.addActionListener(this);

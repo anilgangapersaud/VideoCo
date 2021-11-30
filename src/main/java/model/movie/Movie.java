@@ -7,70 +7,104 @@ import java.util.Objects;
  */
 public class Movie {
 
+    /**
+     * Movie ID
+     */
     private String barcode;
+
+    /**
+     * Movie title
+     */
     private String title;
+
+    /**
+     * Movie genre
+     */
     private String genre;
+
+    /**
+     * Movie Release Date
+     */
     private String releaseDate;
-    private int quantity;
-    private double cost;
 
-    public Movie(String title, String barcode, String releaseDate, String description, String genre, int quantity, double cost) {
-        this.title = title;
-        this.barcode = barcode;
-        this.releaseDate = releaseDate;
-        this.genre = genre;
-        this.quantity = quantity;
-        this.cost = cost;
-    }
+    /**
+     * Cost of movie
+     */
+    private double price;
 
+    /**
+     * Construct an empty movie object
+     */
     public Movie() {}
 
+    /**
+     * @return title of movie
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * @param title movie title
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * @return the movie id
+     */
     public String getBarcode() {
         return barcode;
     }
 
+    /**
+     * @param barcode the movie id
+     */
     public void setBarcode(String barcode) {
         this.barcode = barcode;
     }
 
+    /**
+     * @return the release date of the movie
+     */
     public String getReleaseDate() {
         return releaseDate;
     }
 
+    /**
+     * @param releaseDate the release date of the movie
+     */
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
+    /**
+     * @return movie genre
+     */
     public String getGenre() {
         return genre;
     }
 
+    /**
+     * @param genre the movie genre
+     */
     public void setGenre(String genre) {
         this.genre = genre;
     }
 
-    public int getQuantity() {
-        return quantity;
+    /**
+     * @return the price of the movie
+     */
+    public double getPrice() {
+        return price;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getCost() {
-        return cost;
-    }
-
-    public void setCost(double cost) {
-        this.cost = cost;
+    /**
+     * @param cost the cost of the movie
+     */
+    public void setPrice(double cost) {
+        this.price = cost;
     }
 
     @Override
@@ -85,4 +119,5 @@ public class Movie {
     public int hashCode() {
         return Objects.hash(barcode, title);
     }
+
 }

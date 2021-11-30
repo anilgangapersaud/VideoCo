@@ -4,15 +4,15 @@ import model.Cart;
 import model.Model;
 import model.movie.Movie;
 import model.user.User;
+import view.cards.ShopCards;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The store panel for customers to browse movies and add to order
@@ -47,7 +47,10 @@ public class StorePanel extends JPanel implements ActionListener {
      */
     private final JButton addMovieButton;
 
-    public StorePanel() {
+    private ShopCards shopCards;
+
+    public StorePanel(ShopCards cards) {
+        shopCards = cards;
         setLayout(new BorderLayout(20, 10));
         JPanel north = new JPanel();
         searchLabel = new JLabel("Title:");
@@ -81,7 +84,7 @@ public class StorePanel extends JPanel implements ActionListener {
 
 
         table = new JTable();
-        List<Movie> allMovies = Model.getMovieService().getAllMovies();
+        Map<Movie,Integer> allMovies = Model.getMovieService().getAllMovies();
         displayResultsInTable(allMovies);
         scrollPane = new JScrollPane(table);
 
@@ -92,24 +95,25 @@ public class StorePanel extends JPanel implements ActionListener {
         setVisible(true);
     }
 
-    public void displayResultsInTable(List<Movie> movies) {
+    public void displayResultsInTable(Map<Movie,Integer> movies) {
         DefaultTableModel tmodel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        String data[][] = new String[movies.size()][6];
-        String column[] = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
+        String[][] data = new String[movies.size()][6];
+        String[] column = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
 
         int i = 0;
-        for (Movie m : movies) {
+        for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
+            Movie m = entry.getKey();
             data[i][0] = m.getBarcode();
             data[i][1] = m.getTitle();
             data[i][2] = m.getGenre();
             data[i][3] = m.getReleaseDate();
-            data[i][4] = String.valueOf(m.getCost());
-            data[i][5] = String.valueOf(m.getQuantity());
+            data[i][4] = String.valueOf(m.getPrice());
+            data[i][5] = String.valueOf(entry.getValue());
             i++;
         }
 
@@ -119,7 +123,7 @@ public class StorePanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<Movie> result = new ArrayList<>();
+        Map<Movie,Integer> result = new HashMap<>();
         if (e.getActionCommand().equals("searchTitle")) {
             result = Model.getMovieService().findMovieByTitle(searchInput.getText());
         } else if (e.getActionCommand().equals("comboBoxChanged")) {
@@ -146,13 +150,13 @@ public class StorePanel extends JPanel implements ActionListener {
                     m.setTitle((String) table.getValueAt(row, 1));
                     m.setGenre((String) table.getValueAt(row, 2));
                     m.setReleaseDate((String) table.getValueAt(row, 3));
-                    m.setCost(Double.parseDouble((String) table.getValueAt(row, 4)));
-                    m.setQuantity(stock);
+                    m.setPrice(Double.parseDouble((String) table.getValueAt(row, 4)));
                     int quantityInCart = cart.getQuantity(m);
                     if ((stock - quantityInCart) <= 0) {
                         JOptionPane.showMessageDialog(this, "No stock available for the selected movie.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         cart.addMovieToCart(m, 1);
+                        shopCards.getCartPanel().updateCart();
                     }
                 }
             }

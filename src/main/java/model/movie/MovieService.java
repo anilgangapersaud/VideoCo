@@ -1,6 +1,6 @@
 package model.movie;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * MovieService interface for common operations on movies
@@ -12,20 +12,20 @@ public interface MovieService {
      * @param movieTitle title of movie to search
      * @return a list of movies that match the title
      */
-    List<Movie> findMovieByTitle(String movieTitle);
+    Map<Movie,Integer> findMovieByTitle(String movieTitle);
 
     /**
      * Get movies by category
      * @param genre the category to search
      * @return a list of movies that match the category
      */
-    List<Movie> getMoviesByCategory(String genre);
+    Map<Movie,Integer> getMoviesByCategory(String genre);
 
     /**
      * Get all movies in the system
      * @return a list of all movies
      */
-    List<Movie> getAllMovies();
+    Map<Movie,Integer> getAllMovies();
 
     /**
      * Adds a movie to the database

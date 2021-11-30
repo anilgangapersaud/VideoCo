@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 public class CustomerMenuPanel extends MenuPanel implements ActionListener {
 
     private JButton orders;
+    private JButton cart;
 
     public CustomerMenuPanel(ShopCards cards) {
         super(cards);
@@ -18,6 +19,11 @@ public class CustomerMenuPanel extends MenuPanel implements ActionListener {
         orders.setActionCommand("orders");
         orders.addActionListener(this);
 
+        cart = new JButton("Cart");
+        cart.setActionCommand("cart");
+        cart.addActionListener(this);
+
+        add(cart);
         add(orders);
         add(welcomeMessage);
     }
@@ -29,6 +35,8 @@ public class CustomerMenuPanel extends MenuPanel implements ActionListener {
         } else if (e.getActionCommand().equals("logout")) {
             super.actionPerformed(e);
         } else if (e.getActionCommand().equals("account")) {
+            super.actionPerformed(e);
+        } else if (e.getActionCommand().equals("cart")) {
             super.actionPerformed(e);
         }
     }

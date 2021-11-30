@@ -19,12 +19,7 @@ public class MovieRepository {
     /**
      * Maintains the current list of movies in the system
      */
-    private final List<Movie> movies;
-
-    /**
-     * A quick way to check if a movie exists in the system by barcode mapping
-     */
-    private final Map<String, Movie> movieMap;
+    private final Map<Movie, Integer> movieDatabase;
 
     /**
      * Configurations for the csv file
@@ -36,8 +31,7 @@ public class MovieRepository {
      * Construct a MovieRepository class
      */
     public MovieRepository() {
-        movies = new ArrayList<>();
-        movieMap = new HashMap<>();
+        movieDatabase = new HashMap<>();
         load();
     }
 
@@ -52,15 +46,14 @@ public class MovieRepository {
                             "quantity", "cost"));
             List<CSVRecord> records = parser.getRecords();
             for (int i = 1; i < records.size(); i++) {
+                int quantity = Integer.parseInt(records.get(i).get("quantity"));
                 Movie movie = new Movie();
                 movie.setBarcode(records.get(i).get("barcode"));
                 movie.setTitle(records.get(i).get("title"));
-                movie.setCost(Double.parseDouble(records.get(i).get("cost")));
-                movie.setQuantity(Integer.parseInt(records.get(i).get("quantity")));
+                movie.setPrice(Double.parseDouble(records.get(i).get("cost")));
                 movie.setReleaseDate(records.get(i).get("releaseDate"));
                 movie.setGenre(records.get(i).get("genre"));
-                movies.add(movie);
-                movieMap.put(movie.getBarcode(), movie);
+                movieDatabase.put(movie, quantity);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,9 +75,9 @@ public class MovieRepository {
                                 "quantity",
                                 "cost"
                         ))) {
-            for (Movie m : movies) {
-                printer.printRecord(m.getBarcode(), m.getTitle(), m.getGenre(), m.getReleaseDate(),
-                        m.getQuantity(), m.getCost());
+            for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
+                Movie movie = entry.getKey();
+                printer.printRecord(movie.getBarcode(), movie.getTitle(), movie.getGenre(), movie.getReleaseDate(), entry.getValue(), movie.getPrice());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,11 +89,12 @@ public class MovieRepository {
      * @param movieTitle the title to search
      * @return a list of movies matching the title search
      */
-    public List<Movie> findMovieByTitle(String movieTitle) {
-        List<Movie> titleMatches = new ArrayList<>();
-        for (Movie m : movies) {
+    public Map<Movie,Integer> findMovieByTitle(String movieTitle) {
+        Map<Movie,Integer> titleMatches = new HashMap<>();
+        for (Map.Entry<Movie, Integer> entry : movieDatabase.entrySet()) {
+            Movie m = entry.getKey();
             if (m.getTitle().toLowerCase().matches(".*" + movieTitle.toLowerCase() + ".*")) {
-                titleMatches.add(m);
+                titleMatches.put(entry.getKey(), entry.getValue());
             }
         }
         return titleMatches;
@@ -111,11 +105,12 @@ public class MovieRepository {
      * @param genre the genre to match
      * @return a list of movies matching the category search
      */
-    public List<Movie> getMoviesByCategory(String genre) {
-        List<Movie> genreMatches = new ArrayList<>();
-        for (Movie m : movies) {
+    public Map<Movie,Integer> getMoviesByCategory(String genre) {
+        Map<Movie,Integer> genreMatches = new HashMap<>();
+        for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
+            Movie m = entry.getKey();
             if (m.getGenre().equals(genre)) {
-                genreMatches.add(m);
+                genreMatches.put(entry.getKey(), entry.getValue());
             }
         }
         return genreMatches;
@@ -124,8 +119,8 @@ public class MovieRepository {
     /**
      * @return a list of all movies in the database
      */
-    public List<Movie> getAllMovies() {
-        return this.movies;
+    public Map<Movie,Integer> getAllMovies() {
+        return new HashMap<>(movieDatabase);
     }
 
     /**
@@ -135,8 +130,11 @@ public class MovieRepository {
      */
     public boolean addMovie(Movie movie) {
         if (validateMovie(movie)) {
-            movies.add(movie);
-            movieMap.put(movie.getBarcode(), movie);
+            if (movieDatabase.containsKey(movie)) {
+                movieDatabase.replace(movie,movieDatabase.get(movie)+1);
+            } else {
+                movieDatabase.put(movie, 1);
+            }
             update();
             return true;
         } else {
@@ -148,6 +146,6 @@ public class MovieRepository {
      * Validates the movie object
      */
     private boolean validateMovie(Movie m) {
-        return m.getBarcode() != null && !m.getBarcode().equals("") && m.getQuantity() >= 0 && m.getCost() >= 0.00D;
+        return m.getBarcode() != null && !m.getBarcode().equals("") && m.getPrice() >= 0.00D;
     }
 }

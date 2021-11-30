@@ -93,8 +93,7 @@ public class AddMovieDialog extends JDialog implements ActionListener {
             m.setBarcode(barcodeInput.getText());
             m.setTitle(movieTitleInput.getText());
             m.setGenre((String) categoryList.getSelectedItem());
-            m.setCost(Double.parseDouble(costInput.getText()));
-            m.setQuantity(Integer.parseInt(quantityInput.getText()));
+            m.setPrice(Double.parseDouble(costInput.getText()));
             m.setReleaseDate(releaseDate.getText());
             if (Model.getMovieService().addMovie(m)) {
                 JOptionPane.showMessageDialog(this, "Added Movie!");

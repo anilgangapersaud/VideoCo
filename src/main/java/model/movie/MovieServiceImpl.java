@@ -2,7 +2,7 @@ package model.movie;
 
 import database.MovieRepository;
 
-import java.util.List;
+import java.util.Map;
 
 public class MovieServiceImpl implements MovieService {
 
@@ -13,17 +13,17 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<Movie> findMovieByTitle(String movieTitle) {
+    public Map<Movie,Integer> findMovieByTitle(String movieTitle) {
         return movieRepository.findMovieByTitle(movieTitle);
     }
 
     @Override
-    public List<Movie> getMoviesByCategory(String genre) {
+    public Map<Movie,Integer> getMoviesByCategory(String genre) {
         return movieRepository.getMoviesByCategory(genre);
     }
 
     @Override
-    public List<Movie> getAllMovies() {
+    public Map<Movie,Integer> getAllMovies() {
         return movieRepository.getAllMovies();
     }
 

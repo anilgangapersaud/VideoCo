@@ -1,6 +1,7 @@
 package view.menupanels;
 
 import model.Model;
+import view.cards.ShopCards;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -11,8 +12,10 @@ public class AccountPanel extends JPanel implements ActionListener {
     private JTextField changeUsernameInput;
     private JPasswordField changePasswordInput;
     private JTextField changeEmailInput;
+    private ShopCards shopCards;
 
-    public AccountPanel() {
+    public AccountPanel(ShopCards cards) {
+        shopCards = cards;
         JLabel changeUsernameLabel = new JLabel("Change Username:");
         changeUsernameInput = new JTextField(20);
         JButton changeUsernameButton = new JButton("Save Username");
