@@ -33,10 +33,4 @@ public interface MovieService {
      * @return {@code true} if the movie was added successfully, {@code false} otherwise
      */
     boolean addMovie(Movie movie);
-
-    boolean deleteMovie(int barcode);
-
-    boolean updateMovie(Movie movie);
-
-    Movie getMovie(int barcode);
 }

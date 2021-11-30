@@ -1,4 +1,4 @@
-package model;
+package model.user;
 
 import model.movie.Movie;
 import java.util.HashMap;

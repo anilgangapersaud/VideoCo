@@ -1,8 +1,10 @@
 package view.menupanels;
 
-import model.Cart;
+import model.user.Address;
+import model.user.Cart;
 import model.Model;
 import model.movie.Movie;
+import model.user.User;
 import view.cards.ShopCards;
 
 import javax.swing.*;
@@ -25,16 +27,19 @@ public class CartPanel extends JPanel implements ActionListener {
     private JRadioButton loyaltyPointsOption;
     private JRadioButton paypalOption;
 
+    // error messages
+    private static final String EMPTY_CART_ERROR = "No items in the cart.";
+    private static final String NO_ITEM_SELECTED_ERROR = "No item selected.";
+    private static final String NO_ADDRESS_ERROR = "No address on file. Please update your address in Account Details.";
+    private static final String INVALID_PAYMENT_ERROR = "Invalid Payment. Please try again.";
+
     /**
      * Components for displaying data
      */
     private final JTable table;
     private final JScrollPane scrollPane;
 
-    private ShopCards shopCards;
-
     public CartPanel(ShopCards cards) {
-        shopCards = cards;
         setLayout(new BorderLayout(20, 10));
 
         JPanel north = new JPanel();
@@ -122,7 +127,7 @@ public class CartPanel extends JPanel implements ActionListener {
         if (e.getActionCommand().equals("removeItem")) {
             int[] selected = table.getSelectedRows();
             if (selected.length == 0) {
-                JOptionPane.showMessageDialog(this, "No item selected");
+                JOptionPane.showMessageDialog(this, NO_ITEM_SELECTED_ERROR);
             } else {
                 Cart userCart = Model.getUserService().getLoggedInUser().getCart();
                 for (int row : selected) {
@@ -137,11 +142,20 @@ public class CartPanel extends JPanel implements ActionListener {
             Model.getUserService().getLoggedInUser().getCart().clearCart();
             updateCart();
         } else if (e.getActionCommand().equals("checkout")) {
-            if (Model.getUserService().getLoggedInUser().getCart().getMoviesInCart().size() == 0) {
-                // empty cart
-                JOptionPane.showMessageDialog(this, "No items in the cart");
+            User u = Model.getUserService().getLoggedInUser();
+            Address userAddress = Model.getAddressService().getAddress(u.getUsername());
+            ButtonModel buttonModel = paymentServices.getSelection();
+            if (buttonModel != null) {
+                if (u.getCart().getMoviesInCart().size() == 0) {
+                    JOptionPane.showMessageDialog(this, EMPTY_CART_ERROR);
+                } else if (userAddress == null) {
+                    JOptionPane.showMessageDialog(this, NO_ADDRESS_ERROR, "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // create order
+                    Model.getOrderService().createOrder(userAddress);
+                }
             } else {
-
+                JOptionPane.showMessageDialog(this, INVALID_PAYMENT_ERROR, "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

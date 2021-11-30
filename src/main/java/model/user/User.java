@@ -1,7 +1,5 @@
 package model.user;
 
-import model.Cart;
-
 public class User {
 
     private String username;

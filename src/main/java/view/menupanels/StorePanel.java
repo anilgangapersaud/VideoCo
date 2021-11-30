@@ -1,6 +1,6 @@
 package view.menupanels;
 
-import model.Cart;
+import model.user.Cart;
 import model.Model;
 import model.movie.Movie;
 import model.user.User;

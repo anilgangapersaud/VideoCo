@@ -1,5 +1,7 @@
 package database;
 
+import model.Model;
+import model.user.Address;
 import model.user.User;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -115,10 +117,15 @@ public class UserRepository {
     public boolean changeUsername(String newUsername, User user) {
         if (validateUsername(newUsername) && userAccounts.containsKey(user.getUsername())) {
             // remove old user
+            String oldUsername = user.getUsername();
             userAccounts.remove(user.getUsername());
 
             // update the username
             user.setUsername(newUsername);
+            Address a = Model.getAddressService().getAddress(oldUsername);
+            a.setUsername(newUsername);
+            Model.getAddressService().deleteAddress(oldUsername);
+            Model.getAddressService().saveAddress(a);
 
             // add the new user
             userAccounts.put(newUsername, user);

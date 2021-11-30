@@ -33,7 +33,6 @@ public class LoginPanel extends JPanel implements ActionListener {
             if (user == null) {
                 JOptionPane.showMessageDialog(this.getTopLevelAncestor(), loginUnsuccessful, "Login Failed", JOptionPane.ERROR_MESSAGE);
             } else {
-                // tell store front to swap to shop panel
                 cards.actionPerformed(e);
             }
         }

@@ -4,6 +4,7 @@ import model.Model;
 import view.cards.AccountCards;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,8 @@ public class EditAccountPanel extends JPanel implements ActionListener {
 
     private AccountCards cards;
 
-    private JLabel accountDetails;
+    private JLabel accountInformation;
+
     // username
     private JLabel username;
     private String customerName;
@@ -54,16 +56,11 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         customerEmail = Model.getUserService().getLoggedInUser().getEmailAddress();
         customerLoyaltyPoints = Model.getUserService().getLoggedInUser().getLoyaltyPoints();
 
-        accountDetails = new JLabel("Account Details");
-        JPanel account = new JPanel();
-        account.add(accountDetails, Component.CENTER_ALIGNMENT);
-
         // change username
         username = new JLabel("Username:");
         nameInput = new JTextField(20);
         nameInput.setText(customerName);
         nameInput.setEditable(false);
-        nameInput.setBackground(Color.LIGHT_GRAY);
         editName = new JButton("Edit");
         editName.setActionCommand("editName");
         editName.addActionListener(this);
@@ -85,7 +82,6 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         passwordInput = new JPasswordField(18);
         passwordInput.setText(customerPassword);
         passwordInput.setEditable(false);
-        passwordInput.setBackground(Color.LIGHT_GRAY);
         passwordInput.setEchoChar('*');
         editPassword = new JButton("Edit");
         editPassword.setActionCommand("editPassword");
@@ -108,7 +104,6 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         emailInput = new JTextField(20);
         emailInput.setText(customerEmail);
         emailInput.setEditable(false);
-        emailInput.setBackground(Color.LIGHT_GRAY);
         editEmail = new JButton("Edit");
         editEmail.setActionCommand("editEmail");
         editEmail.addActionListener(this);
@@ -149,8 +144,17 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         buttons.add(Box.createHorizontalStrut(horizontalStrutSize));
         buttons.add(address);
 
+        accountInformation = new JLabel("Account Information");
+        accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         Box box = Box.createVerticalBox();
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(30,30,30,30),
+                BorderFactory.createLoweredBevelBorder()
+        ));
+
+        box.add(accountInformation);
+        box.add(Box.createVerticalStrut(verticalStrutSize));
         box.add(lpPanel);
         box.add(Box.createVerticalStrut(verticalStrutSize));
         box.add(changeUsername);
@@ -172,10 +176,8 @@ public class EditAccountPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("editName")) {
             nameInput.setEditable(true);
-            nameInput.setBackground(Color.WHITE);
         } else if (e.getActionCommand().equals("saveName")) {
             nameInput.setEditable(false);
-            nameInput.setBackground(Color.LIGHT_GRAY);
             boolean result = Model.getUserService().changeUsername(nameInput.getText());
             if (result) {
                 JOptionPane.showMessageDialog(this, "Changed Username");
@@ -185,11 +187,9 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("editPassword")) {
             passwordInput.setEchoChar((char) 0);
             passwordInput.setEditable(true);
-            passwordInput.setBackground(Color.WHITE);
         } else if (e.getActionCommand().equals("savePassword")) {
             passwordInput.setEditable(false);
             passwordInput.setEchoChar('*');
-            passwordInput.setBackground(Color.LIGHT_GRAY);
             boolean result = Model.getUserService().changePassword(new String(passwordInput.getPassword()));
             if (result) {
                 JOptionPane.showMessageDialog(this, "Changed Password");
@@ -198,16 +198,17 @@ public class EditAccountPanel extends JPanel implements ActionListener {
             }
         } else if (e.getActionCommand().equals("editEmail")) {
             emailInput.setEditable(true);
-            emailInput.setBackground(Color.WHITE);
         } else if (e.getActionCommand().equals("saveEmail")) {
             emailInput.setEditable(false);
-            emailInput.setBackground(Color.LIGHT_GRAY);
             boolean result = Model.getUserService().changeEmail(emailInput.getText());
             if (result) {
                 JOptionPane.showMessageDialog(this, "Changed Email");
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid Email", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } else if (e.getActionCommand().equals("address")) {
+            CardLayout cl = (CardLayout) cards.getLayout();
+            cl.show(cards, "eadp");
         }
     }
 }

@@ -17,7 +17,7 @@ public class AccountCards extends JPanel implements ActionListener {
        cl = new CardLayout();
        setLayout(cl);
        EditAccountPanel eacp = new EditAccountPanel(this);
-       EditAddressPanel eadp = new EditAddressPanel();
+       EditAddressPanel eadp = new EditAddressPanel(this);
        EditBillingPanel ebp = new EditBillingPanel();
 
        add(eacp, "eacp");
