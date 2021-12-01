@@ -1,7 +1,7 @@
-import model.movie.MovieService;
-import model.movie.MovieServiceImpl;
-import model.user.UserService;
-import model.user.UserServiceImpl;
+import services.MovieService;
+import services.MovieServiceImpl;
+import services.UserService;
+import services.UserServiceImpl;
 import view.StoreFront;
 
 public class App {

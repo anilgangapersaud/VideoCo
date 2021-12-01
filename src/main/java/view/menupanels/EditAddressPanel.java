@@ -1,7 +1,7 @@
 package view.menupanels;
 
 import model.Model;
-import model.user.Address;
+import model.Address;
 import view.cards.AccountCards;
 
 import javax.swing.*;

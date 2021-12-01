@@ -1,4 +1,6 @@
-package model.movie;
+package services;
+
+import model.Movie;
 
 import java.util.Map;
 

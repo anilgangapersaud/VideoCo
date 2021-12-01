@@ -1,6 +1,6 @@
-package model.user;
+package model;
 
-import model.movie.Movie;
+import model.Movie;
 import java.util.HashMap;
 import java.util.Map;
 

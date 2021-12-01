@@ -1,6 +1,6 @@
 package database;
 
-import model.movie.Movie;
+import model.Movie;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Maintain the movie database and provide common operations on movies
  */
-public class MovieRepository {
+public class MovieRepository implements DatabaseAccess {
 
     /**
      * Maintains the current list of movies in the system
@@ -38,7 +38,8 @@ public class MovieRepository {
     /**
      * Load the data from csv to list and map data structures
      */
-    private void load() {
+    @Override
+    public void load() {
         try {
             CSVParser parser = new CSVParser(new FileReader(MovieRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -63,6 +64,7 @@ public class MovieRepository {
     /**
      * Update the data in the csv file
      */
+    @Override
     public void update() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
                 CSVFormat.RFC4180

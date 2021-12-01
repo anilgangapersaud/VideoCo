@@ -1,9 +1,9 @@
 package view.menupanels;
 
-import model.user.Cart;
+import model.Cart;
 import model.Model;
-import model.movie.Movie;
-import model.user.User;
+import model.Movie;
+import model.User;
 import view.cards.ShopCards;
 
 import javax.swing.*;

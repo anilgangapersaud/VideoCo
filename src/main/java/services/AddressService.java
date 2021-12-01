@@ -1,4 +1,6 @@
-package model.user;
+package services;
+
+import model.Address;
 
 public interface AddressService {
 

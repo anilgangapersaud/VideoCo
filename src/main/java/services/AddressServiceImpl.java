@@ -1,6 +1,7 @@
-package model.user;
+package services;
 
 import database.AddressRepository;
+import model.Address;
 
 public class AddressServiceImpl implements AddressService {
 

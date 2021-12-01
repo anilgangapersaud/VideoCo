@@ -1,7 +1,7 @@
 package view.accountpanels;
 
 import model.Model;
-import model.user.User;
+import model.User;
 import view.cards.LoginCards;
 
 import javax.swing.*;

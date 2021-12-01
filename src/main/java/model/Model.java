@@ -1,10 +1,6 @@
 package model;
 
-import model.movie.MovieService;
-import model.movie.MovieServiceImpl;
-import model.order.OrderService;
-import model.order.OrderServiceImpl;
-import model.user.*;
+import services.*;
 
 public class Model {
 

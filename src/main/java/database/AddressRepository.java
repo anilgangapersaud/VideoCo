@@ -1,6 +1,6 @@
 package database;
 
-import model.user.Address;
+import model.Address;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Persist addresses in csv files and perform CRUD
  */
-public class AddressRepository {
+public class AddressRepository implements DatabaseAccess {
 
     /**
      * Stores the addresses by username
@@ -40,7 +40,8 @@ public class AddressRepository {
     /**
      * load the address data into the map
      */
-    private void load() {
+    @Override
+    public void load() {
         try {
             CSVParser parser = new CSVParser(new FileReader(AddressRepository.addressPath), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -63,7 +64,8 @@ public class AddressRepository {
     /**
      * update the csv file
      */
-    private void update() {
+    @Override
+    public void update() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(addressPath, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader(

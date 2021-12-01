@@ -1,7 +1,7 @@
 package view.dialog;
 
 import model.Model;
-import model.movie.Movie;
+import model.Movie;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

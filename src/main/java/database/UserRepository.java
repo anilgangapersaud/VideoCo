@@ -1,8 +1,8 @@
 package database;
 
 import model.Model;
-import model.user.Address;
-import model.user.User;
+import model.Address;
+import model.User;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Maintain the User database and provide common operations on Users
  */
-public class UserRepository {
+public class UserRepository implements DatabaseAccess {
 
     /**
      * Maintains a set of admin emails that correspond to admin accounts
@@ -48,7 +48,8 @@ public class UserRepository {
     /**
      * Load the data from csvs to list and map data structures
      */
-    private void load() {
+    @Override
+    public void load() {
         try {
             CSVParser parser = new CSVParser(new FileReader(UserRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -188,7 +189,8 @@ public class UserRepository {
     /**
      * Update the csv file
      */
-    private void update() {
+    @Override
+    public void update() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
                 CSVFormat.RFC4180
                         .withDelimiter(',')

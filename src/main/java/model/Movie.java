@@ -1,4 +1,4 @@
-package model.movie;
+package model;
 
 import java.util.Objects;
 

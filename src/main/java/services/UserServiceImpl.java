@@ -1,8 +1,8 @@
-package model.user;
+package services;
 
 import database.UserRepository;
-import model.user.User;
-import model.user.UserService;
+import model.User;
+import services.UserService;
 
 public class UserServiceImpl implements UserService {
 

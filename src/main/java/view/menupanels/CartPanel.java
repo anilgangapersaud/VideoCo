@@ -1,10 +1,12 @@
 package view.menupanels;
 
-import model.user.Address;
-import model.user.Cart;
+import model.Address;
+import model.Cart;
 import model.Model;
-import model.movie.Movie;
-import model.user.User;
+import model.Movie;
+import model.User;
+import model.payments.LoyaltyPoints;
+import services.PaymentService;
 import view.cards.ShopCards;
 
 import javax.swing.*;
@@ -152,7 +154,11 @@ public class CartPanel extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(this, NO_ADDRESS_ERROR, "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     // create order
-                    Model.getOrderService().createOrder(userAddress);
+                    PaymentService paymentMethod = null;
+                    if (buttonModel.getActionCommand().equals("loyaltyPoints")) {
+                        paymentMethod = new LoyaltyPoints(u.getLoyaltyPoints());
+                    }
+                    Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
                 }
             } else {
                 JOptionPane.showMessageDialog(this, INVALID_PAYMENT_ERROR, "Error", JOptionPane.ERROR_MESSAGE);

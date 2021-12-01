@@ -1,4 +1,6 @@
-package model.user;
+package services;
+
+import model.User;
 
 public interface UserService {
 

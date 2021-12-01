@@ -1,6 +1,7 @@
-package model.movie;
+package services;
 
 import database.MovieRepository;
+import model.Movie;
 
 import java.util.Map;
 
@@ -30,20 +31,5 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public boolean addMovie(Movie movie) {
         return movieRepository.addMovie(movie);
-    }
-
-    @Override
-    public boolean deleteMovie(int barcode) {
-        return false;
-    }
-
-    @Override
-    public boolean updateMovie(Movie movie) {
-        return false;
-    }
-
-    @Override
-    public Movie getMovie(int barcode) {
-        return null;
     }
 }
