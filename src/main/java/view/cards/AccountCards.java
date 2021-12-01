@@ -1,7 +1,7 @@
 package view.cards;
 
-import view.menupanels.EditAccountPanel;
-import view.menupanels.EditAddressPanel;
+import view.shoppanels.EditAccountPanel;
+import view.shoppanels.EditAddressPanel;
 import view.menupanels.EditBillingPanel;
 
 import javax.swing.*;

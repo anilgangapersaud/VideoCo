@@ -145,12 +145,11 @@ public class AddressRepository implements DatabaseAccess {
     }
 
     /**
-     * validate address fields
+     * validate address fields checks if any empty fields
      * @param address the address to validate
      * @return validation
      */
     private boolean validateAddress(Address address) {
-        // check if all fields are non null or empty
         return !address.getLineAddress().equals("") && !address.getCity().equals("")
                 && !address.getProvince().equals("") && !address.getPostalCode().equals("")
                 && !address.getUsername().equals("");

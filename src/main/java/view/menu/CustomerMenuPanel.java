@@ -37,6 +37,8 @@ public class CustomerMenuPanel extends MenuPanel implements ActionListener {
             super.actionPerformed(e);
         } else if (e.getActionCommand().equals("cart")) {
             super.actionPerformed(e);
+        } else if (e.getActionCommand().equals("orders")) {
+            super.actionPerformed(e);
         }
     }
 }

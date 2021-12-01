@@ -1,9 +1,9 @@
 package view.cards;
 
-import view.menupanels.EditAccountPanel;
-import view.menupanels.CartPanel;
+import view.shoppanels.CartPanel;
 import view.menupanels.InventoryPanel;
-import view.menupanels.StorePanel;
+import view.shoppanels.OrderPanel;
+import view.shoppanels.StorePanel;
 import view.storefrontpanels.ShopPanel;
 
 import javax.swing.*;
@@ -19,6 +19,7 @@ public class ShopCards extends JPanel implements ActionListener {
     private InventoryPanel ip;
     private StorePanel sp;
     private CartPanel cp;
+    private OrderPanel op;
 
     public ShopCards(ShopPanel shopPanel) {
         this.shopPanel = shopPanel;
@@ -29,11 +30,13 @@ public class ShopCards extends JPanel implements ActionListener {
         ip = new InventoryPanel(this);
         sp = new StorePanel(this);
         cp = new CartPanel(this);
+        op = new OrderPanel(this);
 
         add(ap, "ap");
         add(ip, "ip");
         add(sp, "sp");
         add(cp, "cp");
+        add(op, "op");
 
         setVisible(true);
     }
@@ -58,6 +61,8 @@ public class ShopCards extends JPanel implements ActionListener {
     public CartPanel getCartPanel() {
         return cp;
     }
+
+    public OrderPanel getOrderPanel() { return op; }
 
 
     @Override

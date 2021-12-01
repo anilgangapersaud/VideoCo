@@ -1,14 +1,14 @@
 barcode,title,genre,releaseDate,quantity,cost
-6,Boyhood,drama,02/23/18,1,16.99
-4,Arrival,sci-fi,02/13/18,1,13.99
-9,IT,horror,02/05/18,2,18.99
+6,Boyhood,drama,02/23/18,0,16.99
+4,Arrival,sci-fi,02/13/18,0,13.99
+9,IT,horror,02/05/18,1,18.99
 13,Harry Potter,adventure,02/13/18,1,8.99
 25,Rush Hour,comedy,08/25/18,6,3.99
-23,Home Alone,comedy,11/21/09,29,5.99
+23,Home Alone,comedy,11/21/09,10,5.99
 10,Blade Runner 2049,sci-fi,02/11/18,5,11.99
 27,Rush Hour 3,comedy,11/21/09,14,5.99
 5,Interstellar,sci-fi,02/09/18,1,19.99
-12,Mother!,horror,02/22/18,3,8.99
+12,Mother!,horror,02/22/18,2,8.99
 15,Dune,sci-fi,05/03/13,1,4.99
 7,Blade Runner,sci-fi,02/25/18,2,14.99
 18,Pokemon 2000,adventure,02/03/03,19,1.99
@@ -17,7 +17,7 @@ barcode,title,genre,releaseDate,quantity,cost
 17,The Dark Knight,action,12/11/11,19,10.99
 24,Moonlight,drama,05/31/15,8,6.99
 8,Dunkirk,action,02/07/18,2,15.99
-19,Lord of the Rings,sci-fi,11/09/14,4,9.99
+19,Lord of the Rings,sci-fi,11/09/14,3,9.99
 2,Parasite,drama,02/01/18,4,17.99
 14,Halloween,horror,02/23/20,6,5.99
 26,Rush Hour 2,comedy,05/11/19,11,15.99

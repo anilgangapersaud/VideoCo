@@ -48,6 +48,8 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
             shopCards.getLayout().show(shopCards, "sp");
         } else if (e.getActionCommand().equals("cart")) {
             shopCards.getLayout().show(shopCards, "cp");
+        } else if (e.getActionCommand().equals("orders")) {
+            shopCards.getLayout().show(shopCards, "op");
         }
     }
 }

@@ -50,6 +50,9 @@ public class UserRepository implements DatabaseAccess {
         load();
     }
 
+    /**
+     * @return get the singleton instance of this class
+     */
     public static UserRepository getInstance() {
         if (userRepositoryInstance == null) {
             userRepositoryInstance = new UserRepository();
@@ -57,9 +60,6 @@ public class UserRepository implements DatabaseAccess {
         return userRepositoryInstance;
     }
 
-    /**
-     * Load the data from csvs to list and map data structures
-     */
     @Override
     public void load() {
         try {
@@ -83,6 +83,27 @@ public class UserRepository implements DatabaseAccess {
                 adminEmails.add(adminRecords.get(i).get("email"));
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void update() {
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
+                CSVFormat.RFC4180
+                        .withDelimiter(',')
+                        .withHeader(
+                                "email",
+                                "username",
+                                "password",
+                                "account",
+                                "loyaltyPoints"
+                        ))) {
+            for (Map.Entry<String,User> entry : userAccounts.entrySet()) {
+                User u = entry.getValue();
+                printer.printRecord(u.getEmailAddress(), u.getUsername(), u.getPassword(), u.getAccountType(), u.getLoyaltyPoints());
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -121,6 +142,11 @@ public class UserRepository implements DatabaseAccess {
         return u;
     }
 
+    /**
+     * update a user in the database
+     * @param u the user to update
+     * @return true if successful, false otherwise
+     */
     public boolean updateUser(User u) {
         if (userAccounts.containsKey(u.getUsername())) {
             userAccounts.replace(u.getUsername(), u);
@@ -184,6 +210,10 @@ public class UserRepository implements DatabaseAccess {
         }
     }
 
+    /**
+     * give a loyalty point to a user
+     * @param username the user receiving the loyalty point
+     */
     public void awardLoyaltyPoint(String username) {
         User u = userAccounts.get(username);
         u.setLoyaltyPoints(u.getLoyaltyPoints()+1);
@@ -212,30 +242,6 @@ public class UserRepository implements DatabaseAccess {
             return true;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Update the csv file
-     */
-    @Override
-    public void update() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
-                CSVFormat.RFC4180
-                        .withDelimiter(',')
-                        .withHeader(
-                "email",
-                "username",
-                "password",
-                "account",
-                                "loyaltyPoints"
-        ))) {
-            for (Map.Entry<String,User> entry : userAccounts.entrySet()) {
-                User u = entry.getValue();
-                printer.printRecord(u.getEmailAddress(), u.getUsername(), u.getPassword(), u.getAccountType(), u.getLoyaltyPoints());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

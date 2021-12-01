@@ -10,6 +10,7 @@ import model.Order;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 public class OrderServiceImpl implements OrderService {
 
@@ -54,6 +55,7 @@ public class OrderServiceImpl implements OrderService {
                 o.setUsername(shipping.getUsername());
                 o.setOverdue(false);
                 o.setDueDate(getDueDate());
+                o.setMovies(cart.getMoviesInCart());
                 orderRepository.createOrder(o);
                 return true;
             } else {
@@ -62,5 +64,15 @@ public class OrderServiceImpl implements OrderService {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public List<Order> getOrdersByCustomer(String username) {
+        return orderRepository.getOrdersByCustomer(username);
+    }
+
+    @Override
+    public boolean cancelOrder(int orderNumber) {
+        return orderRepository.cancelOrder(orderNumber);
     }
 }

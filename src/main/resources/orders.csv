@@ -1,13 +1,1 @@
 orderNumber,username,orderStatus,orderDate,dueDate,isOverdue
-0,customer,PROCESSED,01/12/21,15/12/21,false
-1,customer,PROCESSED,01/12/21,15/12/21,false
-2,customer,PROCESSED,01/12/21,15/12/21,false
-3,customer,PROCESSED,01/12/21,15/12/21,false
-4,customer,PROCESSED,01/12/21,15/12/21,false
-5,customer,PROCESSED,01/12/21,15/12/21,false
-6,customer,PROCESSED,01/12/21,15/12/21,false
-7,customer,PROCESSED,01/12/21,15/12/21,false
-8,customer,PROCESSED,01/12/21,15/12/21,false
-9,customer,PROCESSED,01/12/21,15/12/21,false
-10,customer,PROCESSED,01/12/21,15/12/21,false
-11,customer,PROCESSED,01/12/21,15/12/21,false

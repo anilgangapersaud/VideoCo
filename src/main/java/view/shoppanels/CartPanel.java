@@ -1,4 +1,4 @@
-package view.menupanels;
+package view.shoppanels;
 
 import model.Address;
 import model.Cart;
@@ -52,9 +52,6 @@ public class CartPanel extends JPanel implements ActionListener {
     public CartPanel(ShopCards cards) {
         this.cards = cards;
         setLayout(new BorderLayout(20, 10));
-
-        JPanel north = new JPanel();
-        north.setLayout(new BorderLayout());
 
         JLabel paymentLabel = new JLabel("Choose your payment method:");
         loyaltyPointsOption = new JRadioButton("Loyalty Points");
@@ -144,6 +141,7 @@ public class CartPanel extends JPanel implements ActionListener {
         updateCart();
         displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
         cards.getStorePanel().displayAllMovies();
+        cards.getOrderPanel().updateTable();
     }
 
     @Override

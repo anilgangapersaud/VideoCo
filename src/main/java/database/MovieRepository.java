@@ -22,7 +22,12 @@ public class MovieRepository implements DatabaseAccess {
     private final Map<Movie, Integer> movieDatabase;
 
     /**
-     * Singleton instances
+     * Barcode to movie mapping
+     */
+    private final Map<String, Movie> barcodeToMovieMap;
+
+    /**
+     * Singleton instance
      */
     private static MovieRepository movieRepositoryInstance = null;
 
@@ -37,9 +42,14 @@ public class MovieRepository implements DatabaseAccess {
      */
     private MovieRepository() {
         movieDatabase = new HashMap<>();
+        barcodeToMovieMap = new HashMap<>();
         load();
     }
 
+    /**
+     * Return the singleton instance of this class
+     * @return the single MovieRepository
+     */
     public static MovieRepository getInstance() {
         if (movieRepositoryInstance == null) {
             movieRepositoryInstance = new MovieRepository();
@@ -47,9 +57,6 @@ public class MovieRepository implements DatabaseAccess {
         return movieRepositoryInstance;
     }
 
-    /**
-     * Load the data from csv to list and map data structures
-     */
     @Override
     public void load() {
         try {
@@ -67,15 +74,13 @@ public class MovieRepository implements DatabaseAccess {
                 movie.setReleaseDate(records.get(i).get("releaseDate"));
                 movie.setGenre(records.get(i).get("genre"));
                 movieDatabase.put(movie, quantity);
+                barcodeToMovieMap.put(movie.getBarcode(), movie);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Update the data in the csv file
-     */
     @Override
     public void update() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
@@ -156,15 +161,17 @@ public class MovieRepository implements DatabaseAccess {
         }
     }
 
+    /**
+     * Given a map of movies and quantities to rent, update the database accordingly
+     * @param movies the movies to rent
+     * @return true if successful, false otherwise
+     */
     public boolean rentMovies(Map<Movie,Integer> movies) {
         for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
             // check if the stock is available and remove it from the database
             if (movieDatabase.containsKey(entry.getKey())) {
                 if (entry.getValue() <= movieDatabase.get(entry.getKey())) {
                     movieDatabase.replace(entry.getKey(), movieDatabase.get(entry.getKey()) - entry.getValue());
-                    if (movieDatabase.get(entry.getKey()) == 0) {
-                        movieDatabase.remove(entry.getKey());
-                    }
                 } else {
                     return false;
                 }
@@ -174,6 +181,15 @@ public class MovieRepository implements DatabaseAccess {
         }
         update();
         return true;
+    }
+
+    /**
+     * return a single movie to the database given the barcode of the movie
+     * @param barcode the barcode of movie to return
+     */
+    public void returnMovie(String barcode) {
+        Movie m = barcodeToMovieMap.get(barcode);
+        movieDatabase.replace(m, movieDatabase.get(m) + 1);
     }
 
     /**

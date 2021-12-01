@@ -1,4 +1,4 @@
-package view.menupanels;
+package view.shoppanels;
 
 import model.Cart;
 import model.Model;

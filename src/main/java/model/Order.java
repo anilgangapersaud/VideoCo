@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Map;
+
 public class Order {
     private int orderId;
     private String username;
@@ -7,8 +9,17 @@ public class Order {
     private String orderDate;
     private String dueDate;
     private boolean isOverdue;
+    private Map<Movie,Integer> movies;
 
     public Order() {}
+
+    public Map<Movie, Integer> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(Map<Movie, Integer> movies) {
+        this.movies = movies;
+    }
 
     public int getOrderId() {
         return orderId;
