@@ -24,6 +24,11 @@ public class UserRepository implements DatabaseAccess {
     private final Set<String> adminEmails;
 
     /**
+     * Singleton instance
+     */
+    private static UserRepository userRepositoryInstance = null;
+
+    /**
      * A quick way to get a User by username
      */
     private final Map<String, User> userAccounts;
@@ -39,10 +44,17 @@ public class UserRepository implements DatabaseAccess {
     /**
      * Construct a UserRepository class
      */
-    public UserRepository() {
+    private UserRepository() {
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
         load();
+    }
+
+    public static UserRepository getInstance() {
+        if (userRepositoryInstance == null) {
+            userRepositoryInstance = new UserRepository();
+        }
+        return userRepositoryInstance;
     }
 
     /**
@@ -109,6 +121,16 @@ public class UserRepository implements DatabaseAccess {
         return u;
     }
 
+    public boolean updateUser(User u) {
+        if (userAccounts.containsKey(u.getUsername())) {
+            userAccounts.replace(u.getUsername(), u);
+            update();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Change the username of an existing user
      * @param newUsername the new username
@@ -160,6 +182,13 @@ public class UserRepository implements DatabaseAccess {
         } else {
             return false;
         }
+    }
+
+    public void awardLoyaltyPoint(String username) {
+        User u = userAccounts.get(username);
+        u.setLoyaltyPoints(u.getLoyaltyPoints()+1);
+        userAccounts.replace(username, u);
+        update();
     }
 
     /**

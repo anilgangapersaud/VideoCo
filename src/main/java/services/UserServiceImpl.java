@@ -10,7 +10,7 @@ public class UserServiceImpl implements UserService {
     User loggedInUser;
 
     public UserServiceImpl() {
-        userRepository = new UserRepository();
+        userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -60,5 +60,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteAccount(String username) {
         return false;
+    }
+
+    @Override
+    public boolean updateUser(User u) {
+        return userRepository.updateUser(u);
     }
 }

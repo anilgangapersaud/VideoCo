@@ -20,9 +20,18 @@ public class OrderRepository implements DatabaseAccess {
     private static final String ORDER_FILE_PATH = "/src/main/resources/orders.csv";
     private static final String orderPath = System.getProperty("user.dir") + ORDER_FILE_PATH;
 
-    public OrderRepository() {
+    private static OrderRepository orderRepositoryInstance = null;
+
+    private OrderRepository() {
         orderDatabase = new HashMap<>();
         load();
+    }
+
+    public static OrderRepository getInstance() {
+        if (orderRepositoryInstance == null) {
+            orderRepositoryInstance = new OrderRepository();
+        }
+        return orderRepositoryInstance;
     }
 
     @Override
@@ -73,6 +82,16 @@ public class OrderRepository implements DatabaseAccess {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean createOrder(Order o) {
+        orderDatabase.put(o.getOrderId(), o);
+        update();
+        return true;
+    }
+
+    public int getTotalOrders() {
+        return orderDatabase.size();
     }
 }
 

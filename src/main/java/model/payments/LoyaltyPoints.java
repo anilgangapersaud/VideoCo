@@ -1,5 +1,6 @@
 package model.payments;
 
+import model.Model;
 import model.Movie;
 import services.PaymentService;
 
@@ -18,7 +19,13 @@ public class LoyaltyPoints implements PaymentService {
         for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
             totalMovies += entry.getValue();
         }
-
-        return loyaltyPoints >= (totalMovies * 10);
+        if (loyaltyPoints >= totalMovies * 10) {
+            int deduction = totalMovies * 10;
+            Model.getUserService().getLoggedInUser().setLoyaltyPoints(loyaltyPoints - deduction);
+            Model.getUserService().updateUser(Model.getUserService().getLoggedInUser());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -24,6 +24,11 @@ public class AddressRepository implements DatabaseAccess {
     private final Map<String, Address> addressDatabase;
 
     /**
+     * Singleton instance of this class
+     */
+    private static AddressRepository addressRepositoryInstance = null;
+
+    /**
      * configs
      */
     private static final String ADDRESS_FILE_PATH = "/src/main/resources/addresses.csv";
@@ -32,9 +37,16 @@ public class AddressRepository implements DatabaseAccess {
     /**
      * Initialize the address repo
      */
-    public AddressRepository() {
+    private AddressRepository() {
         addressDatabase = new HashMap<>();
         load();
+    }
+
+    public static AddressRepository getInstance() {
+        if (addressRepositoryInstance == null) {
+            addressRepositoryInstance = new AddressRepository();
+        }
+        return addressRepositoryInstance;
     }
 
     /**

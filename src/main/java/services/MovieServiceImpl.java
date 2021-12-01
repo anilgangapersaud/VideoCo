@@ -10,7 +10,7 @@ public class MovieServiceImpl implements MovieService {
     MovieRepository movieRepository;
 
     public MovieServiceImpl() {
-        movieRepository = new MovieRepository();
+        movieRepository = MovieRepository.getInstance();
     }
 
     @Override

@@ -8,7 +8,7 @@ public class AddressServiceImpl implements AddressService {
     private AddressRepository addressRepository;
 
     public AddressServiceImpl() {
-        addressRepository = new AddressRepository();
+        addressRepository = AddressRepository.getInstance();
     }
 
     @Override

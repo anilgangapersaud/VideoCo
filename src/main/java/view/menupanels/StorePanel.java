@@ -84,8 +84,9 @@ public class StorePanel extends JPanel implements ActionListener {
 
 
         table = new JTable();
-        Map<Movie,Integer> allMovies = Model.getMovieService().getAllMovies();
-        displayResultsInTable(allMovies);
+
+        displayAllMovies();
+
         scrollPane = new JScrollPane(table);
 
         add(new JPanel(), BorderLayout.WEST);
@@ -93,6 +94,11 @@ public class StorePanel extends JPanel implements ActionListener {
         add(new JPanel(), BorderLayout.EAST);
         add(scrollPane, BorderLayout.CENTER);
         setVisible(true);
+    }
+
+    public void displayAllMovies() {
+        Map<Movie,Integer> movies = Model.getMovieService().getAllMovies();
+        displayResultsInTable(movies);
     }
 
     public void displayResultsInTable(Map<Movie,Integer> movies) {

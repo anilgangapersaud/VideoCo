@@ -22,6 +22,11 @@ public class MovieRepository implements DatabaseAccess {
     private final Map<Movie, Integer> movieDatabase;
 
     /**
+     * Singleton instances
+     */
+    private static MovieRepository movieRepositoryInstance = null;
+
+    /**
      * Configurations for the csv file
      */
     private static final String MOVIE_FILE_PATH = "/src/main/resources/movies.csv";
@@ -30,9 +35,16 @@ public class MovieRepository implements DatabaseAccess {
     /**
      * Construct a MovieRepository class
      */
-    public MovieRepository() {
+    private MovieRepository() {
         movieDatabase = new HashMap<>();
         load();
+    }
+
+    public static MovieRepository getInstance() {
+        if (movieRepositoryInstance == null) {
+            movieRepositoryInstance = new MovieRepository();
+        }
+        return movieRepositoryInstance;
     }
 
     /**
@@ -122,7 +134,7 @@ public class MovieRepository implements DatabaseAccess {
      * @return a list of all movies in the database
      */
     public Map<Movie,Integer> getAllMovies() {
-        return new HashMap<>(movieDatabase);
+        return movieDatabase;
     }
 
     /**
@@ -142,6 +154,26 @@ public class MovieRepository implements DatabaseAccess {
         } else {
             return false;
         }
+    }
+
+    public boolean rentMovies(Map<Movie,Integer> movies) {
+        for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
+            // check if the stock is available and remove it from the database
+            if (movieDatabase.containsKey(entry.getKey())) {
+                if (entry.getValue() <= movieDatabase.get(entry.getKey())) {
+                    movieDatabase.replace(entry.getKey(), movieDatabase.get(entry.getKey()) - entry.getValue());
+                    if (movieDatabase.get(entry.getKey()) == 0) {
+                        movieDatabase.remove(entry.getKey());
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        update();
+        return true;
     }
 
     /**

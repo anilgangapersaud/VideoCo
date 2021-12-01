@@ -20,15 +20,22 @@ import java.util.Map;
 
 public class CartPanel extends JPanel implements ActionListener {
 
+    private ShopCards cards;
+
     private JButton removeItem;
     private JButton clearCart;
     private JButton checkout;
     private JLabel totalCost;
+    private double customerTotal;
+    private JLabel displayLoyaltyPoints;
+    private int customerLoyaltyPoints;
+    private JLabel loyaltyPointsLabel;
 
     // payment
     private ButtonGroup paymentServices;
     private JRadioButton loyaltyPointsOption;
     private JRadioButton creditCardOption;
+
 
     // error messages
     private static final String EMPTY_CART_ERROR = "No items in the cart.";
@@ -43,6 +50,7 @@ public class CartPanel extends JPanel implements ActionListener {
     private final JScrollPane scrollPane;
 
     public CartPanel(ShopCards cards) {
+        this.cards = cards;
         setLayout(new BorderLayout(20, 10));
 
         JPanel north = new JPanel();
@@ -71,6 +79,10 @@ public class CartPanel extends JPanel implements ActionListener {
         checkout.addActionListener(this);
         checkout.setActionCommand("checkout");
 
+        loyaltyPointsLabel = new JLabel("Loyalty Points:");
+        customerLoyaltyPoints = Model.getUserService().getLoggedInUser().getLoyaltyPoints();
+        displayLoyaltyPoints = new JLabel(String.valueOf(customerLoyaltyPoints));
+
         table = new JTable();
         updateCart();
 
@@ -81,6 +93,8 @@ public class CartPanel extends JPanel implements ActionListener {
         JPanel northBar = new JPanel();
         northBar.add(removeItem);
         northBar.add(clearCart);
+        northBar.add(loyaltyPointsLabel);
+        northBar.add(displayLoyaltyPoints);
 
         JPanel southBar = new JPanel();
         southBar.add(paymentLabel);
@@ -117,12 +131,19 @@ public class CartPanel extends JPanel implements ActionListener {
             tempCost += entry.getKey().getPrice() * entry.getValue();
             i++;
         }
+        customerTotal = tempCost;
         if (totalCost == null) {
             totalCost = new JLabel("");
         }
-        totalCost.setText(String.format("Total: %.2f", tempCost));
+        totalCost.setText(String.format("Total: %.2f", customerTotal));
         tmodel.setDataVector(data,column);
         table.setModel(tmodel);
+    }
+
+    private void updateView() {
+        updateCart();
+        displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
+        cards.getStorePanel().displayAllMovies();
     }
 
     @Override
@@ -138,7 +159,7 @@ public class CartPanel extends JPanel implements ActionListener {
                     m.setBarcode((String) table.getValueAt(row, 0));
                     m.setTitle((String) table.getValueAt(row, 1));
                     userCart.removeMovieFromCart(m);
-                    updateCart();
+                    updateView();
                 }
             }
         } else if (e.getActionCommand().equals("clearCart")) {
@@ -165,6 +186,7 @@ public class CartPanel extends JPanel implements ActionListener {
                     if (paymentAccepted) {
                         JOptionPane.showMessageDialog(this, "Order Created!");
                         u.getCart().clearCart();
+                        updateView();
                     } else {
                         JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
                     }
