@@ -5,6 +5,7 @@ import model.Cart;
 import model.Model;
 import model.Movie;
 import model.User;
+import model.payments.CreditCard;
 import model.payments.LoyaltyPoints;
 import services.PaymentService;
 import view.cards.ShopCards;
@@ -27,7 +28,7 @@ public class CartPanel extends JPanel implements ActionListener {
     // payment
     private ButtonGroup paymentServices;
     private JRadioButton loyaltyPointsOption;
-    private JRadioButton paypalOption;
+    private JRadioButton creditCardOption;
 
     // error messages
     private static final String EMPTY_CART_ERROR = "No items in the cart.";
@@ -51,12 +52,12 @@ public class CartPanel extends JPanel implements ActionListener {
         loyaltyPointsOption = new JRadioButton("Loyalty Points");
         loyaltyPointsOption.setMnemonic(KeyEvent.VK_C);
         loyaltyPointsOption.setActionCommand("loyaltyPoints");
-        paypalOption = new JRadioButton("Paypal");
-        paypalOption.setMnemonic(KeyEvent.VK_C);
-        paypalOption.setActionCommand("paypal");
+        creditCardOption = new JRadioButton("Credit Card");
+        creditCardOption.setMnemonic(KeyEvent.VK_C);
+        creditCardOption.setActionCommand("creditCard");
         paymentServices = new ButtonGroup();
         paymentServices.add(loyaltyPointsOption);
-        paymentServices.add(paypalOption);
+        paymentServices.add(creditCardOption);
 
         removeItem = new JButton("Remove Item");
         removeItem.addActionListener(this);
@@ -83,7 +84,7 @@ public class CartPanel extends JPanel implements ActionListener {
 
         JPanel southBar = new JPanel();
         southBar.add(paymentLabel);
-        southBar.add(paypalOption);
+        southBar.add(creditCardOption);
         southBar.add(loyaltyPointsOption);
         southBar.add(totalCost);
         southBar.add(checkout);
@@ -157,8 +158,16 @@ public class CartPanel extends JPanel implements ActionListener {
                     PaymentService paymentMethod = null;
                     if (buttonModel.getActionCommand().equals("loyaltyPoints")) {
                         paymentMethod = new LoyaltyPoints(u.getLoyaltyPoints());
+                    } else if (buttonModel.getActionCommand().equals("creditCard")) {
+                        paymentMethod = new CreditCard();
                     }
-                    Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
+                    boolean paymentAccepted = Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
+                    if (paymentAccepted) {
+                        JOptionPane.showMessageDialog(this, "Order Created!");
+                        u.getCart().clearCart();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(this, INVALID_PAYMENT_ERROR, "Error", JOptionPane.ERROR_MESSAGE);

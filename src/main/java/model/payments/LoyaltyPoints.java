@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class LoyaltyPoints implements PaymentService {
 
-    int loyaltyPoints;
+    private int loyaltyPoints;
 
     public LoyaltyPoints(int loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;
@@ -19,6 +19,6 @@ public class LoyaltyPoints implements PaymentService {
             totalMovies += entry.getValue();
         }
 
-        return loyaltyPoints <= (totalMovies * 10);
+        return loyaltyPoints >= (totalMovies * 10);
     }
 }
