@@ -142,6 +142,8 @@ public class CartPanel extends JPanel implements ActionListener {
         displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
         cards.getStorePanel().displayAllMovies();
         cards.getOrderPanel().updateTable();
+        cards.getAccountPanel().getAccountPanel().updateLoyaltyPoints();
+        cards.getAccountPanel().getBillingPanel().updateBalance();
     }
 
     @Override
@@ -178,15 +180,19 @@ public class CartPanel extends JPanel implements ActionListener {
                     if (buttonModel.getActionCommand().equals("loyaltyPoints")) {
                         paymentMethod = new LoyaltyPoints(u.getLoyaltyPoints());
                     } else if (buttonModel.getActionCommand().equals("creditCard")) {
-                        paymentMethod = new CreditCard();
+                        paymentMethod = Model.getBillingService().getCreditCard(u.getUsername());
                     }
-                    boolean paymentAccepted = Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
-                    if (paymentAccepted) {
-                        JOptionPane.showMessageDialog(this, "Order Created!");
-                        u.getCart().clearCart();
-                        updateView();
+                    if (paymentMethod == null) {
+                        JOptionPane.showMessageDialog(this, "No credit card on file. Add a credit card in Account Details", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
+                        boolean paymentAccepted = Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
+                        if (paymentAccepted) {
+                            JOptionPane.showMessageDialog(this, "Order Created!");
+                            u.getCart().clearCart();
+                            updateView();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             } else {

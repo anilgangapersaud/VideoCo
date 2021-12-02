@@ -13,12 +13,18 @@ public class AccountCards extends JPanel {
 
    protected CardLayout cl;
 
+   private EditAccountPanel eacp;
+
+   private EditAddressPanel eadp;
+
+   private EditBillingPanel ebp;
+
    public AccountCards() {
        cl = new CardLayout();
        setLayout(cl);
-       EditAccountPanel eacp = new EditAccountPanel(this);
-       EditAddressPanel eadp = new EditAddressPanel(this);
-       EditBillingPanel ebp = new EditBillingPanel();
+       eacp = new EditAccountPanel(this);
+       eadp = new EditAddressPanel(this);
+       ebp = new EditBillingPanel(this);
 
        add(eacp, "eacp");
        add(ebp, "ebp");
@@ -27,5 +33,17 @@ public class AccountCards extends JPanel {
        cl.show(this, "eacp");
 
        setVisible(true);
+   }
+
+   public EditAccountPanel getAccountPanel() {
+       return eacp;
+   }
+
+   public EditBillingPanel getBillingPanel() {
+       return ebp;
+   }
+
+   public EditAddressPanel getAddressPanel() {
+       return eadp;
    }
 }

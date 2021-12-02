@@ -43,11 +43,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public boolean createOrder(Cart cart, PaymentService paymentMethod, Address shipping) {
         if (paymentMethod.pay(cart.getMoviesInCart())) {
-            // remove the stock from the movie repository
             if (movieRepository.rentMovies(cart.getMoviesInCart())) {
-                // give the customer a loyalty point
                 userRepository.awardLoyaltyPoint(shipping.getUsername());
-                // create the order
                 Order o = new Order();
                 o.setOrderId(orderRepository.getTotalOrders());
                 o.setOrderDate(getDate());

@@ -3,6 +3,7 @@ package view.shoppanels;
 import model.Model;
 import view.cards.AccountCards;
 
+import javax.smartcardio.Card;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,8 @@ public class EditAccountPanel extends JPanel implements ActionListener {
     private final JPasswordField passwordInput;
 
     private final JTextField emailInput;
+
+    JLabel loyaltyPoints;
 
     public EditAccountPanel(AccountCards cards) {
         this.cards = cards;
@@ -89,7 +92,7 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         changeEmail.add(saveEmail);
 
         JLabel loyaltyPointsLabel = new JLabel("Loyalty Points:");
-        JLabel loyaltyPoints = new JLabel(String.valueOf(customerLoyaltyPoints));
+        loyaltyPoints = new JLabel(String.valueOf(customerLoyaltyPoints));
         JPanel lpPanel = new JPanel();
         lpPanel.setLayout(new BoxLayout(lpPanel, BoxLayout.X_AXIS));
         lpPanel.add(loyaltyPointsLabel);
@@ -142,6 +145,10 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         setVisible(true);
     }
 
+    public void updateLoyaltyPoints() {
+        loyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("editName")) {
@@ -179,6 +186,9 @@ public class EditAccountPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("address")) {
             CardLayout cl = (CardLayout) cards.getLayout();
             cl.show(cards, "eadp");
+        } else if (e.getActionCommand().equals("billing")) {
+            CardLayout cl = (CardLayout) cards.getLayout();
+            cl.show(cards, "ebp");
         }
     }
 }

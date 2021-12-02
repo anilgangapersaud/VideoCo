@@ -190,7 +190,6 @@ public class MovieRepository implements DatabaseAccess {
      */
     public boolean rentMovies(Map<Movie,Integer> movies) {
         for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
-            // check if the stock is available and remove it from the database
             if (movieDatabase.containsKey(entry.getKey())) {
                 if (entry.getValue() <= movieDatabase.get(entry.getKey())) {
                     movieDatabase.replace(entry.getKey(), movieDatabase.get(entry.getKey()) - entry.getValue());
@@ -252,7 +251,7 @@ public class MovieRepository implements DatabaseAccess {
         if (barcodeToMovieMap.containsKey(m.getBarcode())) {
             return false;
         } else {
-            return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
+            return validateMovieUpdate(m);
         }
     }
 

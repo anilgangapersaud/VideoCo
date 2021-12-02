@@ -12,30 +12,18 @@ import java.awt.event.ActionListener;
 public class EditAddressPanel extends JPanel implements ActionListener {
 
 
-    private AccountCards cards;
+    private final AccountCards cards;
     private Address customerAddress;
 
-    private JLabel accountInformation;
+    private final JTextField streetInput;
 
-    private JLabel streetLabel;
-    private JTextField streetInput;
+    private final JTextField cityInput;
 
-    private JLabel cityLabel;
-    private JTextField cityInput;
+    private final JTextField provinceInput;
 
-    private JLabel provinceLabel;
-    private JTextField provinceInput;
+    private final JTextField postalCodeInput;
 
-    private JLabel postalCodeLabel;
-    private JTextField postalCodeInput;
-
-    private JButton saveAddress;
-    private JButton accountDetails;
-
-    private String username;
-
-    private static int horizontalStrutSize = 5;
-    private static int verticalStrutSize = 35;
+    private final String username;
 
     public EditAddressPanel(AccountCards cards) {
         this.cards = cards;
@@ -44,15 +32,16 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         customerAddress = Model.getAddressService().getAddress(username);
 
         // address
-        streetLabel = new JLabel("Street:");
+        JLabel streetLabel = new JLabel("Street:");
         streetInput = new JTextField(20);
         JPanel streetPanel = new JPanel();
         streetPanel.setLayout(new BoxLayout(streetPanel, BoxLayout.X_AXIS));
         streetPanel.add(streetLabel);
+        int horizontalStrutSize = 5;
         streetPanel.add(Box.createHorizontalStrut(horizontalStrutSize));
         streetPanel.add(streetInput);
 
-        cityLabel = new JLabel("City:");
+        JLabel cityLabel = new JLabel("City:");
         cityInput = new JTextField(20);
         JPanel cityPanel = new JPanel();
         cityPanel.setLayout(new BoxLayout(cityPanel, BoxLayout.X_AXIS));
@@ -60,7 +49,7 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         cityPanel.add(Box.createHorizontalStrut(horizontalStrutSize));
         cityPanel.add(cityInput);
 
-        provinceLabel = new JLabel("Province:");
+        JLabel provinceLabel = new JLabel("Province:");
         provinceInput = new JTextField(20);
         JPanel provincePanel = new JPanel();
         provincePanel.setLayout(new BoxLayout(provincePanel, BoxLayout.X_AXIS));
@@ -68,7 +57,7 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         provincePanel.add(Box.createHorizontalStrut(horizontalStrutSize));
         provincePanel.add(provinceInput);
 
-        postalCodeLabel = new JLabel("Postal Code:");
+        JLabel postalCodeLabel = new JLabel("Postal Code:");
         postalCodeInput = new JTextField(20);
         JPanel postalCodePanel = new JPanel();
         postalCodePanel.setLayout(new BoxLayout(postalCodePanel, BoxLayout.X_AXIS));
@@ -77,10 +66,10 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         postalCodePanel.add(postalCodeInput);
 
         // buttons
-        saveAddress = new JButton("Save Address");
+        JButton saveAddress = new JButton("Save Address");
         saveAddress.addActionListener(this);
         saveAddress.setActionCommand("saveAddress");
-        accountDetails = new JButton("Account");
+        JButton accountDetails = new JButton("Account");
         accountDetails.setActionCommand("account");
         accountDetails.addActionListener(this);
         JPanel buttons = new JPanel();
@@ -89,13 +78,14 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         buttons.add(Box.createHorizontalStrut(horizontalStrutSize));
         buttons.add(saveAddress);
 
-        accountInformation = new JLabel("Address Information");
+        JLabel accountInformation = new JLabel("Address Information");
         accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         updateFields();
 
         Box box = Box.createVerticalBox();
         box.add(accountInformation);
+        int verticalStrutSize = 35;
         box.add(Box.createVerticalStrut(verticalStrutSize));
         box.add(streetPanel);
         box.add(Box.createVerticalStrut(verticalStrutSize));

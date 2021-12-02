@@ -42,6 +42,9 @@ public class AddressRepository implements DatabaseAccess {
         load();
     }
 
+    /**
+     * @return the singleton instance of this class
+     */
     public static AddressRepository getInstance() {
         if (addressRepositoryInstance == null) {
             addressRepositoryInstance = new AddressRepository();
@@ -49,15 +52,11 @@ public class AddressRepository implements DatabaseAccess {
         return addressRepositoryInstance;
     }
 
-    /**
-     * load the address data into the map
-     */
     @Override
     public void load() {
-        try {
-            CSVParser parser = new CSVParser(new FileReader(AddressRepository.addressPath), CSVFormat.RFC4180
-                    .withDelimiter(',')
-                    .withHeader("username", "street", "city", "province", "postalCode"));
+        try (CSVParser parser = new CSVParser(new FileReader(AddressRepository.addressPath), CSVFormat.RFC4180
+                .withDelimiter(',')
+                .withHeader("username", "street", "city", "province", "postalCode"))) {
             List<CSVRecord> records = parser.getRecords();
             for (int i = 1; i < records.size(); i++) {
                 Address address = new Address();

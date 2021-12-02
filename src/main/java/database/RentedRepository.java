@@ -118,4 +118,5 @@ public class RentedRepository implements DatabaseAccess {
         rentedMovies.removeIf(r -> r.getOrderId() == orderNumber);
         update();
     }
+
 }
