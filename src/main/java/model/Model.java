@@ -9,6 +9,7 @@ public class Model {
     private final static AddressService addressService;
     private final static OrderService orderService;
     private final static BillingService billingService;
+    private final static RentedService rentedService;
 
     static {
         userService = new UserServiceImpl();
@@ -16,6 +17,7 @@ public class Model {
         addressService = new AddressServiceImpl();
         orderService = new OrderServiceImpl();
         billingService = new BillingServiceImpl();
+        rentedService = new RentedServiceImpl();
     }
 
     public static UserService getUserService() {
@@ -29,4 +31,6 @@ public class Model {
     public static OrderService getOrderService() { return orderService; }
 
     public static BillingService getBillingService() { return billingService; }
+
+    public static RentedService getRentedService() { return rentedService; }
 }

@@ -1,19 +1,16 @@
 package database;
 
-import model.Model;
 import model.Order;
-import model.User;
-import model.payments.CreditCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import scheduledtasks.CheckOverdueOrders;
+import scheduledtasks.ShipOrders;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -22,37 +19,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class OrderRepository implements DatabaseAccess {
 
-    /**
-     * Periodically checks for overdue orders in the database and notifies users for late fees
-     */
-    public static class CheckOverdueOrders extends TimerTask {
-
+    public static class DeliverOrders extends TimerTask {
+        @Override
         public void run() {
-            System.out.println("Running daily check for overdue orders...");
-            List<Order> orders = orderRepositoryInstance.getAllOrders();
+            List<Order> orders = getInstance().getAllOrders();
             for (Order o : orders) {
-                String dueDate = o.getDueDate();
-                try {
-                    Date dueDateP = new SimpleDateFormat("yyyy/MM/dd").parse(dueDate);
-                    Date todaysDate = Calendar.getInstance().getTime();
-                    if (dueDateP.before(todaysDate)) {
-                        o.setOverdue(true);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                if (o.getOrderStatus().equals("SHIPPED")) {
+                    o.setOrderStatus("DELIVERED");
+                    System.out.println("Delivered order " + o.getOrderId());
                 }
             }
-
-            for (Order o : orders) {
-                if (o.getOrderStatus().equals("DELIVERED") && o.getOverdue()) {
-                    // charge the users credit card $1.00 for each movie
-                    CreditCard c = Model.getBillingService().getCreditCard(o.getUsername());
-                    int totalMovies = orderRepositoryInstance.rentedRepository.countMoviesInOrder(o.getOrderId());
-                    double charge = 1.00D * totalMovies;
-                    c.charge(charge);
-                    System.out.println("Charging " + o.getUsername() + " " + charge + " for an overdue order");
-                }
-            }
+            orderRepositoryInstance.updateCSV();
         }
     }
 
@@ -77,17 +54,15 @@ public class OrderRepository implements DatabaseAccess {
      */
     private final RentedRepository rentedRepository;
 
-    private Set<User> observers;
-
     private OrderRepository() {
         orderDatabase = new HashMap<>();
-        observers = new HashSet<>();
         rentedRepository = RentedRepository.getInstance();
-        load();
+        loadCSV();
 
         Timer timer = new Timer();
-        CheckOverdueOrders overdueOrders = new CheckOverdueOrders();
-        timer.schedule(overdueOrders, Calendar.getInstance().getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+        timer.schedule(new CheckOverdueOrders(), Calendar.getInstance().getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+        timer.schedule(new DeliverOrders(), Calendar.getInstance().getTime(), 600000);
+        timer.schedule(new ShipOrders(), Calendar.getInstance().getTime(), 900000);
     }
 
     /**
@@ -101,7 +76,7 @@ public class OrderRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try {
             CSVParser parser = new CSVParser(new FileReader(OrderRepository.orderPath), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -130,7 +105,7 @@ public class OrderRepository implements DatabaseAccess {
     }
 
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(orderPath, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader("orderNumber",
@@ -165,7 +140,7 @@ public class OrderRepository implements DatabaseAccess {
         } else {
             orderDatabase.remove(orderNumber);
             rentedRepository.returnMovies(orderNumber);
-            update();
+            updateCSV();
             return true;
         }
     }
@@ -179,7 +154,7 @@ public class OrderRepository implements DatabaseAccess {
         Order o = orderDatabase.get(orderNumber);
         o.setOrderStatus(status);
         orderDatabase.replace(orderNumber, o);
-        update();
+        updateCSV();
     }
 
     /**
@@ -189,7 +164,7 @@ public class OrderRepository implements DatabaseAccess {
     public void createOrder(Order o) {
         orderDatabase.put(o.getOrderId(), o);
         rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
-        update();
+        updateCSV();
     }
 
     /**
@@ -227,6 +202,9 @@ public class OrderRepository implements DatabaseAccess {
         return orderDatabase.size();
     }
 
+    public RentedRepository getRentedRepository() {
+        return rentedRepository;
+    }
 
     /**
      * Return movies to the system

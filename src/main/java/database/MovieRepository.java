@@ -43,7 +43,7 @@ public class MovieRepository implements DatabaseAccess {
     private MovieRepository() {
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
-        load();
+        loadCSV();
     }
 
     /**
@@ -58,7 +58,7 @@ public class MovieRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try {
             CSVParser parser = new CSVParser(new FileReader(MovieRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -82,7 +82,7 @@ public class MovieRepository implements DatabaseAccess {
     }
 
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
                 CSVFormat.RFC4180
                         .withDelimiter(',')
@@ -116,7 +116,7 @@ public class MovieRepository implements DatabaseAccess {
                 movieDatabase.put(movie, quantity);
                 barcodeToMovieMap.put(movie.getBarcode(), movie);
             }
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -132,7 +132,7 @@ public class MovieRepository implements DatabaseAccess {
             Movie m = barcodeToMovieMap.get(barcode);
             movieDatabase.remove(m);
         }
-        update();
+        updateCSV();
     }
 
     /**
@@ -200,7 +200,7 @@ public class MovieRepository implements DatabaseAccess {
                 return false;
             }
         }
-        update();
+        updateCSV();
         return true;
     }
 
@@ -211,7 +211,7 @@ public class MovieRepository implements DatabaseAccess {
     public void returnMovie(String barcode) {
         Movie m = barcodeToMovieMap.get(barcode);
         movieDatabase.replace(m, movieDatabase.get(m) + 1);
-        update();
+        updateCSV();
     }
 
     /**
@@ -225,7 +225,7 @@ public class MovieRepository implements DatabaseAccess {
         } else {
             movieDatabase.replace(m, movieDatabase.get(m)-1);
         }
-        update();
+        updateCSV();
     }
 
     /**
@@ -240,7 +240,7 @@ public class MovieRepository implements DatabaseAccess {
             movieDatabase.remove(oldMovie);
             movieDatabase.put(movie, oldMovieQuantity);
             barcodeToMovieMap.replace(movie.getBarcode(), movie);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;

@@ -43,7 +43,7 @@ public class RentedRepository implements DatabaseAccess {
     private RentedRepository() {
         rentedMovies = new ArrayList<>();
         movieRepository = MovieRepository.getInstance();
-        load();
+        loadCSV();
     }
 
     /**
@@ -57,7 +57,7 @@ public class RentedRepository implements DatabaseAccess {
     }
 
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(rentedPath, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader("orderNumber",
@@ -72,7 +72,7 @@ public class RentedRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try {
             CSVParser parser = new CSVParser(new FileReader(RentedRepository.rentedPath), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -102,7 +102,7 @@ public class RentedRepository implements DatabaseAccess {
                 rentedMovies.add(new RentedMovie(orderNumber, entry.getKey().getBarcode()));
             }
         }
-        update();
+        updateCSV();
     }
 
     /**
@@ -116,7 +116,7 @@ public class RentedRepository implements DatabaseAccess {
             }
         }
         rentedMovies.removeIf(r -> r.getOrderId() == orderNumber);
-        update();
+        updateCSV();
     }
 
     public int countMoviesInOrder(int orderNumber) {

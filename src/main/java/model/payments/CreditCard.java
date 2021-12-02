@@ -1,5 +1,6 @@
 package model.payments;
 
+import model.Model;
 import model.Movie;
 import services.PaymentService;
 
@@ -60,11 +61,13 @@ public class CreditCard implements PaymentService {
         for (Map.Entry<Movie, Integer> entry : movies.entrySet()) {
             balance += entry.getKey().getPrice() * entry.getValue();
         }
+        Model.getBillingService().updateCreditCard(this);
         return true;
     }
 
     public void charge(double amount) {
         balance += amount;
+        Model.getBillingService().updateCreditCard(this);
     }
 
 }

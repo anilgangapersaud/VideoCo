@@ -13,20 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Persist addresses in csv files and perform CRUD
- */
 public class AddressRepository implements DatabaseAccess {
-
-    /**
-     * Stores the addresses by username
-     */
-    private final Map<String, Address> addressDatabase;
-
-    /**
-     * Singleton instance of this class
-     */
-    private static AddressRepository addressRepositoryInstance = null;
 
     /**
      * configs
@@ -34,12 +21,12 @@ public class AddressRepository implements DatabaseAccess {
     private static final String ADDRESS_FILE_PATH = "/src/main/resources/addresses.csv";
     private static final String addressPath = System.getProperty("user.dir") + ADDRESS_FILE_PATH;
 
-    /**
-     * Initialize the address repo
-     */
+    private final Map<String, Address> addressDatabase;
+    private static AddressRepository addressRepositoryInstance = null;
+
     private AddressRepository() {
         addressDatabase = new HashMap<>();
-        load();
+        loadCSV();
     }
 
     /**
@@ -53,7 +40,7 @@ public class AddressRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try (CSVParser parser = new CSVParser(new FileReader(AddressRepository.addressPath), CSVFormat.RFC4180
                 .withDelimiter(',')
                 .withHeader("username", "street", "city", "province", "postalCode"))) {
@@ -76,7 +63,7 @@ public class AddressRepository implements DatabaseAccess {
      * update the csv file
      */
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(addressPath, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader(
@@ -103,7 +90,7 @@ public class AddressRepository implements DatabaseAccess {
     public boolean saveAddress(Address address) {
         if (validateAddress(address)) {
             addressDatabase.put(address.getUsername(), address);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -116,7 +103,7 @@ public class AddressRepository implements DatabaseAccess {
      */
     public void deleteAddress(String username) {
         addressDatabase.remove(username);
-        update();
+        updateCSV();
     }
 
     /**
@@ -136,7 +123,7 @@ public class AddressRepository implements DatabaseAccess {
     public boolean updateAddress(Address address) {
         if (validateAddress(address)) {
             addressDatabase.replace(address.getUsername(), address);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -153,4 +140,5 @@ public class AddressRepository implements DatabaseAccess {
                 && !address.getProvince().equals("") && !address.getPostalCode().equals("")
                 && !address.getUsername().equals("");
     }
+
 }

@@ -41,11 +41,11 @@ public class UserRepository implements DatabaseAccess {
      */
     private User loggedInUser;
 
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    private BillingRepository billingRepository;
+    private final BillingRepository billingRepository;
 
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
     /**
      * Configurations for the csv file
@@ -64,7 +64,7 @@ public class UserRepository implements DatabaseAccess {
         addressRepository = AddressRepository.getInstance();
         billingRepository = BillingRepository.getInstance();
         orderRepository = OrderRepository.getInstance();
-        load();
+        loadCSV();
     }
 
     /**
@@ -78,7 +78,7 @@ public class UserRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try {
             CSVParser parser = new CSVParser(new FileReader(UserRepository.path), CSVFormat.RFC4180
                     .withDelimiter(',')
@@ -105,7 +105,7 @@ public class UserRepository implements DatabaseAccess {
     }
 
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
                 CSVFormat.RFC4180
                         .withDelimiter(',')
@@ -133,7 +133,7 @@ public class UserRepository implements DatabaseAccess {
         User u = userAccounts.get(username);
         u.setLoyaltyPoints(u.getLoyaltyPoints()+1);
         userAccounts.replace(username, u);
-        update();
+        updateCSV();
     }
 
     /**
@@ -171,7 +171,7 @@ public class UserRepository implements DatabaseAccess {
             }
 
             userAccounts.put(newUsername, loggedInUser);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -194,7 +194,7 @@ public class UserRepository implements DatabaseAccess {
             // add user back
             userAccounts.put(loggedInUser.getUsername(), loggedInUser);
 
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -217,7 +217,7 @@ public class UserRepository implements DatabaseAccess {
             // add the updated user
             userAccounts.put(loggedInUser.getUsername(), loggedInUser);
 
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -239,7 +239,7 @@ public class UserRepository implements DatabaseAccess {
             orderRepository.cancelOrder(o.getOrderId());
         }
         userAccounts.remove(username);
-        update();
+        updateCSV();
     }
 
     /**
@@ -276,7 +276,7 @@ public class UserRepository implements DatabaseAccess {
     public void updateUser(User u) {
         if (userAccounts.containsKey(u.getUsername())) {
             userAccounts.replace(u.getUsername(), u);
-            update();
+            updateCSV();
         }
     }
 
@@ -293,7 +293,7 @@ public class UserRepository implements DatabaseAccess {
                 user.setAccountType("admin");
             }
             userAccounts.put(user.getUsername(), user);
-            update();
+            updateCSV();
             return true;
         }
     }

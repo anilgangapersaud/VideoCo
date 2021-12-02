@@ -38,10 +38,10 @@ public class CartPanel extends JPanel implements ActionListener {
 
 
     // error messages
-    private static final String EMPTY_CART_ERROR = "No items in the cart.";
-    private static final String NO_ITEM_SELECTED_ERROR = "No item selected.";
-    private static final String NO_ADDRESS_ERROR = "No address on file. Please update your address in Account Details.";
-    private static final String INVALID_PAYMENT_ERROR = "Invalid Payment. Please try again.";
+    private static final String EMPTY_CART_ERROR = "Cart is empty";
+    private static final String NO_ITEM_SELECTED_ERROR = "No item selected";
+    private static final String NO_ADDRESS_ERROR = "No address on file\nPlease update your address in Account Details";
+    private static final String INVALID_PAYMENT_ERROR = "Invalid Payment\nPlease try again.";
 
     /**
      * Components for displaying data
@@ -142,8 +142,6 @@ public class CartPanel extends JPanel implements ActionListener {
         displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
         cards.getStorePanel().displayAllMovies();
         cards.getOrderPanel().updateTable();
-        cards.getAccountPanel().getAccountPanel().updateLoyaltyPoints();
-        cards.getAccountPanel().getBillingPanel().updateBalance();
     }
 
     @Override
@@ -183,13 +181,15 @@ public class CartPanel extends JPanel implements ActionListener {
                         paymentMethod = Model.getBillingService().getCreditCard(u.getUsername());
                     }
                     if (paymentMethod == null) {
-                        JOptionPane.showMessageDialog(this, "No credit card on file. Add a credit card in Account Details", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "No credit card on file\nAdd a credit card in Account Details", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         boolean paymentAccepted = Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
                         if (paymentAccepted) {
                             JOptionPane.showMessageDialog(this, "Order Created!");
                             u.getCart().clearCart();
                             updateView();
+                            cards.getAccountPanel().getAccountPanel().updateLoyaltyPoints();
+                            cards.getAccountPanel().getBillingPanel().updateBalance();
                         } else {
                             JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
                         }

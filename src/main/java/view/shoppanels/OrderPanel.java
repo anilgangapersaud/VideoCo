@@ -20,8 +20,8 @@ public class OrderPanel extends JPanel implements ActionListener {
 
     private JComboBox<String> orderStatus = null;
 
-    private String[] statuses = {
-            "PROCESSED", "DELIVERED", "RETURNED"
+    private final String[] statuses = {
+            "PROCESSED", "DELIVERED", "RETURNED", "SHIPPED"
     };
 
     public OrderPanel(ShopCards cards) {

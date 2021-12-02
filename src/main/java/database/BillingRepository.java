@@ -16,7 +16,6 @@ import java.util.Map;
 public class BillingRepository implements DatabaseAccess {
 
     private final Map<String, CreditCard> billingDatabase;
-
     private static BillingRepository billingRepositoryInstance = null;
 
     private static final String BILLING_FILE_PATH = "/src/main/resources/billing.csv";
@@ -24,7 +23,7 @@ public class BillingRepository implements DatabaseAccess {
 
     private BillingRepository() {
         billingDatabase = new HashMap<>();
-        load();
+        loadCSV();
     }
 
     public static BillingRepository getInstance() {
@@ -35,7 +34,7 @@ public class BillingRepository implements DatabaseAccess {
     }
 
     @Override
-    public void load() {
+    public void loadCSV() {
         try (CSVParser parser = new CSVParser(new FileReader(BillingRepository.billingPath), CSVFormat.RFC4180
                 .withDelimiter(',')
                 .withHeader("username","cardNumber","expiry","csv","balance"))) {
@@ -55,7 +54,7 @@ public class BillingRepository implements DatabaseAccess {
     }
 
     @Override
-    public void update() {
+    public void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(billingPath, false),
             CSVFormat.RFC4180.withDelimiter(',')
                     .withHeader(
@@ -91,7 +90,7 @@ public class BillingRepository implements DatabaseAccess {
     public boolean saveCreditCard(CreditCard c) {
         if (validateCreditCard(c)) {
             billingDatabase.put(c.getUsername(), c);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;
@@ -114,7 +113,7 @@ public class BillingRepository implements DatabaseAccess {
     public boolean updateCreditCard(CreditCard c) {
         if (validateCreditCard(c)) {
             billingDatabase.replace(c.getUsername(), c);
-            update();
+            updateCSV();
             return true;
         } else {
             return false;

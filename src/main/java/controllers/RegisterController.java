@@ -29,7 +29,7 @@ public class RegisterController implements ActionListener {
         if (e.getActionCommand().equals("signup")) {
             if (serviceRegister(new User(
                     view.getUsernameInput(), view.getPasswordInput(), view.getEmailInput(), view.getAccountType()))) {
-                JOptionPane.showMessageDialog(view, "Registration Successful!\n Login with your credentials to start shopping");
+                JOptionPane.showMessageDialog(view, "Registration Successful!\nLogin with your credentials to start shopping");
                 view.clearInputs();
                 view.getCards().getLayout().show(view.getCards(), "lp");
             } else {

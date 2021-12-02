@@ -19,7 +19,7 @@ public class AccountPanel extends JPanel implements ActionListener {
 
     private final JTextField emailInput;
 
-    JLabel loyaltyPoints;
+    private JLabel loyaltyPoints;
 
     public AccountPanel(AccountCards cards) {
         this.cards = cards;

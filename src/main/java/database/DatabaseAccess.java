@@ -8,11 +8,11 @@ public interface DatabaseAccess {
     /**
      * update the csv data in database
      */
-    void update();
+    void updateCSV();
 
     /**
      * load the csv data into app
      */
-    void load();
+    void loadCSV();
 
 }

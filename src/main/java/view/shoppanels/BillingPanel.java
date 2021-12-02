@@ -34,7 +34,7 @@ public class BillingPanel extends JPanel implements ActionListener {
 
         // credit card
         JLabel accountBalanceLabel = new JLabel("Balance:");
-        accountBalance = new JLabel("0$");
+        accountBalance = new JLabel("");
         JPanel balancePanel = new JPanel();
         balancePanel.setLayout(new BoxLayout(balancePanel, BoxLayout.X_AXIS));
         balancePanel.add(accountBalanceLabel);
@@ -82,7 +82,6 @@ public class BillingPanel extends JPanel implements ActionListener {
         JLabel accountInformation = new JLabel("Billing Information");
         accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-
         updateFields();
 
         Box box = Box.createVerticalBox();
@@ -109,7 +108,7 @@ public class BillingPanel extends JPanel implements ActionListener {
     }
 
     public void updateBalance() {
-        accountBalance.setText(Model.getBillingService().getCreditCard(username).getBalance() + "$");
+        accountBalance.setText(String.format("%.2f", Model.getBillingService().getCreditCard(username).getBalance()) + "$");
     }
 
     private void updateFields() {
@@ -117,7 +116,7 @@ public class BillingPanel extends JPanel implements ActionListener {
             cardNumberInput.setText(customerCreditCard.getCardNumber());
             expiryInput.setText(customerCreditCard.getExpiry());
             csvInput.setText(customerCreditCard.getCsv());
-            accountBalance.setText(customerCreditCard.getBalance() + "$");
+            accountBalance.setText(String.format("%.2f", customerCreditCard.getBalance() ) + "$");
         }
     }
 
