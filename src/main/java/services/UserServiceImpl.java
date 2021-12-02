@@ -6,19 +6,14 @@ import model.User;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
-    User loggedInUser;
 
     public UserServiceImpl() {
         userRepository = UserRepository.getInstance();
     }
 
     @Override
-    public User login(String username, String password) {
-        User u = userRepository.login(username, password);
-        if (u != null) {
-            loggedInUser = u;
-        }
-        return u;
+    public boolean login(String username, String password) {
+        return userRepository.login(username, password);
     }
 
     @Override
@@ -28,27 +23,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changeUsername(String newUsername) {
-        if (userRepository.changeUsername(newUsername, loggedInUser)) {
-            loggedInUser.setUsername(newUsername);
-            return true;
-        } else {
-            return false;
-        }
+        return userRepository.changeUsername(newUsername);
     }
 
     @Override
     public boolean changePassword(String newPassword) {
-        return userRepository.changePassword(newPassword, loggedInUser);
+        return userRepository.changePassword(newPassword);
     }
 
     @Override
     public boolean changeEmail(String newEmail) {
-        return userRepository.changeEmail(newEmail, loggedInUser);
+        return userRepository.changeEmail(newEmail);
     }
 
     @Override
     public User getLoggedInUser() {
-        return loggedInUser;
+        return userRepository.getLoggedInUser();
     }
 
     @Override

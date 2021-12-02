@@ -9,17 +9,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LoginCards extends JPanel implements ActionListener {
+public class LoginCards extends JPanel {
 
-    protected CardLayout cl;
-    private EntrancePanel panel;
+    private final EntrancePanel panel;
+    private final CardLayout cl;
 
     public LoginCards(EntrancePanel panel) {
         this.panel = panel;
         cl = new CardLayout();
-        this.setLayout(cl);
+        setLayout(cl);
+
         LoginPanel lp = new LoginPanel(this);
         RegisterPanel rp = new RegisterPanel(this);
+
         add(lp, "lp");
         add(rp, "rp");
 
@@ -31,11 +33,8 @@ public class LoginCards extends JPanel implements ActionListener {
         return cl;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("login")) {
-            panel.getStoreFront(). addShopPanel();
-            panel.actionPerformed(e);
-        }
+    public void login() {
+        panel.getStoreFront().addShopPanel();
+        panel.login();
     }
 }

@@ -6,8 +6,10 @@ import view.StoreFront;
 
 public class App {
 
-    private static UserService userService = new UserServiceImpl();
-    private static MovieService movieService = new MovieServiceImpl();
+    //TODO: abstract logic from views into controllers
+
+    private static final UserService userService = new UserServiceImpl();
+    private static final MovieService movieService = new MovieServiceImpl();
 
     public App() {
         initializeApp();

@@ -33,6 +33,8 @@ public class UserRepository implements DatabaseAccess {
      */
     private final Map<String, User> userAccounts;
 
+    private User loggedInUser;
+
     /**
      * Configurations for the csv file
      */
@@ -132,52 +134,47 @@ public class UserRepository implements DatabaseAccess {
      * @param password user's password
      * @return {@code true} if the credentials match, {@code false} otherwise
      */
-    public User login(String username, String password) {
-        User u = null;
+    public boolean login(String username, String password) {
         if (userAccounts.containsKey(username)) {
             if (userAccounts.get(username).getPassword().equals(password)) {
-                u = userAccounts.get(username);
+                loggedInUser = userAccounts.get(username);
+                return true;
             }
         }
-        return u;
+        return false;
     }
 
     /**
      * update a user in the database
      * @param u the user to update
-     * @return true if successful, false otherwise
      */
-    public boolean updateUser(User u) {
+    public void updateUser(User u) {
         if (userAccounts.containsKey(u.getUsername())) {
             userAccounts.replace(u.getUsername(), u);
             update();
-            return true;
-        } else {
-            return false;
         }
     }
 
     /**
      * Change the username of an existing user
      * @param newUsername the new username
-     * @param user the existing user
      * @return {@code true} if the username has been successfully changed, {@code false} otherwise
      */
-    public boolean changeUsername(String newUsername, User user) {
-        if (validateUsername(newUsername) && userAccounts.containsKey(user.getUsername())) {
+    public boolean changeUsername(String newUsername) {
+        if (validateUsername(newUsername) && userAccounts.containsKey(loggedInUser.getUsername())) {
             // remove old user
-            String oldUsername = user.getUsername();
-            userAccounts.remove(user.getUsername());
+            String oldUsername = loggedInUser.getUsername();
+            userAccounts.remove(oldUsername);
 
             // update the username
-            user.setUsername(newUsername);
+            loggedInUser.setUsername(newUsername);
             Address a = Model.getAddressService().getAddress(oldUsername);
             a.setUsername(newUsername);
             Model.getAddressService().deleteAddress(oldUsername);
             Model.getAddressService().saveAddress(a);
 
             // add the new user
-            userAccounts.put(newUsername, user);
+            userAccounts.put(newUsername, loggedInUser);
 
             update();
             return true;
@@ -189,19 +186,18 @@ public class UserRepository implements DatabaseAccess {
     /**
      * Change the password of an existing user
      * @param newPassword the new password
-     * @param user the existing user
      * @return {@code true} if the password was changed successfully, {@code false} otherwise
      */
-    public boolean changePassword(String newPassword, User user) {
-        if (validatePassword(newPassword) && userAccounts.containsKey(user.getUsername())) {
+    public boolean changePassword(String newPassword) {
+        if (validatePassword(newPassword) && userAccounts.containsKey(loggedInUser.getUsername())) {
             // remove old user
-            userAccounts.remove(user.getUsername());
+            userAccounts.remove(loggedInUser.getUsername());
 
             // change password
-            user.setPassword(newPassword);
+            loggedInUser.setPassword(newPassword);
 
             // add user back
-            userAccounts.put(user.getUsername(), user);
+            userAccounts.put(loggedInUser.getUsername(), loggedInUser);
 
             update();
             return true;
@@ -224,25 +220,28 @@ public class UserRepository implements DatabaseAccess {
     /**
      * Change the email of an existing user
      * @param newEmail the new email
-     * @param user the existing user
      * @return {@code true} if the email was changed successfully, {@code false} otherwise
      */
-    public boolean changeEmail(String newEmail, User user) {
+    public boolean changeEmail(String newEmail) {
         if (validateEmail(newEmail)) {
             // remove the old user
-            userAccounts.remove(user.getUsername());
+            userAccounts.remove(loggedInUser.getUsername());
 
             // update the email address
-            user.setEmailAddress(newEmail);
+            loggedInUser.setEmailAddress(newEmail);
 
             // add the updated user
-            userAccounts.put(user.getUsername(), user);
+            userAccounts.put(loggedInUser.getUsername(), loggedInUser);
 
             update();
             return true;
         } else {
             return false;
         }
+    }
+
+    public User getLoggedInUser() {
+        return loggedInUser;
     }
 
     private boolean validateUsername(String username) {

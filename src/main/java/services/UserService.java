@@ -12,7 +12,7 @@ public interface UserService {
 
     User getLoggedInUser();
 
-    User login(String username, String password);
+    boolean login(String username, String password);
 
     boolean register(User user);
 

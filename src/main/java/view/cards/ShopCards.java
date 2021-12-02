@@ -12,12 +12,15 @@ import java.awt.event.ActionListener;
 
 public class ShopCards extends JPanel implements ActionListener {
 
-    private CardLayout cl;
-    private ShopPanel shopPanel;
-    private AccountCards ap;
-    private StorePanel sp;
-    private CartPanel cp;
-    private OrderPanel op;
+    private final ShopPanel shopPanel;
+
+    private final CardLayout cl;
+
+    private final AccountCards ap;
+
+    private final StorePanel sp;
+    private final CartPanel cp;
+    private final OrderPanel op;
 
     public ShopCards(ShopPanel shopPanel) {
         this.shopPanel = shopPanel;

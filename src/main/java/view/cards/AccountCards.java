@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AccountCards extends JPanel implements ActionListener {
+public class AccountCards extends JPanel {
 
    protected CardLayout cl;
 
@@ -28,10 +28,4 @@ public class AccountCards extends JPanel implements ActionListener {
 
        setVisible(true);
    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
 }
