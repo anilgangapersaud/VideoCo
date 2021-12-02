@@ -27,7 +27,7 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         account.addActionListener(this);
 
         if (Model.getUserService().getLoggedInUser().isAdmin()) {
-            store = new JButton("Inventory");
+            store = new JButton("Manage Inventory");
         } else {
             store = new JButton("Shop");
         }
