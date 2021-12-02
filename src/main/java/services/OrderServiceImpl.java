@@ -29,14 +29,14 @@ public class OrderServiceImpl implements OrderService {
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
-        DateFormat df = new SimpleDateFormat("dd/MM/yy");
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
         return df.format(today.getTime());
     }
 
     private String getDueDate() {
         Calendar calender = Calendar.getInstance();
         calender.add(Calendar.DATE, 14);
-        DateFormat df = new SimpleDateFormat("dd/MM/yy");
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
         return df.format(calender.getTime());
     }
 

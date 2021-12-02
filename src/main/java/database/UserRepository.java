@@ -2,7 +2,9 @@ package database;
 
 import model.Model;
 import model.Address;
+import model.Order;
 import model.User;
+import model.payments.CreditCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -11,6 +13,7 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -38,6 +41,12 @@ public class UserRepository implements DatabaseAccess {
      */
     private User loggedInUser;
 
+    private AddressRepository addressRepository;
+
+    private BillingRepository billingRepository;
+
+    private OrderRepository orderRepository;
+
     /**
      * Configurations for the csv file
      */
@@ -52,6 +61,9 @@ public class UserRepository implements DatabaseAccess {
     private UserRepository() {
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
+        addressRepository = AddressRepository.getInstance();
+        billingRepository = BillingRepository.getInstance();
+        orderRepository = OrderRepository.getInstance();
         load();
     }
 
@@ -131,20 +143,34 @@ public class UserRepository implements DatabaseAccess {
      */
     public boolean changeUsername(String newUsername) {
         if (validateUsername(newUsername) && userAccounts.containsKey(loggedInUser.getUsername())) {
-            // remove old user
             String oldUsername = loggedInUser.getUsername();
             userAccounts.remove(oldUsername);
 
-            // update the username
             loggedInUser.setUsername(newUsername);
             Address a = Model.getAddressService().getAddress(oldUsername);
-            a.setUsername(newUsername);
-            Model.getAddressService().deleteAddress(oldUsername);
-            Model.getAddressService().saveAddress(a);
+            if (a != null) {
+                a.setUsername(newUsername);
+                Model.getAddressService().deleteAddress(oldUsername);
+                Model.getAddressService().saveAddress(a);
+            }
 
-            // add the new user
+            CreditCard c = Model.getBillingService().getCreditCard(oldUsername);
+            if (c != null) {
+                c.setUsername(newUsername);
+                Model.getBillingService().deleteCreditCard(oldUsername);
+                Model.getBillingService().saveCreditCard(c);
+            }
+
+            List<Order> orders = Model.getOrderService().getOrdersByCustomer(oldUsername);
+            if (orders != null) {
+                for (Order o : orders) {
+                    o.setUsername(newUsername);
+                    orderRepository.cancelOrder(o.getOrderId());
+                    orderRepository.createOrder(o);
+                }
+            }
+
             userAccounts.put(newUsername, loggedInUser);
-
             update();
             return true;
         } else {
@@ -203,6 +229,15 @@ public class UserRepository implements DatabaseAccess {
      * @param username the user to delete
      */
     public void deleteUser(String username) {
+        // remove the users address
+        addressRepository.deleteAddress(username);
+        // remove the users billing
+        billingRepository.deleteCreditCard(username);
+        // remove the users orders
+        List<Order> userOrders = orderRepository.getOrdersByCustomer(username);
+        for (Order o : userOrders) {
+            orderRepository.cancelOrder(o.getOrderId());
+        }
         userAccounts.remove(username);
         update();
     }

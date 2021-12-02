@@ -1,6 +1,9 @@
 package database;
 
+import model.Model;
 import model.Order;
+import model.User;
+import model.payments.CreditCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -9,15 +12,49 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The repository to manage orders and common operations on orders
  */
 public class OrderRepository implements DatabaseAccess {
+
+    /**
+     * Periodically checks for overdue orders in the database and notifies users for late fees
+     */
+    public static class CheckOverdueOrders extends TimerTask {
+
+        public void run() {
+            System.out.println("Running daily check for overdue orders...");
+            List<Order> orders = orderRepositoryInstance.getAllOrders();
+            for (Order o : orders) {
+                String dueDate = o.getDueDate();
+                try {
+                    Date dueDateP = new SimpleDateFormat("yyyy/MM/dd").parse(dueDate);
+                    Date todaysDate = Calendar.getInstance().getTime();
+                    if (dueDateP.before(todaysDate)) {
+                        o.setOverdue(true);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            for (Order o : orders) {
+                if (o.getOrderStatus().equals("DELIVERED") && o.getOverdue()) {
+                    // charge the users credit card $1.00 for each movie
+                    CreditCard c = Model.getBillingService().getCreditCard(o.getUsername());
+                    int totalMovies = orderRepositoryInstance.rentedRepository.countMoviesInOrder(o.getOrderId());
+                    double charge = 1.00D * totalMovies;
+                    c.charge(charge);
+                    System.out.println("Charging " + o.getUsername() + " " + charge + " for an overdue order");
+                }
+            }
+        }
+    }
 
     /**
      * the order database
@@ -40,10 +77,17 @@ public class OrderRepository implements DatabaseAccess {
      */
     private final RentedRepository rentedRepository;
 
+    private Set<User> observers;
+
     private OrderRepository() {
         orderDatabase = new HashMap<>();
+        observers = new HashSet<>();
         rentedRepository = RentedRepository.getInstance();
         load();
+
+        Timer timer = new Timer();
+        CheckOverdueOrders overdueOrders = new CheckOverdueOrders();
+        timer.schedule(overdueOrders, Calendar.getInstance().getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
     }
 
     /**

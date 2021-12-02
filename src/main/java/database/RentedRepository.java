@@ -119,4 +119,14 @@ public class RentedRepository implements DatabaseAccess {
         update();
     }
 
+    public int countMoviesInOrder(int orderNumber) {
+        int count = 0;
+        for (RentedMovie r : rentedMovies) {
+            if (r.getOrderId() == orderNumber) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }

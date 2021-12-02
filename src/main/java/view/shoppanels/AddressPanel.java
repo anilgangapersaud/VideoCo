@@ -9,23 +9,25 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class EditAddressPanel extends JPanel implements ActionListener {
-
+public class AddressPanel extends JPanel implements ActionListener {
 
     private final AccountCards cards;
+
     private Address customerAddress;
 
     private final JTextField streetInput;
 
     private final JTextField cityInput;
 
-    private final JTextField provinceInput;
+    private final JComboBox<String> provinceList;
+
+    private final String[] provinces = {"Ontario", "Quebec", "British Columbia", "Alberta", "New Brunswick", "Manitoba", "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia", "Nunavut", "Prince Edward Island", "Saskatchewan", "Yukon"};
 
     private final JTextField postalCodeInput;
 
     private final String username;
 
-    public EditAddressPanel(AccountCards cards) {
+    public AddressPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
         username = Model.getUserService().getLoggedInUser().getUsername();
@@ -50,12 +52,12 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         cityPanel.add(cityInput);
 
         JLabel provinceLabel = new JLabel("Province:");
-        provinceInput = new JTextField(20);
+        provinceList = new JComboBox<>(provinces);
         JPanel provincePanel = new JPanel();
         provincePanel.setLayout(new BoxLayout(provincePanel, BoxLayout.X_AXIS));
         provincePanel.add(provinceLabel);
         provincePanel.add(Box.createHorizontalStrut(horizontalStrutSize));
-        provincePanel.add(provinceInput);
+        provincePanel.add(provinceList);
 
         JLabel postalCodeLabel = new JLabel("Postal Code:");
         postalCodeInput = new JTextField(20);
@@ -110,7 +112,7 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         if (customerAddress != null) {
             streetInput.setText(customerAddress.getLineAddress());
             cityInput.setText(customerAddress.getCity());
-            provinceInput.setText(customerAddress.getProvince());
+            provinceList.setSelectedItem(customerAddress.getProvince());
             postalCodeInput.setText(customerAddress.getPostalCode());
         }
     }
@@ -123,7 +125,7 @@ public class EditAddressPanel extends JPanel implements ActionListener {
         } else if (e.getActionCommand().equals("saveAddress")) {
             Address a = new Address();
             a.setLineAddress(streetInput.getText());
-            a.setProvince(provinceInput.getText());
+            a.setProvince((String)provinceList.getSelectedItem());
             a.setCity(cityInput.getText());
             a.setUsername(username);
             a.setPostalCode(postalCodeInput.getText());
@@ -134,7 +136,7 @@ public class EditAddressPanel extends JPanel implements ActionListener {
                 result = Model.getAddressService().updateAddress(a);
             }
             if (!result) {
-                JOptionPane.showMessageDialog(this, "Invalid Address Information. Please try again.","Error",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid Address Information. Please try again","Error",JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Saved Address");
             }

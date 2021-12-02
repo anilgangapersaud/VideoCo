@@ -1,4 +1,4 @@
-package view.menupanels;
+package view.shoppanels;
 
 import model.Model;
 import model.payments.CreditCard;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.jar.JarEntry;
 
-public class EditBillingPanel extends JPanel implements ActionListener {
+public class BillingPanel extends JPanel implements ActionListener {
 
     private final AccountCards cards;
     private CreditCard customerCreditCard;
@@ -26,14 +26,13 @@ public class EditBillingPanel extends JPanel implements ActionListener {
 
     private final String username;
 
-    public EditBillingPanel(AccountCards cards) {
+    public BillingPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
         username =  Model.getUserService().getLoggedInUser().getUsername();
         customerCreditCard = Model.getBillingService().getCreditCard(username);
 
         // credit card
-
         JLabel accountBalanceLabel = new JLabel("Balance:");
         accountBalance = new JLabel("0$");
         JPanel balancePanel = new JPanel();

@@ -1,30 +1,28 @@
 package view.cards;
 
-import view.shoppanels.EditAccountPanel;
-import view.shoppanels.EditAddressPanel;
-import view.menupanels.EditBillingPanel;
+import view.shoppanels.AccountPanel;
+import view.shoppanels.AddressPanel;
+import view.shoppanels.BillingPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class AccountCards extends JPanel {
 
    protected CardLayout cl;
 
-   private EditAccountPanel eacp;
+   private final AccountPanel eacp;
 
-   private EditAddressPanel eadp;
+   private final AddressPanel eadp;
 
-   private EditBillingPanel ebp;
+   private final BillingPanel ebp;
 
    public AccountCards() {
        cl = new CardLayout();
        setLayout(cl);
-       eacp = new EditAccountPanel(this);
-       eadp = new EditAddressPanel(this);
-       ebp = new EditBillingPanel(this);
+       eacp = new AccountPanel(this);
+       eadp = new AddressPanel(this);
+       ebp = new BillingPanel(this);
 
        add(eacp, "eacp");
        add(ebp, "ebp");
@@ -35,15 +33,15 @@ public class AccountCards extends JPanel {
        setVisible(true);
    }
 
-   public EditAccountPanel getAccountPanel() {
+   public AccountPanel getAccountPanel() {
        return eacp;
    }
 
-   public EditBillingPanel getBillingPanel() {
+   public BillingPanel getBillingPanel() {
        return ebp;
    }
 
-   public EditAddressPanel getAddressPanel() {
+   public AddressPanel getAddressPanel() {
        return eadp;
    }
 }

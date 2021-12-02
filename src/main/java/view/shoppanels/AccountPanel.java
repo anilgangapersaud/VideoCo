@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class EditAccountPanel extends JPanel implements ActionListener {
+public class AccountPanel extends JPanel implements ActionListener {
 
     private final AccountCards cards;
 
@@ -21,7 +21,7 @@ public class EditAccountPanel extends JPanel implements ActionListener {
 
     JLabel loyaltyPoints;
 
-    public EditAccountPanel(AccountCards cards) {
+    public AccountPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
         String customerName = Model.getUserService().getLoggedInUser().getUsername();

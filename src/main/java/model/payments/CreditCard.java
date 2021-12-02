@@ -63,4 +63,8 @@ public class CreditCard implements PaymentService {
         return true;
     }
 
+    public void charge(double amount) {
+        balance += amount;
+    }
+
 }
