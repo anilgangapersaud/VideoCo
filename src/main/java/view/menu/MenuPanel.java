@@ -9,23 +9,22 @@ import java.awt.event.ActionListener;
 
 public abstract class MenuPanel extends JPanel implements ActionListener {
 
-    private JButton account, logout;
     protected JLabel welcomeMessage;
     protected JPanel cards;
-    private JButton store;
-    ShopCards shopCards;
+    private ShopCards shopCards;
 
     public MenuPanel(ShopCards cards) {
         shopCards = cards;
 
-        logout = new JButton("Logout");
+        JButton logout = new JButton("Logout");
         logout.setActionCommand("logout");
         logout.addActionListener(this);
 
-        account = new JButton("Account Details");
+        JButton account = new JButton("Account Details");
         account.setActionCommand("account");
         account.addActionListener(this);
 
+        JButton store;
         if (Model.getUserService().getLoggedInUser().isAdmin()) {
             store = new JButton("Manage Inventory");
         } else {
@@ -34,12 +33,22 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         store.setActionCommand("store");
         store.addActionListener(this);
 
+        JButton orders;
+        if (Model.getUserService().getLoggedInUser().isAdmin()) {
+            orders = new JButton("Manage Orders");
+        } else {
+            orders = new JButton("Orders");
+        }
+        orders.setActionCommand("orders");
+        orders.addActionListener(this);
+
 
         welcomeMessage = new JLabel("Welcome " + Model.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
         add(store);
         add(account);
+        add(orders);
 
         cards.getLayout().show(cards, "sp");
 
@@ -58,6 +67,8 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
             shopCards.getLayout().show(shopCards, "cp");
         } else if (e.getActionCommand().equals("orders")) {
             shopCards.getLayout().show(shopCards, "op");
+        } else if (e.getActionCommand().equals("manageAccounts")) {
+            shopCards.getLayout().show(shopCards, "map");
         }
     }
 }

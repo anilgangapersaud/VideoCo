@@ -103,6 +103,30 @@ public class MovieRepository implements DatabaseAccess {
         }
     }
 
+    /**
+     * Add a movie to the database
+     * @param movie the movie to add
+     * @return {@code true} if the movie was added successfully, {@code false} otherwise
+     */
+    public boolean addMovie(Movie movie, Integer quantity) {
+        if (validateMovieAdd(movie)) {
+            if (movieDatabase.containsKey(movie)) {
+                movieDatabase.replace(movie,movieDatabase.get(movie)+quantity);
+            } else {
+                movieDatabase.put(movie, quantity);
+                barcodeToMovieMap.put(movie.getBarcode(), movie);
+            }
+            update();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Delete movies from the database
+     * @param barcodes the ids of movies to delete
+     */
     public void deleteMovies(List<String> barcodes) {
         for (String barcode : barcodes) {
             Movie m = barcodeToMovieMap.get(barcode);
@@ -128,6 +152,13 @@ public class MovieRepository implements DatabaseAccess {
     }
 
     /**
+     * @return a list of all movies in the database
+     */
+    public Map<Movie,Integer> getAllMovies() {
+        return movieDatabase;
+    }
+
+    /**
      * Get all movies with matching category from the database
      * @param genre the genre to match
      * @return a list of movies matching the category search
@@ -144,39 +175,12 @@ public class MovieRepository implements DatabaseAccess {
     }
 
     /**
-     * @return a list of all movies in the database
-     */
-    public Map<Movie,Integer> getAllMovies() {
-        return movieDatabase;
-    }
-
-    /**
      * Get movie by barcode
      * @param barcode the barcode id of the movie
      * @return the movie
      */
     public Movie getMovie(String barcode) {
         return barcodeToMovieMap.get(barcode);
-    }
-
-    /**
-     * Add a movie to the database
-     * @param movie the movie to add
-     * @return {@code true} if the movie was added successfully, {@code false} otherwise
-     */
-    public boolean addMovie(Movie movie, Integer quantity) {
-        if (validateMovieAdd(movie)) {
-            if (movieDatabase.containsKey(movie)) {
-                movieDatabase.replace(movie,movieDatabase.get(movie)+quantity);
-            } else {
-                movieDatabase.put(movie, quantity);
-                barcodeToMovieMap.put(movie.getBarcode(), movie);
-            }
-            update();
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -255,4 +259,5 @@ public class MovieRepository implements DatabaseAccess {
     private boolean validateMovieUpdate(Movie m) {
         return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
     }
+
 }

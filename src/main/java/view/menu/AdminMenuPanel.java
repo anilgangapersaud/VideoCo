@@ -9,20 +9,13 @@ import java.awt.event.ActionListener;
 
 public class AdminMenuPanel extends MenuPanel implements ActionListener {
 
-    private JButton manageOrders, manageAccounts;
-
     public AdminMenuPanel(ShopCards cards) {
         super(cards);
 
-        manageOrders = new JButton("Manage Orders");
-        manageOrders.setActionCommand("manageOrders");
-        manageOrders.addActionListener(this);
-
-        manageAccounts = new JButton("Manage Accounts");
+        JButton manageAccounts = new JButton("Manage Accounts");
         manageAccounts.setActionCommand("manageAccounts");
         manageAccounts.addActionListener(this);
 
-        add(manageOrders);
         add(manageAccounts);
         add(welcomeMessage);
 
@@ -37,8 +30,10 @@ public class AdminMenuPanel extends MenuPanel implements ActionListener {
             super.actionPerformed(e);
         } else if (e.getActionCommand().equals("store")) {
             super.actionPerformed(e);
-        } else if (e.getActionCommand().equals("inventory")) {
-            shopCards.getLayout().show(shopCards, "ip");
+        } else if (e.getActionCommand().equals("orders")) {
+            super.actionPerformed(e);
+        } else if (e.getActionCommand().equals("manageAccounts")) {
+            super.actionPerformed(e);
         }
     }
 }

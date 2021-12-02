@@ -13,6 +13,7 @@ public class LoyaltyPoints implements PaymentService {
     public LoyaltyPoints(int loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;
     }
+
     @Override
     public boolean pay(Map<Movie, Integer> movies) {
         int totalMovies = 0;
@@ -28,4 +29,5 @@ public class LoyaltyPoints implements PaymentService {
             return false;
         }
     }
+
 }

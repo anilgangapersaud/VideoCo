@@ -6,6 +6,7 @@ import view.cards.ShopCards;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,39 +14,49 @@ import java.util.List;
 
 public class OrderPanel extends JPanel implements ActionListener {
 
-    ShopCards cards;
-
-    private JButton cancelOrder;
-    private JButton returnMovies;
+    private final ShopCards cards;
 
     private final JTable table;
-    private final JScrollPane scrollPane;
+
+    private JComboBox<String> orderStatus = null;
+
+    private String[] statuses = {
+            "PROCESSED", "DELIVERED", "RETURNED"
+    };
 
     public OrderPanel(ShopCards cards) {
         this.cards = cards;
         setLayout(new BorderLayout(20, 10));
 
-        cancelOrder = new JButton("Cancel Order");
-        cancelOrder.addActionListener(this);
-        cancelOrder.setActionCommand("cancel");
-
-        returnMovies = new JButton("Return Movies");
-        returnMovies.setActionCommand("return");
-        returnMovies.addActionListener(this);
-
+        // north bar
         JPanel northbar = new JPanel();
-        northbar.add(cancelOrder);
-        northbar.add(returnMovies);
+
+        if (!Model.getUserService().getLoggedInUser().isAdmin()) {
+            // customer menu bar
+            JButton cancelOrder = new JButton("Cancel Order");
+            cancelOrder.addActionListener(this);
+            cancelOrder.setActionCommand("cancel");
+
+            JButton returnMovies = new JButton("Return Movies");
+            returnMovies.setActionCommand("return");
+            returnMovies.addActionListener(this);
+
+            northbar.add(cancelOrder);
+            northbar.add(returnMovies);
+        } else {
+            // admin menu bar
+        }
 
         table = new JTable();
-        updateTable();
-        scrollPane = new JScrollPane(table);
+        updateViews();
+        JScrollPane scrollPane = new JScrollPane(table);
 
         add(scrollPane, BorderLayout.CENTER);
         add(new JPanel(), BorderLayout.WEST);
         add(new JPanel(), BorderLayout.EAST);
         add(northbar, BorderLayout.NORTH);
         add(new JPanel(), BorderLayout.SOUTH);
+
         setVisible(true);
     }
 
@@ -55,13 +66,22 @@ public class OrderPanel extends JPanel implements ActionListener {
     }
 
     public void updateTable() {
-        List<Order> orders = Model.getOrderService().getOrdersByCustomer(Model.getUserService().getLoggedInUser().getUsername());
+        List<Order> orders;
         DefaultTableModel tmodel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                if (column == 1  && Model.getUserService().getLoggedInUser().isAdmin()) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         };
+        if (Model.getUserService().getLoggedInUser().isAdmin()) {
+            orders = Model.getOrderService().getAllOrders();
+        } else {
+            orders = Model.getOrderService().getOrdersByCustomer(Model.getUserService().getLoggedInUser().getUsername());
+        }
         String[][] data = new String[orders.size()][5];
         String[] column = {"NUMBER","STATUS","DATE","DUEDATE","OVERDUE"};
         int i = 0;
@@ -73,8 +93,13 @@ public class OrderPanel extends JPanel implements ActionListener {
             data[i][4] = String.valueOf(o.getOverdue());
             i++;
         }
+
         tmodel.setDataVector(data,column);
         table.setModel(tmodel);
+        TableColumn statusColumn = table.getColumnModel().getColumn(1);
+        orderStatus = new JComboBox<>(statuses);
+        orderStatus.addActionListener(this);
+        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
     }
 
     @Override
@@ -105,6 +130,14 @@ public class OrderPanel extends JPanel implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(this, "Error returning movies. Status must be DELIVERED", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+        } else if (e.getActionCommand().equals("comboBoxChanged")) {
+            // get the new status of and update the order number
+            String status = (String)orderStatus.getSelectedItem();
+            int[] selected = table.getSelectedRows();
+            if (selected.length == 1) {
+                int orderNumber =  Integer.parseInt((String)table.getValueAt(selected[0], 0));
+                Model.getOrderService().changeOrderStatus(orderNumber, status);
             }
         }
     }

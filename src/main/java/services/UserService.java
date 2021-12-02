@@ -2,6 +2,8 @@ package services;
 
 import model.User;
 
+import java.util.List;
+
 public interface UserService {
 
     boolean changeUsername(String newUsername);
@@ -9,6 +11,12 @@ public interface UserService {
     boolean changePassword(String newPassword);
 
     boolean changeEmail(String newEmail);
+
+    void deleteUser(String username);
+
+    List<User> getAllCustomers();
+
+    User getUser(String username);
 
     User getLoggedInUser();
 

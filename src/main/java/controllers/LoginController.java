@@ -18,7 +18,7 @@ public class LoginController implements ActionListener {
         userService = new UserServiceImpl();
     }
 
-    private void serviceLogin(ActionEvent e) {
+    private void serviceLogin() {
         if (userService.login(view.getUsernameInput(), view.getPasswordInput())) {
             view.cards.login();
         } else {
@@ -30,7 +30,7 @@ public class LoginController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals(LoginPanel.loginCommand)) {
-            serviceLogin(e);
+            serviceLogin();
         }
     }
 }

@@ -13,4 +13,5 @@ public class CreditCard implements PaymentService {
     public boolean pay(Map<Movie, Integer> movies) {
         return true;
     }
+
 }

@@ -1,6 +1,7 @@
 package view.cards;
 
 import view.shoppanels.CartPanel;
+import view.shoppanels.ManageAccountsPanel;
 import view.shoppanels.OrderPanel;
 import view.shoppanels.StorePanel;
 import view.storefrontpanels.ShopPanel;
@@ -21,6 +22,7 @@ public class ShopCards extends JPanel implements ActionListener {
     private final StorePanel sp;
     private final CartPanel cp;
     private final OrderPanel op;
+    private final ManageAccountsPanel map;
 
     public ShopCards(ShopPanel shopPanel) {
         this.shopPanel = shopPanel;
@@ -31,15 +33,18 @@ public class ShopCards extends JPanel implements ActionListener {
         sp = new StorePanel(this);
         cp = new CartPanel(this);
         op = new OrderPanel(this);
+        map = new ManageAccountsPanel(this);
 
         add(ap, "ap");
         add(sp, "sp");
         add(cp, "cp");
         add(op, "op");
+        add(map, "map");
 
         setVisible(true);
     }
 
+    public ManageAccountsPanel getManageAccountsPanel() { return map; }
 
     public CardLayout getLayout() {
         return cl;

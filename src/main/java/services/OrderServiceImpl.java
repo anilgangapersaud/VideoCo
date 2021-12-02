@@ -67,6 +67,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> getAllOrders() {
+        return orderRepository.getAllOrders();
+    }
+
+    @Override
     public List<Order> getOrdersByCustomer(String username) {
         return orderRepository.getOrdersByCustomer(username);
     }
@@ -74,6 +79,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public boolean cancelOrder(int orderNumber) {
         return orderRepository.cancelOrder(orderNumber);
+    }
+
+    @Override
+    public void changeOrderStatus(int orderNumber, String status) {
+        orderRepository.changeOrderStatus(orderNumber, status);
     }
 
     @Override

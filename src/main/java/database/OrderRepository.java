@@ -1,5 +1,6 @@
 package database;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
 import model.Order;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -107,16 +108,6 @@ public class OrderRepository implements DatabaseAccess {
     }
 
     /**
-     * create an order
-     * @param o the order to create
-     */
-    public void createOrder(Order o) {
-        orderDatabase.put(o.getOrderId(), o);
-        rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
-        update();
-    }
-
-    /**
      * cancel an order
      * @param orderNumber the order number of the order to be canceled
      * @return true if successful, false otherwise
@@ -137,25 +128,36 @@ public class OrderRepository implements DatabaseAccess {
     }
 
     /**
-     * Return movies to the system
-     * @param orderNumber the order to return
-     * @return true if successful, false otherwise
+     * Update an order's status
+     * @param orderNumber the order number to update
+     * @param status the new order status
      */
-    public boolean returnOrder(int orderNumber) {
+    public void changeOrderStatus(int orderNumber, String status) {
         Order o = orderDatabase.get(orderNumber);
-        if (o == null) {
-            return false;
+        o.setOrderStatus(status);
+        orderDatabase.replace(orderNumber, o);
+        update();
+    }
+
+    /**
+     * create an order
+     * @param o the order to create
+     */
+    public void createOrder(Order o) {
+        orderDatabase.put(o.getOrderId(), o);
+        rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
+        update();
+    }
+
+    /**
+     * @return all orders in the system
+     */
+    public List<Order> getAllOrders() {
+        List<Order> allOrders = new ArrayList<>();
+        for (Map.Entry<Integer, Order> entry : orderDatabase.entrySet()) {
+            allOrders.add(entry.getValue());
         }
-        if (!o.getOrderStatus().equals("DELIVERED")) {
-            return false;
-        } else {
-            rentedRepository.returnMovies(orderNumber);
-            o.setDueDate("");
-            o.setOrderStatus("RETURNED");
-            o.setOverdue(false);
-            orderDatabase.replace(orderNumber, o);
-            return true;
-        }
+        return allOrders;
     }
 
     /**
@@ -181,5 +183,29 @@ public class OrderRepository implements DatabaseAccess {
     public int getTotalOrders() {
         return orderDatabase.size();
     }
+
+
+    /**
+     * Return movies to the system
+     * @param orderNumber the order to return
+     * @return true if successful, false otherwise
+     */
+    public boolean returnOrder(int orderNumber) {
+        Order o = orderDatabase.get(orderNumber);
+        if (o == null) {
+            return false;
+        }
+        if (!o.getOrderStatus().equals("DELIVERED")) {
+            return false;
+        } else {
+            rentedRepository.returnMovies(orderNumber);
+            o.setDueDate("");
+            o.setOrderStatus("RETURNED");
+            o.setOverdue(false);
+            orderDatabase.replace(orderNumber, o);
+            return true;
+        }
+    }
+
 }
 

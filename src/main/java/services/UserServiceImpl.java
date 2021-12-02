@@ -3,6 +3,8 @@ package services;
 import database.UserRepository;
 import model.User;
 
+import java.util.List;
+
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
@@ -34,6 +36,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changeEmail(String newEmail) {
         return userRepository.changeEmail(newEmail);
+    }
+
+    @Override
+    public void deleteUser(String username) { userRepository.deleteUser(username); }
+
+    @Override
+    public List<User> getAllCustomers() {
+        return userRepository.getAllCustomers();
+    }
+
+    @Override
+    public User getUser(String username) {
+        return userRepository.getUser(username);
     }
 
     @Override

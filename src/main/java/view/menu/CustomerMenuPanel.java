@@ -8,22 +8,14 @@ import java.awt.event.ActionListener;
 
 public class CustomerMenuPanel extends MenuPanel implements ActionListener {
 
-    private JButton orders;
-    private JButton cart;
-
     public CustomerMenuPanel(ShopCards cards) {
         super(cards);
 
-        orders = new JButton("Orders");
-        orders.setActionCommand("orders");
-        orders.addActionListener(this);
-
-        cart = new JButton("Cart");
+        JButton cart = new JButton("Cart");
         cart.setActionCommand("cart");
         cart.addActionListener(this);
 
         add(cart);
-        add(orders);
         add(welcomeMessage);
     }
 

@@ -33,6 +33,9 @@ public class UserRepository implements DatabaseAccess {
      */
     private final Map<String, User> userAccounts;
 
+    /**
+     * The currently logged-in user
+     */
     private User loggedInUser;
 
     /**
@@ -111,48 +114,14 @@ public class UserRepository implements DatabaseAccess {
     }
 
     /**
-     * Register a new user
-     * @param user the new user
-     * @return {@code true} if registration successful, otherwise {@code false}
+     * give a loyalty point to a user
+     * @param username the user receiving the loyalty point
      */
-    public boolean register(User user)  {
-        if (!validateNewUserRegistration(user)) {
-            return false;
-        } else {
-            if (user.getAccountType().equals("employee") && adminEmails.contains(user.getEmailAddress())) {
-                user.setAccountType("admin");
-            }
-            userAccounts.put(user.getUsername(), user);
-            update();
-            return true;
-        }
-    }
-
-    /**
-     * Check user's username and password to validate login
-     * @param username user's username
-     * @param password user's password
-     * @return {@code true} if the credentials match, {@code false} otherwise
-     */
-    public boolean login(String username, String password) {
-        if (userAccounts.containsKey(username)) {
-            if (userAccounts.get(username).getPassword().equals(password)) {
-                loggedInUser = userAccounts.get(username);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * update a user in the database
-     * @param u the user to update
-     */
-    public void updateUser(User u) {
-        if (userAccounts.containsKey(u.getUsername())) {
-            userAccounts.replace(u.getUsername(), u);
-            update();
-        }
+    public void awardLoyaltyPoint(String username) {
+        User u = userAccounts.get(username);
+        u.setLoyaltyPoints(u.getLoyaltyPoints()+1);
+        userAccounts.replace(username, u);
+        update();
     }
 
     /**
@@ -207,17 +176,6 @@ public class UserRepository implements DatabaseAccess {
     }
 
     /**
-     * give a loyalty point to a user
-     * @param username the user receiving the loyalty point
-     */
-    public void awardLoyaltyPoint(String username) {
-        User u = userAccounts.get(username);
-        u.setLoyaltyPoints(u.getLoyaltyPoints()+1);
-        userAccounts.replace(username, u);
-        update();
-    }
-
-    /**
      * Change the email of an existing user
      * @param newEmail the new email
      * @return {@code true} if the email was changed successfully, {@code false} otherwise
@@ -240,8 +198,85 @@ public class UserRepository implements DatabaseAccess {
         }
     }
 
+    /**
+     * Delete a user from the database
+     * @param username the user to delete
+     */
+    public void deleteUser(String username) {
+        userAccounts.remove(username);
+        update();
+    }
+
+    /**
+     * @return all customer accounts
+     */
+    public List<User> getAllCustomers() {
+        List<User> customers = new ArrayList<>();
+        for (Map.Entry<String, User> entry : userAccounts.entrySet()) {
+            if (entry.getValue().getAccountType().equals("customer")) {
+                customers.add(entry.getValue());
+            }
+        }
+        return customers;
+    }
+
+    /**
+     * @return the currently logged-in user
+     */
     public User getLoggedInUser() {
         return loggedInUser;
+    }
+
+    /**
+     * @return a user account
+     */
+    public User getUser(String username) {
+        return userAccounts.get(username);
+    }
+
+    /**
+     * update a user in the database
+     * @param u the user to update
+     */
+    public void updateUser(User u) {
+        if (userAccounts.containsKey(u.getUsername())) {
+            userAccounts.replace(u.getUsername(), u);
+            update();
+        }
+    }
+
+    /**
+     * Register a new user
+     * @param user the new user
+     * @return {@code true} if registration successful, otherwise {@code false}
+     */
+    public boolean register(User user)  {
+        if (!validateNewUserRegistration(user)) {
+            return false;
+        } else {
+            if (user.getAccountType().equals("employee") && adminEmails.contains(user.getEmailAddress())) {
+                user.setAccountType("admin");
+            }
+            userAccounts.put(user.getUsername(), user);
+            update();
+            return true;
+        }
+    }
+
+    /**
+     * Check user's username and password to validate login
+     * @param username user's username
+     * @param password user's password
+     * @return {@code true} if the credentials match, {@code false} otherwise
+     */
+    public boolean login(String username, String password) {
+        if (userAccounts.containsKey(username)) {
+            if (userAccounts.get(username).getPassword().equals(password)) {
+                loggedInUser = userAccounts.get(username);
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean validateUsername(String username) {
@@ -262,4 +297,5 @@ public class UserRepository implements DatabaseAccess {
     private boolean validateEmail(String email) {
         return email != null && !email.equals("");
     }
+
 }
