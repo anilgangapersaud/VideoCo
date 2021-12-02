@@ -14,9 +14,9 @@ import java.util.List;
 
 public class OrderServiceImpl implements OrderService {
 
-    private OrderRepository orderRepository;
-    private MovieRepository movieRepository;
-    private UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final MovieRepository movieRepository;
+    private final UserRepository userRepository;
 
     public OrderServiceImpl() {
         orderRepository = OrderRepository.getInstance();
@@ -74,5 +74,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public boolean cancelOrder(int orderNumber) {
         return orderRepository.cancelOrder(orderNumber);
+    }
+
+    @Override
+    public boolean returnMovies(int orderNumber) {
+        return orderRepository.returnOrder(orderNumber);
     }
 }

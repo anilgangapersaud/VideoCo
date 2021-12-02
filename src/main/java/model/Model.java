@@ -20,9 +20,7 @@ public class Model {
         return userService;
     }
 
-    public static MovieService getMovieService() {
-        return movieService;
-    }
+    public static MovieService getMovieService() {return movieService;}
 
     public static AddressService getAddressService() { return addressService; }
 

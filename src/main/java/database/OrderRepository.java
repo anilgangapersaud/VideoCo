@@ -38,7 +38,7 @@ public class OrderRepository implements DatabaseAccess {
     /**
      * maintains the movies currently out for rent
      */
-    private RentedRepository rentedRepository;
+    private final RentedRepository rentedRepository;
 
     private OrderRepository() {
         orderDatabase = new HashMap<>();
@@ -126,12 +126,34 @@ public class OrderRepository implements DatabaseAccess {
         if (o == null) {
             return false;
         }
-        if (o.getOrderStatus().equals("DELIVERED")) {
+        if (!o.getOrderStatus().equals("PROCESSED")) {
             return false;
         } else {
             orderDatabase.remove(orderNumber);
             rentedRepository.returnMovies(orderNumber);
             update();
+            return true;
+        }
+    }
+
+    /**
+     * Return movies to the system
+     * @param orderNumber the order to return
+     * @return true if successful, false otherwise
+     */
+    public boolean returnOrder(int orderNumber) {
+        Order o = orderDatabase.get(orderNumber);
+        if (o == null) {
+            return false;
+        }
+        if (!o.getOrderStatus().equals("DELIVERED")) {
+            return false;
+        } else {
+            rentedRepository.returnMovies(orderNumber);
+            o.setDueDate("");
+            o.setOrderStatus("RETURNED");
+            o.setOverdue(false);
+            orderDatabase.replace(orderNumber, o);
             return true;
         }
     }

@@ -82,7 +82,7 @@ public class OrderPanel extends JPanel implements ActionListener {
         if (e.getActionCommand().equals("cancel")) {
             int[] selected = table.getSelectedRows();
             if (selected.length != 1) {
-                JOptionPane.showMessageDialog(this, "Select 1 order to cancel","Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Select an order to cancel","Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 int orderNumber = Integer.parseInt((String)table.getValueAt(selected[0],0));
                 boolean result = Model.getOrderService().cancelOrder(orderNumber);
@@ -92,6 +92,20 @@ public class OrderPanel extends JPanel implements ActionListener {
                 } else {
                     JOptionPane.showMessageDialog(this, "Error cancelling order","Error", JOptionPane.ERROR_MESSAGE);}
                 }
+        } else if (e.getActionCommand().equals("return")) {
+            int[] selected = table.getSelectedRows();
+            if (selected.length != 1) {
+                JOptionPane.showMessageDialog(this, "Select 1 order", "Error", JOptionPane.ERROR);
+            } else {
+                int orderNumber = Integer.parseInt((String)table.getValueAt(selected[0],0));
+                boolean result = Model.getOrderService().returnMovies(orderNumber);
+                if (result) {
+                    JOptionPane.showMessageDialog(this, "Thanks for shopping with VideoCo!");
+                    updateViews();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error returning movies. Status must be DELIVERED", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 

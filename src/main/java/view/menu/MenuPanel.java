@@ -9,13 +9,15 @@ import java.awt.event.ActionListener;
 
 public abstract class MenuPanel extends JPanel implements ActionListener {
 
-    private JButton account, logout, store;
+    private JButton account, logout;
     protected JLabel welcomeMessage;
     protected JPanel cards;
+    private JButton store;
     ShopCards shopCards;
 
     public MenuPanel(ShopCards cards) {
         shopCards = cards;
+
         logout = new JButton("Logout");
         logout.setActionCommand("logout");
         logout.addActionListener(this);
@@ -24,9 +26,14 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         account.setActionCommand("account");
         account.addActionListener(this);
 
-        store = new JButton("Store");
+        if (Model.getUserService().getLoggedInUser().isAdmin()) {
+            store = new JButton("Inventory");
+        } else {
+            store = new JButton("Shop");
+        }
         store.setActionCommand("store");
         store.addActionListener(this);
+
 
         welcomeMessage = new JLabel("Welcome " + Model.getUserService().getLoggedInUser().getUsername() + "!");
 
@@ -35,6 +42,7 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         add(account);
 
         cards.getLayout().show(cards, "sp");
+
         this.setVisible(true);
     }
 

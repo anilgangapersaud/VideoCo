@@ -154,5 +154,4 @@ public class AddressRepository implements DatabaseAccess {
                 && !address.getProvince().equals("") && !address.getPostalCode().equals("")
                 && !address.getUsername().equals("");
     }
-
 }

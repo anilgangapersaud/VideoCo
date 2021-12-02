@@ -103,6 +103,14 @@ public class MovieRepository implements DatabaseAccess {
         }
     }
 
+    public void deleteMovies(List<String> barcodes) {
+        for (String barcode : barcodes) {
+            Movie m = barcodeToMovieMap.get(barcode);
+            movieDatabase.remove(m);
+        }
+        update();
+    }
+
     /**
      * Get all movies with matching titles from the database
      * @param movieTitle the title to search
@@ -143,16 +151,26 @@ public class MovieRepository implements DatabaseAccess {
     }
 
     /**
+     * Get movie by barcode
+     * @param barcode the barcode id of the movie
+     * @return the movie
+     */
+    public Movie getMovie(String barcode) {
+        return barcodeToMovieMap.get(barcode);
+    }
+
+    /**
      * Add a movie to the database
      * @param movie the movie to add
      * @return {@code true} if the movie was added successfully, {@code false} otherwise
      */
-    public boolean addMovie(Movie movie) {
-        if (validateMovie(movie)) {
+    public boolean addMovie(Movie movie, Integer quantity) {
+        if (validateMovieAdd(movie)) {
             if (movieDatabase.containsKey(movie)) {
-                movieDatabase.replace(movie,movieDatabase.get(movie)+1);
+                movieDatabase.replace(movie,movieDatabase.get(movie)+quantity);
             } else {
-                movieDatabase.put(movie, 1);
+                movieDatabase.put(movie, quantity);
+                barcodeToMovieMap.put(movie.getBarcode(), movie);
             }
             update();
             return true;
@@ -190,12 +208,51 @@ public class MovieRepository implements DatabaseAccess {
     public void returnMovie(String barcode) {
         Movie m = barcodeToMovieMap.get(barcode);
         movieDatabase.replace(m, movieDatabase.get(m) + 1);
+        update();
     }
 
     /**
-     * Validates the movie object
+     * Remove stock for a particular movie
+     * @param barcode the id of the movie to remove stock
      */
-    private boolean validateMovie(Movie m) {
-        return m.getBarcode() != null && !m.getBarcode().equals("") && m.getPrice() >= 0.00D;
+    public void removeStock(String barcode) {
+        Movie m = barcodeToMovieMap.get(barcode);
+        if (movieDatabase.get(m) <= 0) {
+            return;
+        } else {
+            movieDatabase.replace(m, movieDatabase.get(m)-1);
+        }
+        update();
+    }
+
+    /**
+     * Update a movie in the database
+     * @param movie the movie to update
+     * @return true if successful, false otherwise
+     */
+    public boolean updateMovie(Movie movie) {
+        if (validateMovieUpdate(movie)) {
+            Movie oldMovie = barcodeToMovieMap.get(movie.getBarcode());
+            Integer oldMovieQuantity = movieDatabase.get(oldMovie);
+            movieDatabase.remove(oldMovie);
+            movieDatabase.put(movie, oldMovieQuantity);
+            barcodeToMovieMap.replace(movie.getBarcode(), movie);
+            update();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean validateMovieAdd(Movie m) {
+        if (barcodeToMovieMap.containsKey(m.getBarcode())) {
+            return false;
+        } else {
+            return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
+        }
+    }
+
+    private boolean validateMovieUpdate(Movie m) {
+        return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
     }
 }

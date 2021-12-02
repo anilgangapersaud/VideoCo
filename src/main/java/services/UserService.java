@@ -4,10 +4,6 @@ import model.User;
 
 public interface UserService {
 
-    User login(String username, String password);
-
-    boolean register(User user);
-
     boolean changeUsername(String newUsername);
 
     boolean changePassword(String newPassword);
@@ -16,9 +12,10 @@ public interface UserService {
 
     User getLoggedInUser();
 
-    boolean updateUser(String username, String password, String emailAddress);
+    User login(String username, String password);
 
-    boolean deleteAccount(String username);
+    boolean register(User user);
 
-    boolean updateUser(User u);
+    void updateUser(User user);
+
 }

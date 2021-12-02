@@ -9,13 +9,10 @@ import java.awt.event.ActionListener;
 
 public class AdminMenuPanel extends MenuPanel implements ActionListener {
 
-    private JButton inventory, manageOrders, manageAccounts;
+    private JButton manageOrders, manageAccounts;
 
     public AdminMenuPanel(ShopCards cards) {
         super(cards);
-        inventory = new JButton("Inventory");
-        inventory.setActionCommand("inventory");
-        inventory.addActionListener(this);
 
         manageOrders = new JButton("Manage Orders");
         manageOrders.setActionCommand("manageOrders");
@@ -25,7 +22,6 @@ public class AdminMenuPanel extends MenuPanel implements ActionListener {
         manageAccounts.setActionCommand("manageAccounts");
         manageAccounts.addActionListener(this);
 
-        add(inventory);
         add(manageOrders);
         add(manageAccounts);
         add(welcomeMessage);

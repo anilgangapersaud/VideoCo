@@ -1,22 +1,12 @@
 package model;
 
-import model.Movie;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A shopping cart to hold movies
- */
 public class Cart {
 
-    /**
-     * A cart with movies and quantity of each
-     */
-    private Map<Movie, Integer> cart;
+    private final Map<Movie, Integer> cart;
 
-    /**
-     * Initialize the cart object
-     */
     public Cart() {
         cart = new HashMap<>();
     }
@@ -32,6 +22,10 @@ public class Cart {
         } else {
             cart.put(m, quantity);
         }
+    }
+
+    public void clearCart() {
+        cart.clear();
     }
 
     /**
@@ -62,12 +56,5 @@ public class Cart {
                 cart.replace(m, cart.get(m)-1);
             }
         }
-    }
-
-    /**
-     * Clear the cart of all movies
-     */
-    public void clearCart() {
-        cart.clear();
     }
 }

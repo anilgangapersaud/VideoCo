@@ -5,7 +5,7 @@ import model.Address;
 
 public class AddressServiceImpl implements AddressService {
 
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
     public AddressServiceImpl() {
         addressRepository = AddressRepository.getInstance();
@@ -21,6 +21,7 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.saveAddress(a);
     }
 
+    @Override
     public void deleteAddress(String username) {
         addressRepository.deleteAddress(username);
     }
@@ -29,4 +30,5 @@ public class AddressServiceImpl implements AddressService {
     public boolean updateAddress(Address a) {
         return addressRepository.updateAddress(a);
     }
+
 }

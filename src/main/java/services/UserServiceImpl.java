@@ -2,7 +2,6 @@ package services;
 
 import database.UserRepository;
 import model.User;
-import services.UserService;
 
 public class UserServiceImpl implements UserService {
 
@@ -53,17 +52,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUser(String username, String password, String emailAddress) {
-        return false;
+    public void updateUser(User u) {
+        userRepository.updateUser(u);
     }
 
-    @Override
-    public boolean deleteAccount(String username) {
-        return false;
-    }
-
-    @Override
-    public boolean updateUser(User u) {
-        return userRepository.updateUser(u);
-    }
 }
