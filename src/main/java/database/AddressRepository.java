@@ -9,11 +9,12 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddressRepository implements DatabaseAccess {
+public class AddressRepository implements DatabaseAccess, Subject {
 
     /**
      * configs
@@ -23,9 +24,11 @@ public class AddressRepository implements DatabaseAccess {
 
     private final Map<String, Address> addressDatabase;
     private static AddressRepository addressRepositoryInstance = null;
+    List<Observer> observers;
 
     private AddressRepository() {
         addressDatabase = new HashMap<>();
+        observers = new ArrayList<>();
         loadCSV();
     }
 
@@ -141,4 +144,20 @@ public class AddressRepository implements DatabaseAccess {
                 && !address.getUsername().equals("");
     }
 
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
 }

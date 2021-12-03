@@ -1,19 +1,19 @@
 package view.shoppanels;
 
-import model.Model;
+import controllers.BillingController;
+import database.BillingRepository;
+import database.Observer;
+import database.UserRepository;
 import model.payments.CreditCard;
 import view.cards.AccountCards;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.jar.JarEntry;
 
-public class BillingPanel extends JPanel implements ActionListener {
+public class BillingPanel extends JPanel implements Observer {
 
     private final AccountCards cards;
+
     private CreditCard customerCreditCard;
 
     private final JTextField cardNumberInput;
@@ -29,8 +29,11 @@ public class BillingPanel extends JPanel implements ActionListener {
     public BillingPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
-        username =  Model.getUserService().getLoggedInUser().getUsername();
-        customerCreditCard = Model.getBillingService().getCreditCard(username);
+
+        username =  UserRepository.getInstance().getLoggedInUser().getUsername();
+        customerCreditCard = BillingRepository.getInstance().getCreditCard(username);
+        BillingRepository.getInstance().registerObserver(this);
+        BillingController billingController = new BillingController(this);
 
         // credit card
         JLabel accountBalanceLabel = new JLabel("Balance:");
@@ -68,11 +71,11 @@ public class BillingPanel extends JPanel implements ActionListener {
 
          // buttons
         JButton saveCreditCard = new JButton("Save Card");
-        saveCreditCard.addActionListener(this);
+        saveCreditCard.addActionListener(billingController);
         saveCreditCard.setActionCommand("saveBilling");
         JButton accountDetails = new JButton("Account");
         accountDetails.setActionCommand("account");
-        accountDetails.addActionListener(this);
+        accountDetails.addActionListener(billingController);
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         buttons.add(accountDetails);
@@ -82,7 +85,12 @@ public class BillingPanel extends JPanel implements ActionListener {
         JLabel accountInformation = new JLabel("Billing Information");
         accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        updateFields();
+        if (customerCreditCard != null) {
+            cardNumberInput.setText(customerCreditCard.getCardNumber());
+            expiryInput.setText(customerCreditCard.getExpiry());
+            csvInput.setText(customerCreditCard.getCsv());
+            accountBalance.setText(String.format("%.2f", customerCreditCard.getBalance() ) + "$");
+        }
 
         Box box = Box.createVerticalBox();
         box.add(accountInformation);
@@ -107,45 +115,46 @@ public class BillingPanel extends JPanel implements ActionListener {
         setVisible(true);
     }
 
-    public void updateBalance() {
-        accountBalance.setText(String.format("%.2f", Model.getBillingService().getCreditCard(username).getBalance()) + "$");
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 
-    private void updateFields() {
+    public void displayErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public AccountCards getCards() {
+        return cards;
+    }
+
+    public String getCsv() {
+        return csvInput.getText();
+    }
+
+    public String getExpiry() {
+        return expiryInput.getText();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getCardNumber() {
+        return cardNumberInput.getText();
+    }
+
+    public CreditCard getCustomerCreditCard() {
+        return customerCreditCard;
+    }
+
+    @Override
+    public void update() {
+        customerCreditCard = BillingRepository.getInstance().getCreditCard(username);
         if (customerCreditCard != null) {
             cardNumberInput.setText(customerCreditCard.getCardNumber());
             expiryInput.setText(customerCreditCard.getExpiry());
             csvInput.setText(customerCreditCard.getCsv());
             accountBalance.setText(String.format("%.2f", customerCreditCard.getBalance() ) + "$");
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("account")) {
-            CardLayout cl = (CardLayout) cards.getLayout();
-            cl.show(cards, "eacp");
-        } else if (e.getActionCommand().equals("saveBilling")) {
-            CreditCard c = new CreditCard();
-            c.setCsv(csvInput.getText());
-            c.setExpiry(expiryInput.getText());
-            c.setUsername(username);
-            c.setCardNumber(cardNumberInput.getText());
-            boolean result;
-            if (customerCreditCard == null) {
-                c.setBalance(0.00D);
-                result = Model.getBillingService().saveCreditCard(c);
-            } else {
-                c.setBalance(customerCreditCard.getBalance());
-                result = Model.getBillingService().updateCreditCard(c);
-            }
-            if (!result) {
-                JOptionPane.showMessageDialog(this, "Invalid Billing Information. Please try again", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Saved Billing");
-            }
-            customerCreditCard = c;
-            updateFields();
         }
     }
 }

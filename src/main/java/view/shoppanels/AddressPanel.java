@@ -37,6 +37,7 @@ public class AddressPanel extends JPanel implements Observer {
         username = UserRepository.getInstance().getLoggedInUser().getUsername();
         customerAddress = AddressRepository.getInstance().getAddress(username);
         AddressController addressController = new AddressController(this);
+        AddressRepository.getInstance().registerObserver(this);
 
         // address
         JLabel streetLabel = new JLabel("Street:");

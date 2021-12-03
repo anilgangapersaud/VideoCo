@@ -31,6 +31,8 @@ public class AccountPanel extends JPanel implements Observer {
         String customerEmail = UserRepository.getInstance().getLoggedInUser().getEmailAddress();
         int customerLoyaltyPoints = UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints();
 
+        UserRepository.getInstance().registerObserver(this);
+
         JLabel username = new JLabel("Username:");
         nameInput = new JTextField(20);
         nameInput.setText(customerName);

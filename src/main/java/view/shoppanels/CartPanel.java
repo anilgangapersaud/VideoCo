@@ -187,7 +187,6 @@ public class CartPanel extends JPanel implements ActionListener {
                             JOptionPane.showMessageDialog(this, "Order Created!");
                             u.getCart().clearCart();
                             updateView();
-                            cards.getAccountPanel().getBillingPanel().updateBalance();
                         } else {
                             JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
                         }

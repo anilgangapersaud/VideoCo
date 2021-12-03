@@ -9,20 +9,23 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BillingRepository implements DatabaseAccess {
+public class BillingRepository implements DatabaseAccess, Subject {
 
     private final Map<String, CreditCard> billingDatabase;
     private static BillingRepository billingRepositoryInstance = null;
+    List<Observer> observers;
 
     private static final String BILLING_FILE_PATH = "/src/main/resources/billing.csv";
     private static final String billingPath = System.getProperty("user.dir") + BILLING_FILE_PATH;
 
     private BillingRepository() {
         billingDatabase = new HashMap<>();
+        observers = new ArrayList<>();
         loadCSV();
     }
 
@@ -67,6 +70,7 @@ public class BillingRepository implements DatabaseAccess {
             for (Map.Entry<String,CreditCard> entry : billingDatabase.entrySet()) {
                 CreditCard c = entry.getValue();
                 printer.printRecord(c.getUsername(), c.getCardNumber(), c.getExpiry(), c.getCsv(), c.getBalance());
+                notifyObservers();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -125,4 +129,20 @@ public class BillingRepository implements DatabaseAccess {
                 !c.getCsv().equals("") && !c.getExpiry().equals("");
     }
 
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
 }
