@@ -16,14 +16,12 @@ import java.util.Map;
 
 public class AddressRepository implements DatabaseAccess, Subject {
 
-    /**
-     * configs
-     */
     private static final String ADDRESS_FILE_PATH = "/src/main/resources/addresses.csv";
     private static final String addressPath = System.getProperty("user.dir") + ADDRESS_FILE_PATH;
 
+    private volatile static AddressRepository addressRepositoryInstance;
+
     private final Map<String, Address> addressDatabase;
-    private static AddressRepository addressRepositoryInstance = null;
     private final List<Observer> observers;
 
     private AddressRepository() {
@@ -37,7 +35,11 @@ public class AddressRepository implements DatabaseAccess, Subject {
      */
     public static AddressRepository getInstance() {
         if (addressRepositoryInstance == null) {
-            addressRepositoryInstance = new AddressRepository();
+            synchronized (AddressRepository.class) {
+                if (addressRepositoryInstance == null) {
+                    addressRepositoryInstance = new AddressRepository();
+                }
+            }
         }
         return addressRepositoryInstance;
     }
@@ -133,17 +135,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * validate address fields checks if any empty fields
-     * @param address the address to validate
-     * @return validation
-     */
-    private boolean validateAddress(Address address) {
-        return !address.getLineAddress().equals("") && !address.getCity().equals("")
-                && !address.getProvince().equals("") && !address.getPostalCode().equals("")
-                && !address.getUsername().equals("");
-    }
-
     @Override
     public void registerObserver(Observer o) {
         observers.add(o);
@@ -159,5 +150,16 @@ public class AddressRepository implements DatabaseAccess, Subject {
         for (Observer o : observers) {
             o.update();
         }
+    }
+
+    /**
+     * validate address fields checks if any empty fields
+     * @param address the address to validate
+     * @return validation
+     */
+    private boolean validateAddress(Address address) {
+        return !address.getLineAddress().equals("") && !address.getCity().equals("")
+                && !address.getProvince().equals("") && !address.getPostalCode().equals("")
+                && !address.getUsername().equals("");
     }
 }

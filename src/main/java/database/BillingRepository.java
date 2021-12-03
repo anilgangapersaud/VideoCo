@@ -16,9 +16,11 @@ import java.util.Map;
 
 public class BillingRepository implements DatabaseAccess, Subject {
 
+    private volatile static BillingRepository billingRepositoryInstance;
+
     private final Map<String, CreditCard> billingDatabase;
-    private static BillingRepository billingRepositoryInstance = null;
-    List<Observer> observers;
+
+    private final List<Observer> observers;
 
     private static final String BILLING_FILE_PATH = "/src/main/resources/billing.csv";
     private static final String billingPath = System.getProperty("user.dir") + BILLING_FILE_PATH;
@@ -31,7 +33,11 @@ public class BillingRepository implements DatabaseAccess, Subject {
 
     public static BillingRepository getInstance() {
         if (billingRepositoryInstance == null) {
-            billingRepositoryInstance = new BillingRepository();
+            synchronized (BillingRepository.class) {
+                if (billingRepositoryInstance == null) {
+                    billingRepositoryInstance = new BillingRepository();
+                }
+            }
         }
         return billingRepositoryInstance;
     }
@@ -124,14 +130,16 @@ public class BillingRepository implements DatabaseAccess, Subject {
         }
     }
 
-    private boolean validateCreditCard(CreditCard c) {
-        return c.getBalance() >= 0.00D && !c.getCardNumber().equals("") &&
-                !c.getCsv().equals("") && !c.getExpiry().equals("");
-    }
-
     public void refundCustomer(String username, double amount) {
         CreditCard c = billingDatabase.get(username);
         c.refund(amount);
+        updateCreditCard(c);
+    }
+
+    public void chargeCustomer(String username, double amount) {
+        CreditCard c = billingDatabase.get(username);
+        c.charge(amount);
+        updateCreditCard(c);
     }
 
     @Override
@@ -149,5 +157,10 @@ public class BillingRepository implements DatabaseAccess, Subject {
         for (Observer o : observers) {
             o.update();
         }
+    }
+
+    private boolean validateCreditCard(CreditCard c) {
+        return c.getBalance() >= 0.00D && !c.getCardNumber().equals("") &&
+                !c.getCsv().equals("") && !c.getExpiry().equals("");
     }
 }

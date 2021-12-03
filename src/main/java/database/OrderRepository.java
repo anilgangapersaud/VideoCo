@@ -2,6 +2,7 @@ package database;
 
 import model.Address;
 import model.Cart;
+import model.Movie;
 import model.Order;
 import model.payments.PaymentService;
 import org.apache.commons.csv.CSVFormat;
@@ -35,27 +36,12 @@ public class OrderRepository implements DatabaseAccess, Subject {
     /**
      * singleton instance
      */
-    private static OrderRepository orderRepositoryInstance = null;
-
-    /**
-     * maintains the movies currently out for rent
-     */
-    private final RentedRepository rentedRepository;
-
-    private final BillingRepository billingRepository;
-
-    private final MovieRepository movieRepository;
-
-    private final UserRepository userRepository;
+    private volatile static OrderRepository orderRepositoryInstance;
 
     private final List<Observer> observers;
 
     private OrderRepository() {
         orderDatabase = new HashMap<>();
-        rentedRepository = RentedRepository.getInstance();
-        billingRepository = BillingRepository.getInstance();
-        movieRepository = MovieRepository.getInstance();
-        userRepository = UserRepository.getInstance();
         observers = new ArrayList<>();
         loadCSV();
     }
@@ -65,7 +51,11 @@ public class OrderRepository implements DatabaseAccess, Subject {
      */
     public static OrderRepository getInstance() {
         if (orderRepositoryInstance == null) {
-            orderRepositoryInstance = new OrderRepository();
+            synchronized (OrderRepository.class) {
+                if (orderRepositoryInstance == null) {
+                    orderRepositoryInstance = new OrderRepository();
+                }
+            }
         }
         return orderRepositoryInstance;
     }
@@ -121,6 +111,22 @@ public class OrderRepository implements DatabaseAccess, Subject {
         }
     }
 
+    private BillingRepository getBillingRepository() {
+        return BillingRepository.getInstance();
+    }
+
+    private RentedRepository getRentedRepository() {
+        return RentedRepository.getInstance();
+    }
+
+    private MovieRepository getMovieRepository() {
+        return MovieRepository.getInstance();
+    }
+
+    private UserRepository getUserRepository() {
+        return UserRepository.getInstance();
+    }
+
     /**
      * cancel an order
      * @param orderNumber the order number of the order to be canceled
@@ -134,9 +140,9 @@ public class OrderRepository implements DatabaseAccess, Subject {
         if (!o.getOrderStatus().equals("PROCESSED")) {
             return false;
         } else {
-            billingRepository.refundCustomer(o.getUsername(), rentedRepository.getOrderTotal(orderNumber));
+            getBillingRepository().refundCustomer(o.getUsername(), getRentedRepository().getOrderTotal(orderNumber));
             orderDatabase.remove(orderNumber);
-            rentedRepository.returnMovies(orderNumber);
+            getRentedRepository().returnMovies(orderNumber);
             updateCSV();
             return true;
         }
@@ -159,8 +165,8 @@ public class OrderRepository implements DatabaseAccess, Subject {
      */
     public boolean createOrder(Cart cart, PaymentService paymentMethod, Address shipping) {
         if (paymentMethod.pay(cart.getMoviesInCart())) {
-            if (movieRepository.rentMovies(cart.getMoviesInCart())) {
-                userRepository.awardLoyaltyPoint(shipping.getUsername());
+            if (getMovieRepository().rentMovies(cart.getMoviesInCart())) {
+                getUserRepository().awardLoyaltyPoint(shipping.getUsername());
                 Order o = new Order();
                 o.setOrderId(getTotalOrders());
                 o.setOrderDate(getDate());
@@ -170,7 +176,8 @@ public class OrderRepository implements DatabaseAccess, Subject {
                 o.setDueDate(getDueDate());
                 o.setMovies(cart.getMoviesInCart());
                 orderDatabase.put(o.getOrderId(), o);
-                rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
+                getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
+                getBillingRepository().chargeCustomer(o.getUsername(), getRentedRepository().getOrderTotal(o.getOrderId()));
                 updateCSV();
                 return true;
             } else {
@@ -183,7 +190,7 @@ public class OrderRepository implements DatabaseAccess, Subject {
 
     public void createOrder(Order o) {
         orderDatabase.put(o.getOrderId(), o);
-        rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
+        getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
         updateCSV();
     }
 
@@ -251,7 +258,7 @@ public class OrderRepository implements DatabaseAccess, Subject {
         if (!o.getOrderStatus().equals("DELIVERED")) {
             return false;
         } else {
-            rentedRepository.returnMovies(orderNumber);
+            getRentedRepository().returnMovies(orderNumber);
             o.setDueDate("");
             o.setOrderStatus("COMPLETED");
             o.setOverdue(false);

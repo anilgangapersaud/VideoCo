@@ -29,7 +29,7 @@ public class MovieRepository implements DatabaseAccess, Subject {
     /**
      * Singleton instance
      */
-    private static MovieRepository movieRepositoryInstance = null;
+    private volatile static MovieRepository movieRepositoryInstance;
 
     private final List<Observer> observers;
 
@@ -55,7 +55,11 @@ public class MovieRepository implements DatabaseAccess, Subject {
      */
     public static MovieRepository getInstance() {
         if (movieRepositoryInstance == null) {
-            movieRepositoryInstance = new MovieRepository();
+            synchronized (MovieRepository.class) {
+                if (movieRepositoryInstance == null) {
+                    movieRepositoryInstance = new MovieRepository();
+                }
+            }
         }
         return movieRepositoryInstance;
     }

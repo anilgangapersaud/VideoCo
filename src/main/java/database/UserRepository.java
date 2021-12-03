@@ -27,7 +27,7 @@ public class UserRepository implements DatabaseAccess, Subject {
     /**
      * Singleton instance
      */
-    private static UserRepository userRepositoryInstance = null;
+    private volatile static UserRepository userRepositoryInstance;
 
     /**
      * A quick way to get a User by username
@@ -40,12 +40,6 @@ public class UserRepository implements DatabaseAccess, Subject {
      * The currently logged-in user
      */
     private User loggedInUser;
-
-    private final AddressRepository addressRepository;
-
-    private final BillingRepository billingRepository;
-
-    private final OrderRepository orderRepository;
 
     /**
      * Configurations for the csv file
@@ -62,9 +56,6 @@ public class UserRepository implements DatabaseAccess, Subject {
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
         observers = new ArrayList<>();
-        addressRepository = AddressRepository.getInstance();
-        billingRepository = BillingRepository.getInstance();
-        orderRepository = OrderRepository.getInstance();
         loadCSV();
     }
 
@@ -73,7 +64,11 @@ public class UserRepository implements DatabaseAccess, Subject {
      */
     public static UserRepository getInstance() {
         if (userRepositoryInstance == null) {
-            userRepositoryInstance = new UserRepository();
+            synchronized (UserRepository.class) {
+                if (userRepositoryInstance == null) {
+                    userRepositoryInstance = new UserRepository();
+                }
+            }
         }
         return userRepositoryInstance;
     }
@@ -138,6 +133,18 @@ public class UserRepository implements DatabaseAccess, Subject {
         updateCSV();
     }
 
+    public AddressRepository getAddressRepository() {
+        return AddressRepository.getInstance();
+    }
+
+    public BillingRepository getBillingRepository() {
+        return BillingRepository.getInstance();
+    }
+
+    public OrderRepository getOrderRepository() {
+        return OrderRepository.getInstance();
+    }
+
     /**
      * Change the username of an existing user
      * @param newUsername the new username
@@ -149,26 +156,26 @@ public class UserRepository implements DatabaseAccess, Subject {
             userAccounts.remove(oldUsername);
 
             loggedInUser.setUsername(newUsername);
-            Address a = addressRepository.getAddress(oldUsername);
+            Address a = getAddressRepository().getAddress(oldUsername);
             if (a != null) {
                 a.setUsername(newUsername);
-                addressRepository.deleteAddress(oldUsername);
-                addressRepository.saveAddress(a);
+                getAddressRepository().deleteAddress(oldUsername);
+                getAddressRepository().saveAddress(a);
             }
 
-            CreditCard c = billingRepository.getCreditCard(oldUsername);
+            CreditCard c = getBillingRepository().getCreditCard(oldUsername);
             if (c != null) {
                 c.setUsername(newUsername);
-                billingRepository.deleteCreditCard(oldUsername);
-                billingRepository.saveCreditCard(c);
+                getBillingRepository().deleteCreditCard(oldUsername);
+                getBillingRepository().saveCreditCard(c);
             }
 
-            List<Order> orders = orderRepository.getOrdersByCustomer(oldUsername);
+            List<Order> orders = getOrderRepository().getOrdersByCustomer(oldUsername);
             if (orders != null) {
                 for (Order o : orders) {
                     o.setUsername(newUsername);
-                    orderRepository.cancelOrder(o.getOrderId());
-                    orderRepository.createOrder(o);
+                    getOrderRepository().cancelOrder(o.getOrderId());
+                    getOrderRepository().createOrder(o);
                 }
             }
 
@@ -232,13 +239,13 @@ public class UserRepository implements DatabaseAccess, Subject {
      */
     public void deleteUser(String username) {
         // remove the users address
-        addressRepository.deleteAddress(username);
+        getAddressRepository().deleteAddress(username);
         // remove the users billing
-        billingRepository.deleteCreditCard(username);
+        getBillingRepository().deleteCreditCard(username);
         // remove the users orders
-        List<Order> userOrders = orderRepository.getOrdersByCustomer(username);
+        List<Order> userOrders = getOrderRepository().getOrdersByCustomer(username);
         for (Order o : userOrders) {
-            orderRepository.cancelOrder(o.getOrderId());
+            getOrderRepository().cancelOrder(o.getOrderId());
         }
         userAccounts.remove(username);
         updateCSV();

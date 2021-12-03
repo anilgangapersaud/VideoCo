@@ -25,14 +25,9 @@ public class RentedRepository implements DatabaseAccess {
     private final List<RentedMovie> rentedMovies;
 
     /**
-     * the movie repository
-     */
-    private final MovieRepository movieRepository;
-
-    /**
      * singleton instance
      */
-    private static RentedRepository rentedRepositoryInstance = null;
+    private volatile static RentedRepository rentedRepositoryInstance;
 
     /**
      * configs
@@ -42,7 +37,6 @@ public class RentedRepository implements DatabaseAccess {
 
     private RentedRepository() {
         rentedMovies = new ArrayList<>();
-        movieRepository = MovieRepository.getInstance();
         loadCSV();
     }
 
@@ -51,9 +45,17 @@ public class RentedRepository implements DatabaseAccess {
      */
     public static RentedRepository getInstance() {
         if (rentedRepositoryInstance == null) {
-            rentedRepositoryInstance = new RentedRepository();
+            synchronized (RentedRepository.class) {
+                if (rentedRepositoryInstance == null) {
+                    rentedRepositoryInstance = new RentedRepository();
+                }
+            }
         }
         return rentedRepositoryInstance;
+    }
+
+    public MovieRepository getMovieRepository() {
+        return MovieRepository.getInstance();
     }
 
     @Override
@@ -112,7 +114,7 @@ public class RentedRepository implements DatabaseAccess {
     public void returnMovies(int orderNumber) {
         for (RentedMovie movie : rentedMovies) {
             if (movie.getOrderId() == orderNumber) {
-                movieRepository.returnMovie(movie.getBarcode());
+                getMovieRepository().returnMovie(movie.getBarcode());
             }
         }
         rentedMovies.removeIf(r -> r.getOrderId() == orderNumber);
@@ -134,7 +136,7 @@ public class RentedRepository implements DatabaseAccess {
         for (RentedMovie r : rentedMovies) {
             if (orderNumber == r.getOrderId()) {
                 String barcode = r.getBarcode();
-                Movie m = movieRepository.getMovie(barcode);
+                Movie m = getMovieRepository().getMovie(barcode);
                 total += m.getPrice();
             }
         }

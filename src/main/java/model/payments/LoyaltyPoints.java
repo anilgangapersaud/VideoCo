@@ -8,7 +8,7 @@ import java.util.Map;
 public class LoyaltyPoints implements PaymentService {
 
     private final int loyaltyPoints;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public LoyaltyPoints(int loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;

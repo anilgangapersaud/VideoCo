@@ -48,6 +48,7 @@ public class CheckOverdueOrders extends TimerTask {
                                 CreditCard c = billingRepository.getCreditCard(o.getUsername());
                                 double charge = 9.99D;
                                 c.charge(charge);
+                                billingRepository.updateCreditCard(c);
                                 System.out.println("Charging " + o.getUsername() + " 9.99 for a late fee outside of Ontario");
                             }
                         }
@@ -64,6 +65,7 @@ public class CheckOverdueOrders extends TimerTask {
                 int totalMovies = rentedRepository.countMoviesInOrder(o.getOrderId());
                 double charge = 1.00D * totalMovies;
                 c.charge(charge);
+                billingRepository.updateCreditCard(c);
                 System.out.println("Charging " + o.getUsername() + " " + charge + " for an overdue order");
             }
         }
