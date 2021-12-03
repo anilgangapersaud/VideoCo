@@ -1,91 +1,71 @@
 package view.shoppanels;
 
-import model.Address;
-import model.Cart;
+import controllers.CartController;
+import database.Observer;
+import database.UserRepository;
 import model.Model;
-import model.Movie;
-import model.User;
-import model.payments.CreditCard;
-import model.payments.LoyaltyPoints;
-import services.PaymentService;
 import view.cards.ShopCards;
+import view.tablemodels.CartTableModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.Map;
 
-public class CartPanel extends JPanel implements ActionListener {
+public class CartPanel extends JPanel implements Observer {
 
-    private ShopCards cards;
+    private final ShopCards cards;
 
-    private JButton removeItem;
-    private JButton clearCart;
-    private JButton checkout;
     private JLabel totalCost;
-    private double customerTotal;
-    private JLabel displayLoyaltyPoints;
-    private int customerLoyaltyPoints;
-    private JLabel loyaltyPointsLabel;
 
-    // payment
-    private ButtonGroup paymentServices;
-    private JRadioButton loyaltyPointsOption;
-    private JRadioButton creditCardOption;
+    private final JLabel displayLoyaltyPoints;
 
-
-    // error messages
-    private static final String EMPTY_CART_ERROR = "Cart is empty";
-    private static final String NO_ITEM_SELECTED_ERROR = "No item selected";
-    private static final String NO_ADDRESS_ERROR = "No address on file\nPlease update your address in Account Details";
-    private static final String INVALID_PAYMENT_ERROR = "Invalid Payment\nPlease try again.";
+    private final ButtonGroup paymentServices;
 
     /**
      * Components for displaying data
      */
     private final JTable table;
-    private final JScrollPane scrollPane;
 
     public CartPanel(ShopCards cards) {
         this.cards = cards;
         setLayout(new BorderLayout(20, 10));
+        CartController cartController = new CartController(this);
+        UserRepository.getInstance().registerObserver(this);
 
         JLabel paymentLabel = new JLabel("Choose your payment method:");
-        loyaltyPointsOption = new JRadioButton("Loyalty Points");
+        JRadioButton loyaltyPointsOption = new JRadioButton("Loyalty Points");
         loyaltyPointsOption.setMnemonic(KeyEvent.VK_C);
         loyaltyPointsOption.setActionCommand("loyaltyPoints");
-        creditCardOption = new JRadioButton("Credit Card");
+        JRadioButton creditCardOption = new JRadioButton("Credit Card");
         creditCardOption.setMnemonic(KeyEvent.VK_C);
         creditCardOption.setActionCommand("creditCard");
         paymentServices = new ButtonGroup();
         paymentServices.add(loyaltyPointsOption);
         paymentServices.add(creditCardOption);
 
-        removeItem = new JButton("Remove Item");
-        removeItem.addActionListener(this);
+        JButton removeItem = new JButton("Remove Item");
+        removeItem.addActionListener(cartController);
         removeItem.setActionCommand("removeItem");
 
-        clearCart = new JButton("Clear Cart");
-        clearCart.addActionListener(this);
+        JButton clearCart = new JButton("Clear Cart");
+        clearCart.addActionListener(cartController);
         clearCart.setActionCommand("clearCart");
 
-        checkout = new JButton("Place Order");
-        checkout.addActionListener(this);
+        JButton checkout = new JButton("Place Order");
+        checkout.addActionListener(cartController);
         checkout.setActionCommand("checkout");
 
-        loyaltyPointsLabel = new JLabel("Loyalty Points:");
-        customerLoyaltyPoints = Model.getUserService().getLoggedInUser().getLoyaltyPoints();
+        JLabel loyaltyPointsLabel = new JLabel("Loyalty Points:");
+        int customerLoyaltyPoints = UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints();
         displayLoyaltyPoints = new JLabel(String.valueOf(customerLoyaltyPoints));
 
         table = new JTable();
-        updateCart();
+
+        CartTableModel ctm = new CartTableModel();
+        table.setModel(ctm);
+        JScrollPane scrollPane = new JScrollPane(table);
 
         totalCost = new JLabel("");
-
-        scrollPane = new JScrollPane(table);
 
         JPanel northBar = new JPanel();
         northBar.add(removeItem);
@@ -108,93 +88,24 @@ public class CartPanel extends JPanel implements ActionListener {
         setVisible(true);
     }
 
-    public void updateCart() {
-        Cart userCart = Model.getUserService().getLoggedInUser().getCart();
-        DefaultTableModel tmodel = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        String[][] data = new String[userCart.getMoviesInCart().size()][4];
-        String[] column = {"BARCODE", "TITLE", "PRICE", "QUANTITY"};
-        int i = 0;
-        double tempCost = 0;
-        for (Map.Entry<Movie, Integer> entry : userCart.getMoviesInCart().entrySet()) {
-            data[i][0] = entry.getKey().getBarcode();
-            data[i][1] = entry.getKey().getTitle();
-            data[i][2] = String.valueOf(entry.getKey().getPrice());
-            data[i][3] = String.valueOf(entry.getValue());
-            tempCost += entry.getKey().getPrice() * entry.getValue();
-            i++;
-        }
-        customerTotal = tempCost;
-        if (totalCost == null) {
-            totalCost = new JLabel("");
-        }
-        totalCost.setText(String.format("Total: %.2f", customerTotal));
-        tmodel.setDataVector(data,column);
-        table.setModel(tmodel);
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 
-    private void updateView() {
-        updateCart();
-        displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
-        cards.getOrderPanel().updateTable();
+    public void displayErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public JTable getTable() {
+        return table;
+    }
+
+    public ButtonGroup getPaymentServices() {
+        return paymentServices;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("removeItem")) {
-            int[] selected = table.getSelectedRows();
-            if (selected.length == 0) {
-                JOptionPane.showMessageDialog(this, NO_ITEM_SELECTED_ERROR);
-            } else {
-                Cart userCart = Model.getUserService().getLoggedInUser().getCart();
-                for (int row : selected) {
-                    Movie m = new Movie();
-                    m.setBarcode((String) table.getValueAt(row, 0));
-                    m.setTitle((String) table.getValueAt(row, 1));
-                    userCart.removeMovieFromCart(m);
-                    updateView();
-                }
-            }
-        } else if (e.getActionCommand().equals("clearCart")) {
-            Model.getUserService().getLoggedInUser().getCart().clearCart();
-            updateCart();
-        } else if (e.getActionCommand().equals("checkout")) {
-            User u = Model.getUserService().getLoggedInUser();
-            Address userAddress = Model.getAddressService().getAddress(u.getUsername());
-            ButtonModel buttonModel = paymentServices.getSelection();
-            if (buttonModel != null) {
-                if (u.getCart().getMoviesInCart().size() == 0) {
-                    JOptionPane.showMessageDialog(this, EMPTY_CART_ERROR);
-                } else if (userAddress == null) {
-                    JOptionPane.showMessageDialog(this, NO_ADDRESS_ERROR, "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // create order
-                    PaymentService paymentMethod = null;
-                    if (buttonModel.getActionCommand().equals("loyaltyPoints")) {
-                        paymentMethod = new LoyaltyPoints(u.getLoyaltyPoints());
-                    } else if (buttonModel.getActionCommand().equals("creditCard")) {
-                        paymentMethod = Model.getBillingService().getCreditCard(u.getUsername());
-                    }
-                    if (paymentMethod == null) {
-                        JOptionPane.showMessageDialog(this, "No credit card on file\nAdd a credit card in Account Details", "Error", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        boolean paymentAccepted = Model.getOrderService().createOrder(u.getCart(), paymentMethod, userAddress);
-                        if (paymentAccepted) {
-                            JOptionPane.showMessageDialog(this, "Order Created!");
-                            u.getCart().clearCart();
-                            updateView();
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Payment Not Accepted", "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, INVALID_PAYMENT_ERROR, "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    public void update() {
+        displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
     }
 }
