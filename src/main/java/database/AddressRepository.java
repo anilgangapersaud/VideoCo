@@ -24,7 +24,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
 
     private final Map<String, Address> addressDatabase;
     private static AddressRepository addressRepositoryInstance = null;
-    List<Observer> observers;
+    private final List<Observer> observers;
 
     private AddressRepository() {
         addressDatabase = new HashMap<>();

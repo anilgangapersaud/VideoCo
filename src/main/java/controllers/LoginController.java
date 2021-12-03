@@ -1,7 +1,6 @@
 package controllers;
 
-import services.UserService;
-import services.UserServiceImpl;
+import database.UserRepository;
 import view.accountpanels.LoginPanel;
 
 import javax.swing.*;
@@ -11,15 +10,15 @@ import java.awt.event.ActionListener;
 public class LoginController implements ActionListener {
 
     private final LoginPanel view;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     public LoginController(LoginPanel view) {
         this.view = view;
-        userService = new UserServiceImpl();
+        userRepository = UserRepository.getInstance();
     }
 
     private void serviceLogin() {
-        if (userService.login(view.getUsernameInput(), view.getPasswordInput())) {
+        if (userRepository.login(view.getUsernameInput(), view.getPasswordInput())) {
             view.cards.login();
         } else {
             JOptionPane.showMessageDialog(view, "Invalid Credentials", "Login Unsuccessful", JOptionPane.ERROR_MESSAGE);

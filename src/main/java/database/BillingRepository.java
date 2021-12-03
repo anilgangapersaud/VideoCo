@@ -103,7 +103,7 @@ public class BillingRepository implements DatabaseAccess, Subject {
 
     /**
      * Delete a credit card from the database
-     * @param username
+     * @param username the user of the credit card
      */
     public void deleteCreditCard(String username) {
         billingDatabase.remove(username);

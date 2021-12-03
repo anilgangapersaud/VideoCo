@@ -31,7 +31,7 @@ public class MovieRepository implements DatabaseAccess, Subject {
      */
     private static MovieRepository movieRepositoryInstance = null;
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
     /**
      * Configurations for the csv file
@@ -100,8 +100,8 @@ public class MovieRepository implements DatabaseAccess, Subject {
             for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
                 Movie movie = entry.getKey();
                 printer.printRecord(movie.getBarcode(), movie.getTitle(), movie.getGenre(), movie.getReleaseDate(), entry.getValue(), movie.getPrice());
-                notifyObservers();
             }
+            notifyObservers();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,7 +171,7 @@ public class MovieRepository implements DatabaseAccess, Subject {
         Map<Movie,Integer> genreMatches = new HashMap<>();
         for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
             Movie m = entry.getKey();
-            if (m.getGenre().equals(genre)) {
+            if (m.getGenre().equalsIgnoreCase(genre)) {
                 genreMatches.put(entry.getKey(), entry.getValue());
             }
         }

@@ -1,19 +1,25 @@
 package scheduledtasks;
 
-import model.Model;
+import database.OrderRepository;
 import model.Order;
 
 import java.util.List;
 import java.util.TimerTask;
 
 public class ShipOrders extends TimerTask {
+
+    private final OrderRepository orderRepository;
+
+    public ShipOrders() {
+        orderRepository = OrderRepository.getInstance();
+    }
+
     @Override
     public void run() {
-        // check for any orders that have "PROCESSED" status and ship it
-        List<Order> orders = Model.getOrderService().getAllOrders();
+        List<Order> orders = orderRepository.getAllOrders();
         for (Order o : orders) {
             if (o.getOrderStatus().equals("PROCESSED")) {
-                Model.getOrderService().changeOrderStatus(o.getOrderId(), "SHIPPED");
+                orderRepository.changeOrderStatus(o.getOrderId(), "SHIPPED");
                 System.out.println("Shipping order number " + o.getOrderId());
             }
         }

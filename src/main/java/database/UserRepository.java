@@ -1,6 +1,5 @@
 package database;
 
-import model.Model;
 import model.Address;
 import model.Order;
 import model.User;
@@ -13,7 +12,6 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -151,21 +149,21 @@ public class UserRepository implements DatabaseAccess, Subject {
             userAccounts.remove(oldUsername);
 
             loggedInUser.setUsername(newUsername);
-            Address a = Model.getAddressService().getAddress(oldUsername);
+            Address a = addressRepository.getAddress(oldUsername);
             if (a != null) {
                 a.setUsername(newUsername);
-                Model.getAddressService().deleteAddress(oldUsername);
-                Model.getAddressService().saveAddress(a);
+                addressRepository.deleteAddress(oldUsername);
+                addressRepository.saveAddress(a);
             }
 
-            CreditCard c = Model.getBillingService().getCreditCard(oldUsername);
+            CreditCard c = billingRepository.getCreditCard(oldUsername);
             if (c != null) {
                 c.setUsername(newUsername);
-                Model.getBillingService().deleteCreditCard(oldUsername);
-                Model.getBillingService().saveCreditCard(c);
+                billingRepository.deleteCreditCard(oldUsername);
+                billingRepository.saveCreditCard(c);
             }
 
-            List<Order> orders = Model.getOrderService().getOrdersByCustomer(oldUsername);
+            List<Order> orders = orderRepository.getOrdersByCustomer(oldUsername);
             if (orders != null) {
                 for (Order o : orders) {
                     o.setUsername(newUsername);

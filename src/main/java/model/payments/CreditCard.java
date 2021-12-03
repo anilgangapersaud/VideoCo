@@ -1,8 +1,7 @@
 package model.payments;
 
-import model.Model;
+import database.BillingRepository;
 import model.Movie;
-import services.PaymentService;
 
 import java.util.Map;
 
@@ -14,7 +13,11 @@ public class CreditCard implements PaymentService {
     private String csv;
     private double balance;
 
-    public CreditCard() {}
+    private BillingRepository billingRepository;
+
+    public CreditCard() {
+        billingRepository = BillingRepository.getInstance();
+    }
 
     public String getUsername() {
         return username;
@@ -61,18 +64,18 @@ public class CreditCard implements PaymentService {
         for (Map.Entry<Movie, Integer> entry : movies.entrySet()) {
             balance += entry.getKey().getPrice() * entry.getValue();
         }
-        Model.getBillingService().updateCreditCard(this);
+        billingRepository.updateCreditCard(this);
         return true;
     }
 
     public void charge(double amount) {
         balance += amount;
-        Model.getBillingService().updateCreditCard(this);
+        billingRepository.updateCreditCard(this);
     }
 
     public void refund(double amount) {
         balance -= amount;
-        Model.getBillingService().updateCreditCard(this);
+        billingRepository.updateCreditCard(this);
     }
 
 }

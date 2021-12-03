@@ -1,17 +1,18 @@
 package model.payments;
 
-import model.Model;
+import database.UserRepository;
 import model.Movie;
-import services.PaymentService;
 
 import java.util.Map;
 
 public class LoyaltyPoints implements PaymentService {
 
     private final int loyaltyPoints;
+    private UserRepository userRepository;
 
     public LoyaltyPoints(int loyaltyPoints) {
         this.loyaltyPoints = loyaltyPoints;
+        userRepository = UserRepository.getInstance();
     }
 
     @Override
@@ -22,8 +23,8 @@ public class LoyaltyPoints implements PaymentService {
         }
         if (loyaltyPoints >= totalMovies * 10) {
             int deduction = totalMovies * 10;
-            Model.getUserService().getLoggedInUser().setLoyaltyPoints(loyaltyPoints - deduction);
-            Model.getUserService().updateUser(Model.getUserService().getLoggedInUser());
+            userRepository.getLoggedInUser().setLoyaltyPoints(loyaltyPoints - deduction);
+            userRepository.updateUser(userRepository.getLoggedInUser());
             return true;
         } else {
             return false;

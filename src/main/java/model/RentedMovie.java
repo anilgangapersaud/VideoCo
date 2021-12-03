@@ -2,9 +2,9 @@ package model;
 
 public class RentedMovie {
 
-    private int orderId;
+    private final int orderId;
 
-    private String barcode;
+    private final String barcode;
 
     public RentedMovie(int orderId, String barcode) {
         this.orderId = orderId;
@@ -15,15 +15,7 @@ public class RentedMovie {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
     public String getBarcode() {
         return barcode;
-    }
-
-    public void setBarcode(String barcode) {
-        this.barcode = barcode;
     }
 }

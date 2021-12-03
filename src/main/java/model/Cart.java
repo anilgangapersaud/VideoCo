@@ -11,7 +11,7 @@ import java.util.Map;
 public class Cart implements Subject {
 
     private final Map<Movie, Integer> cart;
-    List<Observer> observers;
+    private final List<Observer> observers;
     private double total;
 
     public Cart() {

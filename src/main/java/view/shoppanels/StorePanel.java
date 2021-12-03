@@ -3,7 +3,6 @@ package view.shoppanels;
 import controllers.StoreController;
 import database.MovieRepository;
 import database.UserRepository;
-import model.Model;
 
 import model.Movie;
 import view.tablemodels.StoreTableModel;
@@ -96,7 +95,7 @@ public class StorePanel extends JPanel {
         north.add(categoryList);
         north.add(searchMoviesButton);
 
-        if (!Model.getUserService().getLoggedInUser().isAdmin()) {
+        if (!UserRepository.getInstance().getLoggedInUser().isAdmin()) {
             JButton addMovieButton = new JButton("Add to Cart");
             addMovieButton.setActionCommand("addMovie");
             addMovieButton.addActionListener(controller);

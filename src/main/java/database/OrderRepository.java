@@ -1,19 +1,20 @@
 package database;
 
+import model.Address;
+import model.Cart;
 import model.Order;
+import model.payments.PaymentService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import scheduledtasks.CheckOverdueOrders;
-import scheduledtasks.DeliverOrders;
-import scheduledtasks.ShipOrders;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The repository to manage orders and common operations on orders
@@ -43,19 +44,20 @@ public class OrderRepository implements DatabaseAccess, Subject {
 
     private final BillingRepository billingRepository;
 
+    private final MovieRepository movieRepository;
+
+    private final UserRepository userRepository;
+
     private final List<Observer> observers;
 
     private OrderRepository() {
         orderDatabase = new HashMap<>();
         rentedRepository = RentedRepository.getInstance();
         billingRepository = BillingRepository.getInstance();
+        movieRepository = MovieRepository.getInstance();
+        userRepository = UserRepository.getInstance();
         observers = new ArrayList<>();
         loadCSV();
-
-        Timer timer = new Timer();
-        timer.schedule(new CheckOverdueOrders(), Calendar.getInstance().getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
-        timer.schedule(new DeliverOrders(), Calendar.getInstance().getTime(), 600000);
-        timer.schedule(new ShipOrders(), Calendar.getInstance().getTime(), 900000);
     }
 
     /**
@@ -154,12 +156,51 @@ public class OrderRepository implements DatabaseAccess, Subject {
 
     /**
      * create an order
-     * @param o the order to create
      */
+    public boolean createOrder(Cart cart, PaymentService paymentMethod, Address shipping) {
+        if (paymentMethod.pay(cart.getMoviesInCart())) {
+            if (movieRepository.rentMovies(cart.getMoviesInCart())) {
+                userRepository.awardLoyaltyPoint(shipping.getUsername());
+                Order o = new Order();
+                o.setOrderId(getTotalOrders());
+                o.setOrderDate(getDate());
+                o.setOrderStatus("PROCESSED");
+                o.setUsername(shipping.getUsername());
+                o.setOverdue(false);
+                o.setDueDate(getDueDate());
+                o.setMovies(cart.getMoviesInCart());
+                orderDatabase.put(o.getOrderId(), o);
+                rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
+                updateCSV();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public void createOrder(Order o) {
         orderDatabase.put(o.getOrderId(), o);
         rentedRepository.storeMovies(o.getOrderId(), o.getMovies());
         updateCSV();
+    }
+
+    private String getDueDate() {
+        Calendar calender = Calendar.getInstance();
+        calender.add(Calendar.DATE, 14);
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        return df.format(calender.getTime());
+    }
+
+    private String getDate() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        return df.format(today.getTime());
     }
 
     /**

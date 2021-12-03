@@ -2,7 +2,6 @@ package view.tablemodels;
 
 import database.MovieRepository;
 import database.Observer;
-import model.Model;
 import model.Movie;
 
 import javax.swing.table.DefaultTableModel;
@@ -39,7 +38,7 @@ public class StoreTableModel extends DefaultTableModel implements Observer {
     }
 
     private void updateTable() {
-        Map<Movie,Integer> movies = Model.getMovieService().getAllMovies();
+        Map<Movie,Integer> movies = MovieRepository.getInstance().getAllMovies();
         String[][] data = new String[movies.size()][6];
         String[] column = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
 

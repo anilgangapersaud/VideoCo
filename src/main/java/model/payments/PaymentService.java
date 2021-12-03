@@ -1,4 +1,4 @@
-package services;
+package model.payments;
 
 import model.Movie;
 
@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface PaymentService {
 
-    boolean pay(Map<Movie,Integer> movies);
+    boolean pay(Map<Movie, Integer> movies);
 
 }

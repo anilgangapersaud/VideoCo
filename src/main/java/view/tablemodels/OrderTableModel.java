@@ -2,7 +2,7 @@ package view.tablemodels;
 
 import database.Observer;
 import database.OrderRepository;
-import model.Model;
+import database.UserRepository;
 import model.Order;
 
 import javax.swing.*;
@@ -14,9 +14,13 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
 
     private final JTable view;
     private final JComboBox<String> orderStatus;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     public OrderTableModel(JTable table, JComboBox<String> orderStatus) {
         view = table;
+        orderRepository = OrderRepository.getInstance();
+        userRepository = UserRepository.getInstance();
         this.orderStatus = orderStatus;
         subscribe();
         updateTable();
@@ -28,15 +32,15 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == 1 && Model.getUserService().getLoggedInUser().isAdmin();
+        return column == 1 && userRepository.getLoggedInUser().isAdmin();
     }
 
     private void updateTable() {
         List<Order> orders;
-        if (Model.getUserService().getLoggedInUser().isAdmin()) {
-            orders = Model.getOrderService().getAllOrders();
+        if (userRepository.getLoggedInUser().isAdmin()) {
+            orders = orderRepository.getAllOrders();
         } else {
-            orders = Model.getOrderService().getOrdersByCustomer(Model.getUserService().getLoggedInUser().getUsername());
+            orders = orderRepository.getOrdersByCustomer(userRepository.getLoggedInUser().getUsername());
         }
         String[][] data = new String[orders.size()][5];
         String[] column = {"NUMBER","STATUS","DATE","DUEDATE","OVERDUE"};
@@ -50,6 +54,7 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
             i++;
         }
         setDataVector(data,column);
+        view.setModel(this);
         TableColumn statusColumn = view.getColumnModel().getColumn(1);
         statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
     }
