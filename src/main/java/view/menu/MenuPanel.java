@@ -1,5 +1,6 @@
 package view.menu;
 
+import database.UserRepository;
 import model.Model;
 import view.cards.ShopCards;
 
@@ -7,25 +8,27 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public abstract class MenuPanel extends JPanel implements ActionListener {
+public class MenuPanel extends JPanel implements ActionListener {
 
-    protected JLabel welcomeMessage;
-    protected JPanel cards;
-    private ShopCards shopCards;
+    private JLabel welcomeMessage;
+    private final ShopCards shopCards;
 
     public MenuPanel(ShopCards cards) {
         shopCards = cards;
 
+        // first panel
         JButton logout = new JButton("Logout");
         logout.setActionCommand("logout");
         logout.addActionListener(this);
 
+        // second panel
         JButton account = new JButton("Account Details");
         account.setActionCommand("account");
         account.addActionListener(this);
 
+        // third panel
         JButton store;
-        if (Model.getUserService().getLoggedInUser().isAdmin()) {
+        if (UserRepository.getInstance().isAdmin()) {
             store = new JButton("Manage Inventory");
         } else {
             store = new JButton("Shop");
@@ -33,8 +36,20 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         store.setActionCommand("store");
         store.addActionListener(this);
 
+        // fourth panel
+        JButton fourthPanel;
+        if (UserRepository.getInstance().isAdmin()) {
+            fourthPanel = new JButton("Manage Accounts");
+            fourthPanel.setActionCommand("manageAccounts");
+        } else {
+            fourthPanel = new JButton("Cart");
+            fourthPanel.setActionCommand("cart");
+        }
+        fourthPanel.addActionListener(this);
+
+        // fifth panel
         JButton orders;
-        if (Model.getUserService().getLoggedInUser().isAdmin()) {
+        if (UserRepository.getInstance().isAdmin()) {
             orders = new JButton("Manage Orders");
         } else {
             orders = new JButton("Orders");
@@ -46,9 +61,11 @@ public abstract class MenuPanel extends JPanel implements ActionListener {
         welcomeMessage = new JLabel("Welcome " + Model.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
-        add(store);
         add(account);
+        add(store);
+        add(fourthPanel);
         add(orders);
+        add(welcomeMessage);
 
         cards.getLayout().show(cards, "sp");
 

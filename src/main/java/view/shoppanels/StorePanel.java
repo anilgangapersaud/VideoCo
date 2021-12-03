@@ -203,7 +203,7 @@ public class StorePanel extends JPanel implements ActionListener {
                 Model.getMovieService().deleteMovies(barcodes);
             }
         } else if (e.getActionCommand().equals("add")) {
-            new AddMovieDialog(this);
+            new AddMovieDialog();
         } else if (e.getActionCommand().equals("edit")) {
             int[] selected = table.getSelectedRows();
             if (selected.length != 1) {
@@ -211,7 +211,7 @@ public class StorePanel extends JPanel implements ActionListener {
             } else {
                 String barcode = (String)table.getValueAt(selected[0],0);
                 Movie m = Model.getMovieService().getMovie(barcode);
-                new EditMovieDialog(this, m);
+                new EditMovieDialog(m);
             }
         }
     }

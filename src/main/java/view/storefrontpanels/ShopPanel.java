@@ -3,8 +3,7 @@ package view.storefrontpanels;
 import model.Model;
 import view.cards.ShopCards;
 import view.cards.StoreFrontCards;
-import view.menu.AdminMenuPanel;
-import view.menu.CustomerMenuPanel;
+import view.menu.MenuPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,26 +12,19 @@ import java.awt.event.ActionListener;
 
 public class ShopPanel extends JPanel implements ActionListener {
 
-    private StoreFrontCards cards;
+    private final StoreFrontCards cards;
 
     public ShopPanel(StoreFrontCards cards) {
         this.cards = cards;
-        // shop window configs
         this.setLayout(new BorderLayout());
 
-        // add card layout to center
         ShopCards shopCards = new ShopCards(this);
         this.add(shopCards, BorderLayout.CENTER);
 
-        // menu
         if (Model.getUserService().getLoggedInUser() != null) {
-            if (Model.getUserService().getLoggedInUser().isAdmin()) {
-                this.add(new AdminMenuPanel(shopCards), BorderLayout.NORTH);
-            } else {
-                this.add(new CustomerMenuPanel(shopCards), BorderLayout.NORTH);
-            }
+            this.add(new MenuPanel(shopCards), BorderLayout.NORTH);
         }
-        // default view
+
         this.setVisible(true);
     }
 

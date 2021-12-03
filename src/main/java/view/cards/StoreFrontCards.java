@@ -5,12 +5,10 @@ import view.storefrontpanels.ShopPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class StoreFrontCards extends JPanel {
 
-    protected CardLayout cl;
+    private final CardLayout cl;
 
     public StoreFrontCards() {
         cl = new CardLayout();

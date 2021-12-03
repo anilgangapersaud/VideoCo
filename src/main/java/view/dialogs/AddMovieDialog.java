@@ -1,7 +1,6 @@
 package view.dialogs;
 
 import controllers.AddMovieController;
-import view.shoppanels.StorePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,10 +26,7 @@ public class AddMovieDialog extends JDialog {
 
     private final JTextField quantityInput;
 
-    private final StorePanel sp;
-
-    public AddMovieDialog(StorePanel store) {
-        sp = store;
+    public AddMovieDialog() {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new GridBagLayout());
         setSize(windowWidth, windowHeight);
@@ -120,9 +116,4 @@ public class AddMovieDialog extends JDialog {
     public String getQuantityInput() {
         return quantityInput.getText();
     }
-
-    public StorePanel getStorePanel() {
-        return sp;
-    }
-
 }

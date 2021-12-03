@@ -280,6 +280,10 @@ public class UserRepository implements DatabaseAccess {
         }
     }
 
+    public boolean isAdmin() {
+        return loggedInUser != null && loggedInUser.isAdmin();
+    }
+
     /**
      * Register a new user
      * @param user the new user

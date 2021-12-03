@@ -1,16 +1,12 @@
 package view.dialogs;
 
-import jdk.nashorn.internal.scripts.JO;
-import model.Model;
+import controllers.EditMovieController;
 import model.Movie;
-import view.shoppanels.StorePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class EditMovieDialog extends JDialog implements ActionListener {
+public class EditMovieDialog extends JDialog{
 
     private static final int windowWidth = 300;
     private static final int windowHeight = 500;
@@ -19,68 +15,57 @@ public class EditMovieDialog extends JDialog implements ActionListener {
             "Horror", "Mystery", "Adventure", "Action", "Thriller", "Comedy", "Sci-fi", "Drama"
     };
 
-    private Movie editingMovie;
+    private final Movie editingMovie;
+    private final JTextField movieTitleInput;
+    private final JComboBox<String> categoryList;
+    private final JTextField releaseDateInput;
+    private final JTextField priceInput;
 
-    private JLabel movieTitleLabel;
-    private JTextField movieTitleInput;
-
-    private JLabel movieCategoryLabel;
-    private JComboBox categoryList;
-
-    private JLabel releaseDateLabel;
-    private JTextField releaseDateInput;
-
-    private JLabel priceLabel;
-    private JTextField priceInput;
-
-    private JButton updateButton;
-
-    private StorePanel sp;
-
-    private int verticalStrut = 10;
-    private int columnsize = 5;
-
-    public EditMovieDialog(StorePanel store, Movie m) {
-        sp = store;
+    public EditMovieDialog(Movie m) {
         editingMovie = new Movie();
         editingMovie.setReleaseDate(m.getReleaseDate());
         editingMovie.setBarcode(m.getBarcode());
         editingMovie.setPrice(m.getPrice());
         editingMovie.setTitle(m.getTitle());
         editingMovie.setGenre(m.getGenre());
+
+        EditMovieController editMovieController = new EditMovieController(this);
+
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new GridBagLayout());
         setSize(windowWidth, windowHeight);
         setResizable(false);
         setTitle("Edit Movie");
 
-        movieTitleLabel = new JLabel("Title");
+        JLabel movieTitleLabel = new JLabel("Title");
         movieTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        movieTitleInput = new JTextField(columnsize);
+        int columnSize = 5;
+        movieTitleInput = new JTextField(columnSize);
         movieTitleInput.setText(editingMovie.getTitle());
 
-        movieCategoryLabel = new JLabel("Category");
+        JLabel movieCategoryLabel = new JLabel("Category");
         movieCategoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        categoryList = new JComboBox(categories);
-        categoryList.addActionListener(this);
+        categoryList = new JComboBox<>(categories);
+        categoryList.addActionListener(editMovieController);
         categoryList.setSelectedItem(editingMovie.getGenre());
 
-        releaseDateLabel = new JLabel("Release Date - MM/DD/YY");
+        JLabel releaseDateLabel = new JLabel("Release Date - MM/DD/YY");
         releaseDateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        releaseDateInput = new JTextField(columnsize);
+        releaseDateInput = new JTextField(columnSize);
         releaseDateInput.setText(editingMovie.getReleaseDate());
 
-        priceLabel = new JLabel("Price");
-        priceInput = new JTextField(columnsize);
+        JLabel priceLabel = new JLabel("Price");
+        priceInput = new JTextField(columnSize);
         priceInput.setText(String.valueOf(editingMovie.getPrice()));
 
-        updateButton = new JButton("Update");
+        JButton updateButton = new JButton("Update");
         updateButton.setActionCommand("update");
-        updateButton.addActionListener(this);
+        updateButton.addActionListener(editMovieController);
 
         Box box = Box.createVerticalBox();
         box.add(movieTitleLabel);
         box.add(movieTitleInput);
+        int verticalStrut = 10;
         box.add(Box.createVerticalStrut(verticalStrut));
         box.add(movieCategoryLabel);
         box.add(categoryList);
@@ -95,22 +80,29 @@ public class EditMovieDialog extends JDialog implements ActionListener {
 
         add(box);
         setVisible(true);
-
-        setVisible(true);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("update")) {
-            editingMovie.setTitle(movieTitleInput.getText());
-            editingMovie.setGenre((String)categoryList.getSelectedItem());
-            editingMovie.setPrice(Double.parseDouble(priceInput.getText()));
-            editingMovie.setReleaseDate(releaseDateInput.getText());
-            if (Model.getMovieService().updateMovie(editingMovie)) {
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error updating movie.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    public Movie getEditingMovie() {
+        return editingMovie;
+    }
+
+    public String getMovieTitleInput() {
+        return movieTitleInput.getText();
+    }
+
+    public String getMovieCategory() {
+        return (String)categoryList.getSelectedItem();
+    }
+
+    public double getPrice() {
+        return Double.parseDouble(priceInput.getText());
+    }
+
+    public String getReleaseDate() {
+        return releaseDateInput.getText();
+    }
+
+    public void displayErrorMessage(String errorMessage) {
+        JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
