@@ -30,7 +30,7 @@ public class RegisterController implements ActionListener {
             view.clearInputs();
             view.getCards().getLayout().show(view.getCards(), "lp");
         } else {
-            JOptionPane.showMessageDialog(view, "", "Registration Failed", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Registration Failed\nCheck fields and try again", "Registration Failed", JOptionPane.ERROR_MESSAGE);
             view.clearInputs();
         }
     }

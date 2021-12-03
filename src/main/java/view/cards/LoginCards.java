@@ -2,12 +2,10 @@ package view.cards;
 
 import view.accountpanels.LoginPanel;
 import view.accountpanels.RegisterPanel;
-import view.storefrontpanels.EntrancePanel;
+import view.EntrancePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginCards extends JPanel {
 

@@ -1,4 +1,4 @@
-package scheduledtasks;
+package scheduled_tasks;
 
 import database.OrderRepository;
 import model.Order;

@@ -1,6 +1,6 @@
-import scheduledtasks.CheckOverdueOrders;
-import scheduledtasks.DeliverOrders;
-import scheduledtasks.ShipOrders;
+import scheduled_tasks.CheckOverdueOrders;
+import scheduled_tasks.DeliverOrders;
+import scheduled_tasks.ShipOrders;
 import view.StoreFront;
 
 import java.util.Calendar;
@@ -8,7 +8,6 @@ import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 public class App {
-
 
     private static final long DELIVERY_TIME = 600000;
 

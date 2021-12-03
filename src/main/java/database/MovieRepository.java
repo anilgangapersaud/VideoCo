@@ -191,6 +191,11 @@ public class MovieRepository implements DatabaseAccess, Subject {
         return barcodeToMovieMap.get(barcode);
     }
 
+    public int getStockForMovie(String barcode) {
+        Movie m = barcodeToMovieMap.get(barcode);
+        return movieDatabase.get(m);
+    }
+
     /**
      * Given a map of movies and quantities to rent, update the database accordingly
      * @param movies the movies to rent

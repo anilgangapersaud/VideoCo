@@ -1,6 +1,6 @@
 package view.cards;
 
-import view.storefrontpanels.EntrancePanel;
+import view.EntrancePanel;
 import view.storefrontpanels.ShopPanel;
 
 import javax.swing.*;

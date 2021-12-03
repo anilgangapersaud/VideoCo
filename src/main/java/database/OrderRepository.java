@@ -164,7 +164,6 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
                 o.setMovies(cart.getMoviesInCart());
                 orderDatabase.put(o.getOrderId(), o);
                 getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
-                getBillingRepository().chargeCustomer(o.getUsername(), getRentedRepository().getOrderTotal(o.getOrderId()));
                 updateCSV();
                 return true;
             } else {
@@ -174,6 +173,30 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
             return false;
         }
     }
+
+    public Order createOrder(Map<Movie,Integer> movies, PaymentService paymentMethod, Address shipping) {
+        if (paymentMethod.acceptPayment(this, movies)) {
+            if (getMovieRepository().rentMovies(movies)) {
+                Order o = new Order();
+                o.setOrderId(getTotalOrders());
+                o.setOrderDate(getDate());
+                o.setOrderStatus("PROCESSED");
+                o.setUsername(shipping.getUsername());
+                o.setOverdue(false);
+                o.setDueDate(getDueDate());
+                o.setMovies(movies);
+                orderDatabase.put(o.getOrderId(), o);
+                getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
+                updateCSV();
+                return o;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
 
     public void createOrder(Order o) {
         orderDatabase.put(o.getOrderId(), o);
@@ -214,6 +237,9 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         return orders;
     }
 
+    public Order getOrder(int orderNumber) {
+        return orderDatabase.get(orderNumber);
+    }
     /**
      * get the total number of orders in the system
      * @return total orders

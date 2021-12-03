@@ -79,6 +79,9 @@ public class RegisterPanel extends JPanel implements ActionListener {
     }
 
     public String getAccountType() {
+        if (accountTypes.getSelection() == null) {
+            return "";
+        }
         return accountTypes.getSelection().getActionCommand();
     }
 
