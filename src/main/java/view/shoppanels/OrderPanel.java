@@ -62,7 +62,6 @@ public class OrderPanel extends JPanel implements ActionListener {
 
     private void updateViews() {
         updateTable();
-        cards.getStorePanel().displayAllMovies();
     }
 
     public void updateTable() {

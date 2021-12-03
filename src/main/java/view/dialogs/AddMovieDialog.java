@@ -1,15 +1,12 @@
 package view.dialogs;
 
-import model.Model;
-import model.Movie;
+import controllers.AddMovieController;
 import view.shoppanels.StorePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class AddMovieDialog extends JDialog implements ActionListener {
+public class AddMovieDialog extends JDialog {
 
     private static final int windowWidth = 300;
     private static final int windowHeight = 400;
@@ -18,30 +15,19 @@ public class AddMovieDialog extends JDialog implements ActionListener {
             "Horror", "Mystery", "Adventure", "Action", "Thriller", "Comedy", "Sci-fi", "Drama"
     };
 
-    private JLabel barcodeLabel;
-    private JTextField barcodeInput;
+    private final JTextField barcodeInput;
 
-    private JLabel movieTitleLabel;
-    private JTextField movieTitleInput;
+    private final JTextField movieTitleInput;
 
-    private JLabel movieCategoryLabel;
-    private JComboBox categoryList;
+    private final JComboBox<String> categoryList;
 
-    private JLabel releaseDateLabel;
-    private JTextField releaseDateInput;
+    private final JTextField releaseDateInput;
 
-    private JLabel priceLabel;
-    private JTextField priceInput;
+    private final JTextField priceInput;
 
-    private JLabel quantityLabel;
-    private JTextField quantityInput;
+    private final JTextField quantityInput;
 
-    private JButton addButton;
-
-    private StorePanel sp;
-
-    private int verticalStrut = 10;
-    private int columnsize = 5;
+    private final StorePanel sp;
 
     public AddMovieDialog(StorePanel store) {
         sp = store;
@@ -51,36 +37,40 @@ public class AddMovieDialog extends JDialog implements ActionListener {
         setResizable(false);
         setTitle("Add Movie");
 
-        barcodeLabel = new JLabel("Barcode");
+        AddMovieController movieController = new AddMovieController(this);
+
+        JLabel barcodeLabel = new JLabel("Barcode");
         barcodeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        barcodeInput = new JTextField(columnsize);
+        int columnSize = 5;
+        barcodeInput = new JTextField(columnSize);
 
-        movieTitleLabel = new JLabel("Title");
+        JLabel movieTitleLabel = new JLabel("Title");
         movieTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        movieTitleInput = new JTextField(columnsize);
+        movieTitleInput = new JTextField(columnSize);
 
-        movieCategoryLabel = new JLabel("Category");
+        JLabel movieCategoryLabel = new JLabel("Category");
         movieCategoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        categoryList = new JComboBox(categories);
-        categoryList.addActionListener(this);
+        categoryList = new JComboBox<>(categories);
+        categoryList.addActionListener(movieController);
 
-        releaseDateLabel = new JLabel("Release Date - MM/DD/YY");
+        JLabel releaseDateLabel = new JLabel("Release Date - MM/DD/YY");
         releaseDateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        releaseDateInput = new JTextField(columnsize);
+        releaseDateInput = new JTextField(columnSize);
 
-        priceLabel = new JLabel("Price");
-        priceInput = new JTextField(columnsize);
+        JLabel priceLabel = new JLabel("Price");
+        priceInput = new JTextField(columnSize);
 
-        quantityLabel = new JLabel("Quantity");
-        quantityInput = new JTextField(columnsize);
+        JLabel quantityLabel = new JLabel("Quantity");
+        quantityInput = new JTextField(columnSize);
 
-        addButton = new JButton("Add");
-        addButton.setActionCommand("add");
-        addButton.addActionListener(this);
+        JButton addButton = new JButton("Add");
+        addButton.setActionCommand("addMovie");
+        addButton.addActionListener(movieController);
 
         Box box = Box.createVerticalBox();
         box.add(barcodeLabel);
         box.add(barcodeInput);
+        int verticalStrut = 10;
         box.add(Box.createVerticalStrut(verticalStrut));
         box.add(movieTitleLabel);
         box.add(movieTitleInput);
@@ -103,21 +93,36 @@ public class AddMovieDialog extends JDialog implements ActionListener {
         setVisible(true);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("add")) {
-            Movie m = new Movie();
-            m.setBarcode(barcodeInput.getText());
-            m.setTitle(movieTitleInput.getText());
-            m.setPrice(Double.parseDouble(priceInput.getText()));
-            m.setGenre((String)categoryList.getSelectedItem());
-            m.setReleaseDate(releaseDateInput.getText());
-            if (Model.getMovieService().addMovie(m, Integer.parseInt(quantityInput.getText()))) {
-                sp.displayAllMovies();
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error adding movie. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    public void displayErrorMessage(String error) {
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
+
+    public String getBarcodeInput() {
+        return barcodeInput.getText();
+    }
+
+    public String getMovieTitleInput() {
+        return movieTitleInput.getText();
+    }
+
+    public String getCategory() {
+        return (String)categoryList.getSelectedItem();
+    }
+
+    public String getReleaseDateInput() {
+        return releaseDateInput.getText();
+    }
+
+    public String getPriceInput() {
+        return priceInput.getText();
+    }
+
+    public String getQuantityInput() {
+        return quantityInput.getText();
+    }
+
+    public StorePanel getStorePanel() {
+        return sp;
+    }
+
 }

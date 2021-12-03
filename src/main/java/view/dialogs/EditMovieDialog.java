@@ -107,7 +107,6 @@ public class EditMovieDialog extends JDialog implements ActionListener {
             editingMovie.setPrice(Double.parseDouble(priceInput.getText()));
             editingMovie.setReleaseDate(releaseDateInput.getText());
             if (Model.getMovieService().updateMovie(editingMovie)) {
-                sp.displayAllMovies();
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Error updating movie.", "Error", JOptionPane.ERROR_MESSAGE);

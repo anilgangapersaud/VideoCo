@@ -140,7 +140,6 @@ public class CartPanel extends JPanel implements ActionListener {
     private void updateView() {
         updateCart();
         displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
-        cards.getStorePanel().displayAllMovies();
         cards.getOrderPanel().updateTable();
     }
 

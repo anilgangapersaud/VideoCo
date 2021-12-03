@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class StoreFrontCards extends JPanel implements ActionListener {
+public class StoreFrontCards extends JPanel {
 
     protected CardLayout cl;
 
@@ -29,8 +29,4 @@ public class StoreFrontCards extends JPanel implements ActionListener {
         add(sp, "sp");
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
 }

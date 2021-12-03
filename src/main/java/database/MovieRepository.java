@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Maintain the movie database and provide common operations on movies
  */
-public class MovieRepository implements DatabaseAccess {
+public class MovieRepository implements DatabaseAccess, Subject {
 
     /**
      * Maintains the current list of movies in the system
@@ -31,6 +31,8 @@ public class MovieRepository implements DatabaseAccess {
      */
     private static MovieRepository movieRepositoryInstance = null;
 
+    private List<Observer> observers;
+
     /**
      * Configurations for the csv file
      */
@@ -43,6 +45,7 @@ public class MovieRepository implements DatabaseAccess {
     private MovieRepository() {
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
+        observers = new ArrayList<>();
         loadCSV();
     }
 
@@ -97,6 +100,7 @@ public class MovieRepository implements DatabaseAccess {
             for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
                 Movie movie = entry.getKey();
                 printer.printRecord(movie.getBarcode(), movie.getTitle(), movie.getGenre(), movie.getReleaseDate(), entry.getValue(), movie.getPrice());
+                notifyObservers();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,4 +263,21 @@ public class MovieRepository implements DatabaseAccess {
         return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
     }
 
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
 }

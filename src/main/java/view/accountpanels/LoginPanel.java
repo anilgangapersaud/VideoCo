@@ -21,7 +21,6 @@ public class LoginPanel extends JPanel implements ActionListener {
 
     public LoginPanel(LoginCards cards) {
         this.cards = cards;
-
         loginController = new LoginController(this);
         createView();
     }
