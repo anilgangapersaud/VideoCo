@@ -166,7 +166,6 @@ public class StorePanel extends JPanel implements ActionListener {
                         JOptionPane.showMessageDialog(this, "No stock available for the selected movie.", "Error", JOptionPane.ERROR_MESSAGE);
                     } else {
                         cart.addMovieToCart(m, 1);
-                        shopCards.getCartPanel().updateCart();
                     }
                 }
             }

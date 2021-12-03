@@ -2,7 +2,6 @@ package controllers;
 
 import database.AddressRepository;
 import database.BillingRepository;
-import database.OrderRepository;
 import database.UserRepository;
 import model.*;
 import model.payments.LoyaltyPoints;
@@ -29,6 +28,7 @@ public class CartController implements ActionListener {
             Movie m = new Movie();
             m.setBarcode((String) view.getTable().getValueAt(row,0));
             m.setTitle((String) view.getTable().getValueAt(row,1));
+            m.setPrice(Double.parseDouble((String)view.getTable().getValueAt(0,2)));
             userCart.removeMovieFromCart(m);
         }
     }

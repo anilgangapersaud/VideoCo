@@ -3,7 +3,6 @@ package view.shoppanels;
 import controllers.CartController;
 import database.Observer;
 import database.UserRepository;
-import model.Model;
 import view.cards.ShopCards;
 import view.tablemodels.CartTableModel;
 
@@ -31,6 +30,7 @@ public class CartPanel extends JPanel implements Observer {
         setLayout(new BorderLayout(20, 10));
         CartController cartController = new CartController(this);
         UserRepository.getInstance().registerObserver(this);
+        UserRepository.getInstance().getLoggedInUser().getCart().registerObserver(this);
 
         JLabel paymentLabel = new JLabel("Choose your payment method:");
         JRadioButton loyaltyPointsOption = new JRadioButton("Loyalty Points");
@@ -106,6 +106,7 @@ public class CartPanel extends JPanel implements Observer {
 
     @Override
     public void update() {
-        displayLoyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
+        displayLoyaltyPoints.setText(String.valueOf(UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints()));
+        totalCost.setText(String.format("%.2f$", UserRepository.getInstance().getLoggedInUser().getCart().getTotal()));
     }
 }

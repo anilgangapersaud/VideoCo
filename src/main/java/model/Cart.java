@@ -1,14 +1,23 @@
 package model;
 
+import database.Observer;
+import database.Subject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class Cart {
+public class Cart implements Subject {
 
     private final Map<Movie, Integer> cart;
+    List<Observer> observers;
+    private double total;
 
     public Cart() {
         cart = new HashMap<>();
+        observers = new ArrayList<>();
+        total = 0.00D;
     }
 
     /**
@@ -22,10 +31,14 @@ public class Cart {
         } else {
             cart.put(m, quantity);
         }
+        total += m.getPrice();
+        notifyObservers();
     }
 
     public void clearCart() {
         cart.clear();
+        total = 0.00D;
+        notifyObservers();
     }
 
     /**
@@ -34,6 +47,10 @@ public class Cart {
      */
     public Integer getQuantity(Movie m) {
         return cart.getOrDefault(m, 0);
+    }
+
+    public double getTotal() {
+        return total;
     }
 
     /**
@@ -55,6 +72,25 @@ public class Cart {
             } else {
                 cart.replace(m, cart.get(m)-1);
             }
+            total -= m.getPrice();
+        }
+        notifyObservers();
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
         }
     }
 }
