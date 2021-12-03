@@ -70,8 +70,8 @@ public class BillingRepository implements DatabaseAccess, Subject {
             for (Map.Entry<String,CreditCard> entry : billingDatabase.entrySet()) {
                 CreditCard c = entry.getValue();
                 printer.printRecord(c.getUsername(), c.getCardNumber(), c.getExpiry(), c.getCsv(), c.getBalance());
-                notifyObservers();
             }
+            notifyObservers();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -127,6 +127,11 @@ public class BillingRepository implements DatabaseAccess, Subject {
     private boolean validateCreditCard(CreditCard c) {
         return c.getBalance() >= 0.00D && !c.getCardNumber().equals("") &&
                 !c.getCsv().equals("") && !c.getExpiry().equals("");
+    }
+
+    public void refundCustomer(String username, double amount) {
+        CreditCard c = billingDatabase.get(username);
+        c.refund(amount);
     }
 
     @Override

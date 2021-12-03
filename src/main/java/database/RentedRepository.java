@@ -129,4 +129,16 @@ public class RentedRepository implements DatabaseAccess {
         return count;
     }
 
+    public double getOrderTotal(int orderNumber) {
+        double total = 0;
+        for (RentedMovie r : rentedMovies) {
+            if (orderNumber == r.getOrderId()) {
+                String barcode = r.getBarcode();
+                Movie m = movieRepository.getMovie(barcode);
+                total += m.getPrice();
+            }
+        }
+        return total;
+    }
+
 }

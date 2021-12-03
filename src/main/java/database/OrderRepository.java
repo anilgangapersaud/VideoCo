@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import scheduledtasks.CheckOverdueOrders;
+import scheduledtasks.DeliverOrders;
 import scheduledtasks.ShipOrders;
 
 import java.io.FileReader;
@@ -17,21 +18,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The repository to manage orders and common operations on orders
  */
-public class OrderRepository implements DatabaseAccess {
-
-    public static class DeliverOrders extends TimerTask {
-        @Override
-        public void run() {
-            List<Order> orders = getInstance().getAllOrders();
-            for (Order o : orders) {
-                if (o.getOrderStatus().equals("SHIPPED")) {
-                    o.setOrderStatus("DELIVERED");
-                    System.out.println("Delivered order " + o.getOrderId());
-                }
-            }
-            orderRepositoryInstance.updateCSV();
-        }
-    }
+public class OrderRepository implements DatabaseAccess, Subject {
 
     /**
      * the order database
@@ -54,9 +41,15 @@ public class OrderRepository implements DatabaseAccess {
      */
     private final RentedRepository rentedRepository;
 
+    private final BillingRepository billingRepository;
+
+    private final List<Observer> observers;
+
     private OrderRepository() {
         orderDatabase = new HashMap<>();
         rentedRepository = RentedRepository.getInstance();
+        billingRepository = BillingRepository.getInstance();
+        observers = new ArrayList<>();
         loadCSV();
 
         Timer timer = new Timer();
@@ -120,6 +113,7 @@ public class OrderRepository implements DatabaseAccess {
                 printer.printRecord(o.getOrderId(), o.getUsername(), o.getOrderStatus(),
                         o.getOrderDate(), o.getDueDate(), o.getOverdue());
             }
+            notifyObservers();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -138,6 +132,7 @@ public class OrderRepository implements DatabaseAccess {
         if (!o.getOrderStatus().equals("PROCESSED")) {
             return false;
         } else {
+            billingRepository.refundCustomer(o.getUsername(), rentedRepository.getOrderTotal(orderNumber));
             orderDatabase.remove(orderNumber);
             rentedRepository.returnMovies(orderNumber);
             updateCSV();
@@ -202,10 +197,6 @@ public class OrderRepository implements DatabaseAccess {
         return orderDatabase.size();
     }
 
-    public RentedRepository getRentedRepository() {
-        return rentedRepository;
-    }
-
     /**
      * Return movies to the system
      * @param orderNumber the order to return
@@ -221,12 +212,29 @@ public class OrderRepository implements DatabaseAccess {
         } else {
             rentedRepository.returnMovies(orderNumber);
             o.setDueDate("");
-            o.setOrderStatus("RETURNED");
+            o.setOrderStatus("COMPLETED");
             o.setOverdue(false);
             orderDatabase.replace(orderNumber, o);
+            updateCSV();
             return true;
         }
     }
 
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
 }
 

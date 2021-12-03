@@ -1,144 +1,75 @@
 package view.shoppanels;
 
-import model.Model;
-import model.Order;
-import view.cards.ShopCards;
+import controllers.OrderController;
+import database.UserRepository;
+import view.tablemodels.OrderTableModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 
-public class OrderPanel extends JPanel implements ActionListener {
-
-    private final ShopCards cards;
+public class OrderPanel extends JPanel {
 
     private final JTable table;
 
-    private JComboBox<String> orderStatus = null;
+    private final JComboBox<String> orderStatus;
 
     private final String[] statuses = {
-            "PROCESSED", "DELIVERED", "RETURNED", "SHIPPED"
+            "PROCESSED", "SHIPPED", "DELIVERED", "COMPLETED",
     };
 
-    public OrderPanel(ShopCards cards) {
-        this.cards = cards;
+    public OrderPanel() {
         setLayout(new BorderLayout(20, 10));
+        OrderController orderController = new OrderController(this);
 
-        // north bar
-        JPanel northbar = new JPanel();
+        JPanel northBar = new JPanel();
 
-        if (!Model.getUserService().getLoggedInUser().isAdmin()) {
-            // customer menu bar
+        if (!UserRepository.getInstance().getLoggedInUser().isAdmin()) {
             JButton cancelOrder = new JButton("Cancel Order");
-            cancelOrder.addActionListener(this);
+            cancelOrder.addActionListener(orderController);
             cancelOrder.setActionCommand("cancel");
 
             JButton returnMovies = new JButton("Return Movies");
             returnMovies.setActionCommand("return");
-            returnMovies.addActionListener(this);
+            returnMovies.addActionListener(orderController);
 
-            northbar.add(cancelOrder);
-            northbar.add(returnMovies);
-        } else {
-            // admin menu bar
+            northBar.add(cancelOrder);
+            northBar.add(returnMovies);
         }
 
+        orderStatus = new JComboBox<>(statuses);
+        orderStatus.addActionListener(orderController);
+
         table = new JTable();
-        updateViews();
+        OrderTableModel otm = new OrderTableModel(table, orderStatus);
+
+        TableColumn statusColumn = table.getColumnModel().getColumn(1);
+        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
         JScrollPane scrollPane = new JScrollPane(table);
 
         add(scrollPane, BorderLayout.CENTER);
         add(new JPanel(), BorderLayout.WEST);
         add(new JPanel(), BorderLayout.EAST);
-        add(northbar, BorderLayout.NORTH);
+        add(northBar, BorderLayout.NORTH);
         add(new JPanel(), BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    private void updateViews() {
-        updateTable();
+    public void displayErrorMessage(String error) {
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public void updateTable() {
-        List<Order> orders;
-        DefaultTableModel tmodel = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                if (column == 1  && Model.getUserService().getLoggedInUser().isAdmin()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
-        if (Model.getUserService().getLoggedInUser().isAdmin()) {
-            orders = Model.getOrderService().getAllOrders();
-        } else {
-            orders = Model.getOrderService().getOrdersByCustomer(Model.getUserService().getLoggedInUser().getUsername());
-        }
-        String[][] data = new String[orders.size()][5];
-        String[] column = {"NUMBER","STATUS","DATE","DUEDATE","OVERDUE"};
-        int i = 0;
-        for (Order o : orders) {
-            data[i][0] = String.valueOf(o.getOrderId());
-            data[i][1] = o.getOrderStatus();
-            data[i][2] = o.getOrderDate();
-            data[i][3] = o.getDueDate();
-            data[i][4] = String.valueOf(o.getOverdue());
-            i++;
-        }
-
-        tmodel.setDataVector(data,column);
-        table.setModel(tmodel);
-        TableColumn statusColumn = table.getColumnModel().getColumn(1);
-        orderStatus = new JComboBox<>(statuses);
-        orderStatus.addActionListener(this);
-        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("cancel")) {
-            int[] selected = table.getSelectedRows();
-            if (selected.length != 1) {
-                JOptionPane.showMessageDialog(this, "Select an order to cancel","Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                int orderNumber = Integer.parseInt((String)table.getValueAt(selected[0],0));
-                boolean result = Model.getOrderService().cancelOrder(orderNumber);
-                if (result) {
-                    JOptionPane.showMessageDialog(this, "Cancelled Order");
-                    updateViews();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error cancelling order","Error", JOptionPane.ERROR_MESSAGE);}
-                }
-        } else if (e.getActionCommand().equals("return")) {
-            int[] selected = table.getSelectedRows();
-            if (selected.length != 1) {
-                JOptionPane.showMessageDialog(this, "Select 1 order", "Error", JOptionPane.ERROR);
-            } else {
-                int orderNumber = Integer.parseInt((String)table.getValueAt(selected[0],0));
-                boolean result = Model.getOrderService().returnMovies(orderNumber);
-                if (result) {
-                    JOptionPane.showMessageDialog(this, "Thanks for shopping with VideoCo!");
-                    updateViews();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error returning movies. Status must be DELIVERED", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else if (e.getActionCommand().equals("comboBoxChanged")) {
-            // get the new status of and update the order number
-            String status = (String)orderStatus.getSelectedItem();
-            int[] selected = table.getSelectedRows();
-            if (selected.length == 1) {
-                int orderNumber =  Integer.parseInt((String)table.getValueAt(selected[0], 0));
-                Model.getOrderService().changeOrderStatus(orderNumber, status);
-            }
-        }
+    public JTable getTable() {
+        return table;
+    }
+
+    public JComboBox<String> getOrderStatus() {
+        return orderStatus;
     }
 
 }

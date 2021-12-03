@@ -25,7 +25,7 @@ public class ShopCards extends JPanel implements ActionListener {
         AccountCards ap = new AccountCards();
         StorePanel sp = new StorePanel(this);
         CartPanel cp = new CartPanel();
-        OrderPanel op = new OrderPanel(this);
+        OrderPanel op = new OrderPanel();
         ManageAccountsPanel map = new ManageAccountsPanel();
 
         add(ap, "ap");

@@ -70,4 +70,9 @@ public class CreditCard implements PaymentService {
         Model.getBillingService().updateCreditCard(this);
     }
 
+    public void refund(double amount) {
+        balance -= amount;
+        Model.getBillingService().updateCreditCard(this);
+    }
+
 }
