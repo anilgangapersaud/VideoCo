@@ -18,28 +18,12 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
     public OrderTableModel(JTable table, JComboBox<String> orderStatus) {
         view = table;
         this.orderStatus = orderStatus;
+        subscribe();
+        updateTable();
+    }
+
+    private void subscribe() {
         OrderRepository.getInstance().registerObserver(this);
-        List<Order> orders;
-        if (Model.getUserService().getLoggedInUser().isAdmin()) {
-            orders = Model.getOrderService().getAllOrders();
-        } else {
-            orders = Model.getOrderService().getOrdersByCustomer(Model.getUserService().getLoggedInUser().getUsername());
-        }
-        String[][] data = new String[orders.size()][5];
-        String[] column = {"NUMBER","STATUS","DATE","DUEDATE","OVERDUE"};
-        int i = 0;
-        for (Order o : orders) {
-            data[i][0] = String.valueOf(o.getOrderId());
-            data[i][1] = o.getOrderStatus();
-            data[i][2] = o.getOrderDate();
-            data[i][3] = o.getDueDate();
-            data[i][4] = String.valueOf(o.getOverdue());
-            i++;
-        }
-        setDataVector(data,column);
-        table.setModel(this);
-        TableColumn statusColumn = table.getColumnModel().getColumn(1);
-        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
     }
 
     @Override
@@ -47,8 +31,7 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
         return column == 1 && Model.getUserService().getLoggedInUser().isAdmin();
     }
 
-    @Override
-    public void update() {
+    private void updateTable() {
         List<Order> orders;
         if (Model.getUserService().getLoggedInUser().isAdmin()) {
             orders = Model.getOrderService().getAllOrders();
@@ -69,5 +52,10 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
         setDataVector(data,column);
         TableColumn statusColumn = view.getColumnModel().getColumn(1);
         statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
+    }
+
+    @Override
+    public void update() {
+        updateTable();
     }
 }

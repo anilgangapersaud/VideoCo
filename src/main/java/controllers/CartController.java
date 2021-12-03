@@ -14,8 +14,8 @@ import java.awt.event.ActionListener;
 
 public class CartController implements ActionListener {
 
-    private CartPanel view;
-    private UserRepository userRepository;
+    private final CartPanel view;
+    private final UserRepository userRepository;
 
     public CartController(CartPanel view) {
         this.view = view;
@@ -66,17 +66,26 @@ public class CartController implements ActionListener {
         }
     }
 
+    private void removeItem() {
+        int[] selected = view.getTable().getSelectedRows();
+        if (selected.length == 0) {
+            view.displayErrorMessage("Select a movie");
+        } else {
+            removeMovieFromCart(selected);
+        }
+    }
+
+    private void clearCart() {
+        userRepository.getLoggedInUser().getCart().clearCart();
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("removeItem")) {
-            int[] selected = view.getTable().getSelectedRows();
-            if (selected.length == 0) {
-                view.displayErrorMessage("Select a movie");
-            } else {
-                removeMovieFromCart(selected);
-            }
+            removeItem();
         } else if (e.getActionCommand().equals("clearCart")) {
-            userRepository.getLoggedInUser().getCart().clearCart();
+            clearCart();
         } else if (e.getActionCommand().equals("checkout")) {
             performCheckout();
         }

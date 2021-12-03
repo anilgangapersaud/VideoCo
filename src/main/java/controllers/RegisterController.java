@@ -20,22 +20,26 @@ public class RegisterController implements ActionListener {
         userService = new UserServiceImpl();
     }
 
-    public boolean serviceRegister(User u) {
+    private boolean serviceRegister(User u) {
        return userService.register(u);
+    }
+
+    private void signup() {
+        if (serviceRegister(new User(
+                view.getUsernameInput(), view.getPasswordInput(), view.getEmailInput(), view.getAccountType()))) {
+            JOptionPane.showMessageDialog(view, "Registration Successful!\nLogin with your credentials to start shopping");
+            view.clearInputs();
+            view.getCards().getLayout().show(view.getCards(), "lp");
+        } else {
+            JOptionPane.showMessageDialog(view, "", "Registration Failed", JOptionPane.ERROR_MESSAGE);
+            view.clearInputs();
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("signup")) {
-            if (serviceRegister(new User(
-                    view.getUsernameInput(), view.getPasswordInput(), view.getEmailInput(), view.getAccountType()))) {
-                JOptionPane.showMessageDialog(view, "Registration Successful!\nLogin with your credentials to start shopping");
-                view.clearInputs();
-                view.getCards().getLayout().show(view.getCards(), "lp");
-            } else {
-                JOptionPane.showMessageDialog(view, "", "Registration Failed", JOptionPane.ERROR_MESSAGE);
-                view.clearInputs();
-            }
+            signup();
         }
     }
 }

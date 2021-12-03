@@ -17,37 +17,61 @@ public class AccountController implements ActionListener {
         userRepository = UserRepository.getInstance();
     }
 
+    private void editName() {
+        view.getNameInput().setEditable(true);
+    }
+
+    private void saveName() {
+        view.getNameInput().setEditable(false);
+        if (userRepository.changeUsername(view.getNameInput().getText())) {
+            view.displayMessage("Username changed");
+        } else {
+            view.displayErrorMessage("Invalid username");
+        }
+    }
+
+    private void editPassword() {
+        view.getPasswordInput().setEchoChar((char) 0);
+        view.getPasswordInput().setEditable(true);
+    }
+
+    private void savePassword() {
+        view.getPasswordInput().setEditable(false);
+        view.getPasswordInput().setEchoChar('*');
+        if (UserRepository.getInstance().changePassword(new String(view.getPasswordInput().getPassword()))) {
+            view.displayMessage("Password Changed");
+        } else {
+            view.displayErrorMessage("Invalid Password");
+        }
+    }
+
+    private void editEmail() {
+        view.getEmailInput().setEditable(true);
+    }
+
+    private void saveEmail() {
+        view.getEmailInput().setEditable(false);
+        if (UserRepository.getInstance().changeEmail(view.getEmailInput().getText())) {
+            view.displayMessage("Email Changed");
+        } else {
+            view.displayErrorMessage("Invalid Email");
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("editName")) {
-            view.getNameInput().setEditable(true);
+            editName();
         } else if (e.getActionCommand().equals("saveName")) {
-            view.getNameInput().setEditable(false);
-            if (userRepository.changeUsername(view.getNameInput().getText())) {
-                view.displayMessage("Username changed");
-            } else {
-                view.displayErrorMessage("Invalid username");
-            }
+            saveName();
         } else if (e.getActionCommand().equals("editPassword")) {
-            view.getPasswordInput().setEchoChar((char) 0);
-            view.getPasswordInput().setEditable(true);
+            editPassword();
         } else if (e.getActionCommand().equals("savePassword")) {
-            view.getPasswordInput().setEditable(false);
-            view.getPasswordInput().setEchoChar('*');
-            if (UserRepository.getInstance().changePassword(new String(view.getPasswordInput().getPassword()))) {
-                view.displayMessage("Password Changed");
-            } else {
-                view.displayErrorMessage("Invalid Password");
-            }
+            savePassword();
         } else if (e.getActionCommand().equals("editEmail")) {
-            view.getEmailInput().setEditable(true);
+            editEmail();
         } else if (e.getActionCommand().equals("saveEmail")) {
-            view.getEmailInput().setEditable(false);
-            if (UserRepository.getInstance().changeEmail(view.getEmailInput().getText())) {
-                view.displayMessage("Email Changed");
-            } else {
-                view.displayErrorMessage("Invalid Email");
-            }
+            saveEmail();
         } else if (e.getActionCommand().equals("address")) {
             CardLayout cl = (CardLayout) view.getCards().getLayout();
             cl.show(view.getCards(), "eadp");
