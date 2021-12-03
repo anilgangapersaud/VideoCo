@@ -1,15 +1,14 @@
 package view.shoppanels;
 
-import model.Model;
+import controllers.AccountController;
+import database.Observer;
+import database.UserRepository;
 import view.cards.AccountCards;
 
-import javax.smartcardio.Card;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class AccountPanel extends JPanel implements ActionListener {
+public class AccountPanel extends JPanel implements Observer {
 
     private final AccountCards cards;
 
@@ -19,15 +18,18 @@ public class AccountPanel extends JPanel implements ActionListener {
 
     private final JTextField emailInput;
 
-    private JLabel loyaltyPoints;
+    private final JLabel loyaltyPoints;
 
     public AccountPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
-        String customerName = Model.getUserService().getLoggedInUser().getUsername();
-        String customerPassword = Model.getUserService().getLoggedInUser().getPassword();
-        String customerEmail = Model.getUserService().getLoggedInUser().getEmailAddress();
-        int customerLoyaltyPoints = Model.getUserService().getLoggedInUser().getLoyaltyPoints();
+
+        AccountController accountController = new AccountController(this);
+
+        String customerName = UserRepository.getInstance().getLoggedInUser().getUsername();
+        String customerPassword = UserRepository.getInstance().getLoggedInUser().getPassword();
+        String customerEmail = UserRepository.getInstance().getLoggedInUser().getEmailAddress();
+        int customerLoyaltyPoints = UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints();
 
         JLabel username = new JLabel("Username:");
         nameInput = new JTextField(20);
@@ -35,10 +37,10 @@ public class AccountPanel extends JPanel implements ActionListener {
         nameInput.setEditable(false);
         JButton editName = new JButton("Edit");
         editName.setActionCommand("editName");
-        editName.addActionListener(this);
+        editName.addActionListener(accountController);
         JButton saveName = new JButton("Save");
         saveName.setActionCommand("saveName");
-        saveName.addActionListener(this);
+        saveName.addActionListener(accountController);
         JPanel changeUsername = new JPanel();
         changeUsername.setLayout(new BoxLayout(changeUsername, BoxLayout.X_AXIS));
         changeUsername.add(username);
@@ -57,9 +59,9 @@ public class AccountPanel extends JPanel implements ActionListener {
         passwordInput.setEchoChar('*');
         JButton editPassword = new JButton("Edit");
         editPassword.setActionCommand("editPassword");
-        editPassword.addActionListener(this);
+        editPassword.addActionListener(accountController);
         JButton savePassword = new JButton("Save");
-        savePassword.addActionListener(this);
+        savePassword.addActionListener(accountController);
         savePassword.setActionCommand("savePassword");
         JPanel changePassword = new JPanel();
         changePassword.setLayout(new BoxLayout(changePassword, BoxLayout.X_AXIS));
@@ -77,10 +79,10 @@ public class AccountPanel extends JPanel implements ActionListener {
         emailInput.setEditable(false);
         JButton editEmail = new JButton("Edit");
         editEmail.setActionCommand("editEmail");
-        editEmail.addActionListener(this);
+        editEmail.addActionListener(accountController);
         JButton saveEmail = new JButton("Save");
         saveEmail.setActionCommand("saveEmail");
-        saveEmail.addActionListener(this);
+        saveEmail.addActionListener(accountController);
         JPanel changeEmail = new JPanel();
         changeEmail.setLayout(new BoxLayout(changeEmail, BoxLayout.X_AXIS));
         changeEmail.add(emailLabel);
@@ -101,10 +103,10 @@ public class AccountPanel extends JPanel implements ActionListener {
 
         JButton billing = new JButton("Billing");
         billing.setActionCommand("billing");
-        billing.addActionListener(this);
+        billing.addActionListener(accountController);
         JButton address = new JButton("Address");
         address.setActionCommand("address");
-        address.addActionListener(this);
+        address.addActionListener(accountController);
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         buttons.add(Box.createHorizontalStrut(horizontalStrutSize));
@@ -115,16 +117,11 @@ public class AccountPanel extends JPanel implements ActionListener {
         JLabel accountInformation = new JLabel("Account Information");
         accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        Box box = Box.createVerticalBox();
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(30,30,30,30),
-                BorderFactory.createLoweredBevelBorder()
-        ));
-
-        box.add(accountInformation);
         int verticalStrutSize = 35;
+        Box box = Box.createVerticalBox();
+        box.add(accountInformation);
         box.add(Box.createVerticalStrut(verticalStrutSize));
-        if (!Model.getUserService().getLoggedInUser().isAdmin()) {
+        if (!UserRepository.getInstance().isAdmin()) {
             box.add(lpPanel);
             box.add(Box.createVerticalStrut(verticalStrutSize));
         }
@@ -134,61 +131,45 @@ public class AccountPanel extends JPanel implements ActionListener {
         box.add(Box.createVerticalStrut(verticalStrutSize));
         box.add(changeEmail);
         box.add(Box.createVerticalStrut(verticalStrutSize));
-        if (!Model.getUserService().getLoggedInUser().isAdmin()) {
+        if (!UserRepository.getInstance().isAdmin()) {
             box.add(buttons);
         }
-        box.setAlignmentX(Component.CENTER_ALIGNMENT);
-        box.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(30,30,30,30),
+                BorderFactory.createLoweredBevelBorder()
+        ));
 
         add(box);
-
         setVisible(true);
     }
 
-    public void updateLoyaltyPoints() {
-        loyaltyPoints.setText(String.valueOf(Model.getUserService().getLoggedInUser().getLoyaltyPoints()));
+    public JTextField getNameInput() {
+        return nameInput;
+    }
+
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    public void displayErrorMessage(String errorMessage) {
+        JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public JPasswordField getPasswordInput() {
+        return passwordInput;
+    }
+
+    public JTextField getEmailInput() {
+        return emailInput;
+    }
+
+    public AccountCards getCards() {
+        return cards;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("editName")) {
-            nameInput.setEditable(true);
-        } else if (e.getActionCommand().equals("saveName")) {
-            nameInput.setEditable(false);
-            boolean result = Model.getUserService().changeUsername(nameInput.getText());
-            if (result) {
-                JOptionPane.showMessageDialog(this, "Changed Username");
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid Username", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getActionCommand().equals("editPassword")) {
-            passwordInput.setEchoChar((char) 0);
-            passwordInput.setEditable(true);
-        } else if (e.getActionCommand().equals("savePassword")) {
-            passwordInput.setEditable(false);
-            passwordInput.setEchoChar('*');
-            boolean result = Model.getUserService().changePassword(new String(passwordInput.getPassword()));
-            if (result) {
-                JOptionPane.showMessageDialog(this, "Changed Password");
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid Password", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getActionCommand().equals("editEmail")) {
-            emailInput.setEditable(true);
-        } else if (e.getActionCommand().equals("saveEmail")) {
-            emailInput.setEditable(false);
-            boolean result = Model.getUserService().changeEmail(emailInput.getText());
-            if (result) {
-                JOptionPane.showMessageDialog(this, "Changed Email");
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid Email", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getActionCommand().equals("address")) {
-            CardLayout cl = (CardLayout) cards.getLayout();
-            cl.show(cards, "eadp");
-        } else if (e.getActionCommand().equals("billing")) {
-            CardLayout cl = (CardLayout) cards.getLayout();
-            cl.show(cards, "ebp");
-        }
+    public void update() {
+        loyaltyPoints.setText(String.valueOf(UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints()));
     }
 }

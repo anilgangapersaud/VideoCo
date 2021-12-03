@@ -1,5 +1,9 @@
 package view.shoppanels;
 
+import controllers.AddressController;
+import database.AddressRepository;
+import database.Observer;
+import database.UserRepository;
 import model.Model;
 import model.Address;
 import view.cards.AccountCards;
@@ -9,7 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AddressPanel extends JPanel implements ActionListener {
+public class AddressPanel extends JPanel implements Observer {
 
     private final AccountCards cards;
 
@@ -30,8 +34,9 @@ public class AddressPanel extends JPanel implements ActionListener {
     public AddressPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
-        username = Model.getUserService().getLoggedInUser().getUsername();
-        customerAddress = Model.getAddressService().getAddress(username);
+        username = UserRepository.getInstance().getLoggedInUser().getUsername();
+        customerAddress = AddressRepository.getInstance().getAddress(username);
+        AddressController addressController = new AddressController(this);
 
         // address
         JLabel streetLabel = new JLabel("Street:");
@@ -69,21 +74,26 @@ public class AddressPanel extends JPanel implements ActionListener {
 
         // buttons
         JButton saveAddress = new JButton("Save Address");
-        saveAddress.addActionListener(this);
+        saveAddress.addActionListener(addressController);
         saveAddress.setActionCommand("saveAddress");
         JButton accountDetails = new JButton("Account");
         accountDetails.setActionCommand("account");
-        accountDetails.addActionListener(this);
+        accountDetails.addActionListener(addressController);
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         buttons.add(accountDetails);
         buttons.add(Box.createHorizontalStrut(horizontalStrutSize));
         buttons.add(saveAddress);
 
+        if (customerAddress != null) {
+            streetInput.setText(customerAddress.getLineAddress());
+            cityInput.setText(customerAddress.getCity());
+            provinceList.setSelectedItem(customerAddress.getProvince());
+            postalCodeInput.setText(customerAddress.getPostalCode());
+        }
+
         JLabel accountInformation = new JLabel("Address Information");
         accountInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        updateFields();
 
         Box box = Box.createVerticalBox();
         box.add(accountInformation);
@@ -108,40 +118,50 @@ public class AddressPanel extends JPanel implements ActionListener {
         setVisible(true);
     }
 
-    private void updateFields() {
+    public AccountCards getCards() {
+        return cards;
+    }
+
+    public JTextField getStreetInput() {
+        return streetInput;
+    }
+
+    public String getProvince() {
+        return (String)provinceList.getSelectedItem();
+    }
+
+    public String getCity() {
+        return cityInput.getText();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPostalCode() {
+        return postalCodeInput.getText();
+    }
+
+    public Address getCustomerAddress() {
+        return customerAddress;
+    }
+
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    public void displayErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, "", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void update() {
+        customerAddress = AddressRepository.getInstance().getAddress(UserRepository.getInstance().getLoggedInUser().getUsername());
         if (customerAddress != null) {
             streetInput.setText(customerAddress.getLineAddress());
             cityInput.setText(customerAddress.getCity());
             provinceList.setSelectedItem(customerAddress.getProvince());
             postalCodeInput.setText(customerAddress.getPostalCode());
-        }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("account")) {
-            CardLayout cl = (CardLayout) cards.getLayout();
-            cl.show(cards, "eacp");
-        } else if (e.getActionCommand().equals("saveAddress")) {
-            Address a = new Address();
-            a.setLineAddress(streetInput.getText());
-            a.setProvince((String)provinceList.getSelectedItem());
-            a.setCity(cityInput.getText());
-            a.setUsername(username);
-            a.setPostalCode(postalCodeInput.getText());
-            boolean result;
-            if (customerAddress == null) {
-                result = Model.getAddressService().saveAddress(a);
-            } else {
-                result = Model.getAddressService().updateAddress(a);
-            }
-            if (!result) {
-                JOptionPane.showMessageDialog(this, "Invalid Address Information. Please try again","Error",JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Saved Address");
-            }
-            customerAddress = a;
-            updateFields();
         }
     }
 }

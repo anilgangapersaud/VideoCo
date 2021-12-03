@@ -1,7 +1,6 @@
 package view.menu;
 
 import database.UserRepository;
-import model.Model;
 import view.cards.ShopCards;
 
 import javax.swing.*;
@@ -58,7 +57,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         orders.addActionListener(this);
 
 
-        welcomeMessage = new JLabel("Welcome " + Model.getUserService().getLoggedInUser().getUsername() + "!");
+        welcomeMessage = new JLabel("Welcome " + UserRepository.getInstance().getLoggedInUser().getUsername() + "!");
 
         add(logout);
         add(account);

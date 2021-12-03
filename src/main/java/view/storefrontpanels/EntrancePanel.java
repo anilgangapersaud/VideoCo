@@ -16,7 +16,7 @@ import java.io.IOException;
 public class EntrancePanel extends JPanel implements ActionListener {
 
     private static final String videocoLogoPath = System.getProperty("user.dir") + "/src/main/resources/videoco_emblem.png";
-    private StoreFrontCards cards;
+    private final StoreFrontCards cards;
 
     public EntrancePanel(StoreFrontCards cards) {
         this.cards = cards;

@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * Maintain the User database and provide common operations on Users
  */
-public class UserRepository implements DatabaseAccess {
+public class UserRepository implements DatabaseAccess, Subject {
 
     /**
      * Maintains a set of admin emails that correspond to admin accounts
@@ -35,6 +35,8 @@ public class UserRepository implements DatabaseAccess {
      * A quick way to get a User by username
      */
     private final Map<String, User> userAccounts;
+
+    List<Observer> observers;
 
     /**
      * The currently logged-in user
@@ -61,6 +63,7 @@ public class UserRepository implements DatabaseAccess {
     private UserRepository() {
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
+        observers = new ArrayList<>();
         addressRepository = AddressRepository.getInstance();
         billingRepository = BillingRepository.getInstance();
         orderRepository = OrderRepository.getInstance();
@@ -120,6 +123,7 @@ public class UserRepository implements DatabaseAccess {
                 User u = entry.getValue();
                 printer.printRecord(u.getEmailAddress(), u.getUsername(), u.getPassword(), u.getAccountType(), u.getLoyaltyPoints());
             }
+            notifyObservers();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -337,4 +341,20 @@ public class UserRepository implements DatabaseAccess {
         return email != null && !email.equals("");
     }
 
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
 }
