@@ -1,6 +1,5 @@
 package view.storefrontpanels;
 
-import view.StoreFront;
 import view.cards.LoginCards;
 import view.cards.StoreFrontCards;
 
@@ -21,7 +20,6 @@ public class EntrancePanel extends JPanel implements ActionListener {
     public EntrancePanel(StoreFrontCards cards) {
         this.cards = cards;
         setLayout(new BorderLayout());
-        // load logo in the center
         try {
             BufferedImage videocoLogo = ImageIO.read(new File(videocoLogoPath));
             Image dimg = videocoLogo.getScaledInstance(800, 500,Image.SCALE_SMOOTH);
@@ -31,9 +29,7 @@ public class EntrancePanel extends JPanel implements ActionListener {
             e.printStackTrace();
         }
 
-        // login panel at the bottom
         add(new LoginCards(this), BorderLayout.SOUTH);
-
         setVisible(true);
     }
 

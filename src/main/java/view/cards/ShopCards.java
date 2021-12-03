@@ -17,23 +17,16 @@ public class ShopCards extends JPanel implements ActionListener {
 
     private final CardLayout cl;
 
-    private final AccountCards ap;
-
-    private final StorePanel sp;
-    private final CartPanel cp;
-    private final OrderPanel op;
-    private final ManageAccountsPanel map;
-
     public ShopCards(ShopPanel shopPanel) {
         this.shopPanel = shopPanel;
         cl = new CardLayout();
         this.setLayout(cl);
 
-        ap = new AccountCards();
-        sp = new StorePanel(this);
-        cp = new CartPanel(this);
-        op = new OrderPanel(this);
-        map = new ManageAccountsPanel(this);
+        AccountCards ap = new AccountCards();
+        StorePanel sp = new StorePanel(this);
+        CartPanel cp = new CartPanel();
+        OrderPanel op = new OrderPanel(this);
+        ManageAccountsPanel map = new ManageAccountsPanel();
 
         add(ap, "ap");
         add(sp, "sp");
@@ -44,26 +37,9 @@ public class ShopCards extends JPanel implements ActionListener {
         setVisible(true);
     }
 
-    public ManageAccountsPanel getManageAccountsPanel() { return map; }
-
     public CardLayout getLayout() {
         return cl;
     }
-
-    public AccountCards getAccountPanel() {
-        return ap;
-    }
-
-    public StorePanel getStorePanel() {
-        return sp;
-    }
-
-    public CartPanel getCartPanel() {
-        return cp;
-    }
-
-    public OrderPanel getOrderPanel() { return op; }
-
 
     @Override
     public void actionPerformed(ActionEvent e) {

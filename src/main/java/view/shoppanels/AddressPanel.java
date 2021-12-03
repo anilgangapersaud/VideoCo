@@ -4,14 +4,11 @@ import controllers.AddressController;
 import database.AddressRepository;
 import database.Observer;
 import database.UserRepository;
-import model.Model;
 import model.Address;
 import view.cards.AccountCards;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class AddressPanel extends JPanel implements Observer {
 
@@ -152,7 +149,7 @@ public class AddressPanel extends JPanel implements Observer {
     }
 
     public void displayErrorMessage(String message) {
-        JOptionPane.showMessageDialog(this, "", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override

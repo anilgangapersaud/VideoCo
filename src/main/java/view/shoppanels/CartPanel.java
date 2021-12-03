@@ -3,7 +3,6 @@ package view.shoppanels;
 import controllers.CartController;
 import database.Observer;
 import database.UserRepository;
-import view.cards.ShopCards;
 import view.tablemodels.CartTableModel;
 
 import javax.swing.*;
@@ -12,9 +11,7 @@ import java.awt.event.KeyEvent;
 
 public class CartPanel extends JPanel implements Observer {
 
-    private final ShopCards cards;
-
-    private JLabel totalCost;
+    private final JLabel totalCost;
 
     private final JLabel displayLoyaltyPoints;
 
@@ -25,8 +22,7 @@ public class CartPanel extends JPanel implements Observer {
      */
     private final JTable table;
 
-    public CartPanel(ShopCards cards) {
-        this.cards = cards;
+    public CartPanel() {
         setLayout(new BorderLayout(20, 10));
         CartController cartController = new CartController(this);
         UserRepository.getInstance().registerObserver(this);
