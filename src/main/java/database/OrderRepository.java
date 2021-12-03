@@ -4,7 +4,10 @@ import model.Address;
 import model.Cart;
 import model.Movie;
 import model.Order;
+import model.payments.CreditCard;
+import model.payments.LoyaltyPoints;
 import model.payments.PaymentService;
+import model.payments.PaymentVisitor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -20,7 +23,7 @@ import java.util.*;
 /**
  * The repository to manage orders and common operations on orders
  */
-public class OrderRepository implements DatabaseAccess, Subject {
+public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor {
 
     /**
      * the order database
@@ -111,22 +114,6 @@ public class OrderRepository implements DatabaseAccess, Subject {
         }
     }
 
-    private BillingRepository getBillingRepository() {
-        return BillingRepository.getInstance();
-    }
-
-    private RentedRepository getRentedRepository() {
-        return RentedRepository.getInstance();
-    }
-
-    private MovieRepository getMovieRepository() {
-        return MovieRepository.getInstance();
-    }
-
-    private UserRepository getUserRepository() {
-        return UserRepository.getInstance();
-    }
-
     /**
      * cancel an order
      * @param orderNumber the order number of the order to be canceled
@@ -148,12 +135,6 @@ public class OrderRepository implements DatabaseAccess, Subject {
         }
     }
 
-    public void deleteOrder(int orderNumber) {
-        getRentedRepository().returnMovies(orderNumber);
-        orderDatabase.remove(orderNumber);
-        updateCSV();
-    }
-
     /**
      * Update an order's status
      * @param orderNumber the order number to update
@@ -170,7 +151,7 @@ public class OrderRepository implements DatabaseAccess, Subject {
      * create an order
      */
     public boolean createOrder(Cart cart, PaymentService paymentMethod, Address shipping) {
-        if (paymentMethod.pay(cart.getMoviesInCart())) {
+        if (paymentMethod.acceptPayment(this, cart.getMoviesInCart())) {
             if (getMovieRepository().rentMovies(cart.getMoviesInCart())) {
                 getUserRepository().awardLoyaltyPoint(shipping.getUsername());
                 Order o = new Order();
@@ -200,20 +181,10 @@ public class OrderRepository implements DatabaseAccess, Subject {
         updateCSV();
     }
 
-    private String getDueDate() {
-        Calendar calender = Calendar.getInstance();
-        calender.add(Calendar.DATE, 14);
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-        return df.format(calender.getTime());
-    }
-
-    private String getDate() {
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-        return df.format(today.getTime());
+    public void deleteOrder(int orderNumber) {
+        getRentedRepository().returnMovies(orderNumber);
+        orderDatabase.remove(orderNumber);
+        updateCSV();
     }
 
     /**
@@ -290,5 +261,64 @@ public class OrderRepository implements DatabaseAccess, Subject {
             o.update();
         }
     }
+
+    @Override
+    public boolean visitLoyaltyPoints(LoyaltyPoints loyaltyPoints, Map<Movie,Integer> movies) {
+        int totalMovies = 0;
+        for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
+            totalMovies += entry.getValue();
+        }
+        if (loyaltyPoints.getLoyaltyPoints() >= totalMovies * 10) {
+            int deduction = totalMovies * 10;
+            getUserRepository().getLoggedInUser().setLoyaltyPoints(loyaltyPoints.getLoyaltyPoints() - deduction);
+            getUserRepository().updateUser(getUserRepository().getLoggedInUser());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean visitCreditCard(CreditCard creditCard, Map<Movie, Integer> movies) {
+        for (Map.Entry<Movie, Integer> entry : movies.entrySet()) {
+            creditCard.charge(entry.getKey().getPrice() * entry.getValue());
+            getBillingRepository().updateCreditCard(creditCard);
+        }
+        return true;
+    }
+
+
+    private String getDueDate() {
+        Calendar calender = Calendar.getInstance();
+        calender.add(Calendar.DATE, 14);
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        return df.format(calender.getTime());
+    }
+
+    private String getDate() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+        return df.format(today.getTime());
+    }
+
+    private BillingRepository getBillingRepository() {
+        return BillingRepository.getInstance();
+    }
+
+    private RentedRepository getRentedRepository() {
+        return RentedRepository.getInstance();
+    }
+
+    private MovieRepository getMovieRepository() {
+        return MovieRepository.getInstance();
+    }
+
+    private UserRepository getUserRepository() {
+        return UserRepository.getInstance();
+    }
+
 }
 

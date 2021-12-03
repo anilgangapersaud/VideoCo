@@ -1,4 +1,5 @@
 package model.payments;
+
 import model.Movie;
 
 import java.util.Map;
@@ -54,20 +55,17 @@ public class CreditCard implements PaymentService {
         this.balance = balance;
     }
 
-    @Override
-    public boolean pay(Map<Movie, Integer> movies) {
-        for (Map.Entry<Movie, Integer> entry : movies.entrySet()) {
-            balance += entry.getKey().getPrice() * entry.getValue();
-        }
-        return true;
-    }
-
     public void charge(double amount) {
         balance += amount;
     }
 
     public void refund(double amount) {
         balance -= amount;
+    }
+
+    @Override
+    public boolean acceptPayment(PaymentVisitor visitor, Map<Movie,Integer> movies) {
+        return visitor.visitCreditCard(this, movies);
     }
 
 }

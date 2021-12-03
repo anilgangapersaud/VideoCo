@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface PaymentService {
 
-    boolean pay(Map<Movie, Integer> movies);
+    boolean acceptPayment(PaymentVisitor visitor, Map<Movie,Integer> movies);
 
 }
