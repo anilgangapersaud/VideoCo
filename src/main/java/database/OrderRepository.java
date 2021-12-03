@@ -148,6 +148,12 @@ public class OrderRepository implements DatabaseAccess, Subject {
         }
     }
 
+    public void deleteOrder(int orderNumber) {
+        getRentedRepository().returnMovies(orderNumber);
+        orderDatabase.remove(orderNumber);
+        updateCSV();
+    }
+
     /**
      * Update an order's status
      * @param orderNumber the order number to update

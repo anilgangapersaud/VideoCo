@@ -245,7 +245,7 @@ public class UserRepository implements DatabaseAccess, Subject {
         // remove the users orders
         List<Order> userOrders = getOrderRepository().getOrdersByCustomer(username);
         for (Order o : userOrders) {
-            getOrderRepository().cancelOrder(o.getOrderId());
+            getOrderRepository().deleteOrder(o.getOrderId());
         }
         userAccounts.remove(username);
         updateCSV();
