@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class AddressRepository implements DatabaseAccess, Subject {
 
-    private static final String ADDRESS_FILE_PATH = "/src/main/resources/addresses.csv";
-    private static final String addressPath = System.getProperty("user.dir") + ADDRESS_FILE_PATH;
+    private static final String ADDRESS_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/addresses.csv";
 
     private volatile static AddressRepository addressRepositoryInstance;
 
     private final Map<String, Address> addressDatabase;
+
     private final List<Observer> observers;
 
     private AddressRepository() {
@@ -46,7 +46,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
 
     @Override
     public void loadCSV() {
-        try (CSVParser parser = new CSVParser(new FileReader(AddressRepository.addressPath), CSVFormat.RFC4180
+        try (CSVParser parser = new CSVParser(new FileReader(ADDRESS_CSV_PATH), CSVFormat.RFC4180
                 .withDelimiter(',')
                 .withHeader("username", "street", "city", "province", "postalCode"))) {
             List<CSVRecord> records = parser.getRecords();
@@ -59,8 +59,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
                 address.setPostalCode(records.get(i).get("postalCode"));
                 addressDatabase.put(address.getUsername(), address);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignore) {
         }
     }
 
@@ -69,7 +68,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
      */
     @Override
     public void updateCSV() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(addressPath, false),
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(ADDRESS_CSV_PATH, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader(
                                 "username",
@@ -82,8 +81,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
                 Address a = entry.getValue();
                 printer.printRecord(a.getUsername(), a.getLineAddress(), a.getCity(), a.getProvince(), a.getPostalCode());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignore) {
         }
     }
 
@@ -158,8 +156,17 @@ public class AddressRepository implements DatabaseAccess, Subject {
      * @return validation
      */
     private boolean validateAddress(Address address) {
-        return !address.getLineAddress().equals("") && !address.getCity().equals("")
-                && !address.getProvince().equals("") && !address.getPostalCode().equals("")
-                && !address.getUsername().equals("");
+        if (address == null) {
+            return false;
+        } else {
+            if (address.getLineAddress() == null || address.getCity() == null || address.getProvince() == null
+                || address.getPostalCode() == null || address.getUsername() == null) {
+                return false;
+            } else {
+                return !address.getLineAddress().equals("") && !address.getCity().equals("")
+                        && !address.getProvince().equals("") && !address.getPostalCode().equals("")
+                        && !address.getUsername().equals("");
+            }
+        }
     }
 }

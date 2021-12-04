@@ -160,7 +160,17 @@ public class BillingRepository implements DatabaseAccess, Subject {
     }
 
     private boolean validateCreditCard(CreditCard c) {
-        return c.getBalance() >= 0.00D && !c.getCardNumber().equals("") &&
-                !c.getCsv().equals("") && !c.getExpiry().equals("");
+        if (c == null) {
+            return false;
+        } else {
+            if (c.getUsername() == null || c.getExpiry() == null || c.getCsv() == null
+            || c.getCardNumber() == null || c.getBalance() < 0) {
+                return false;
+            } else {
+                return !c.getCardNumber().equals("") &&
+                        !c.getCsv().equals("") && !c.getExpiry().equals("");
+            }
+        }
     }
+
 }

@@ -3,6 +3,7 @@ package model.payments;
 import model.Movie;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class CreditCard implements PaymentService {
 
@@ -57,6 +58,14 @@ public class CreditCard implements PaymentService {
 
     public void charge(double amount) {
         balance += amount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CreditCard that = (CreditCard) o;
+        return Double.compare(that.balance, balance) == 0 && Objects.equals(username, that.username) && Objects.equals(cardNumber, that.cardNumber) && Objects.equals(expiry, that.expiry) && Objects.equals(csv, that.csv);
     }
 
     public void refund(double amount) {
