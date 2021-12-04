@@ -1,9 +1,6 @@
 package database;
 
-import model.Address;
-import model.Order;
 import model.User;
-import model.payments.CreditCard;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -26,10 +23,12 @@ public class UserRepository implements DatabaseAccess, Subject {
 
     private User loggedInUser;
 
-    private static final String ADMIN_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/admins.csv";
-    private static final String USER_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/users.csv";
+    private final String ADMIN_CSV_PATH;
+    private final String USER_CSV_PATH;
 
-    private UserRepository() {
+    private UserRepository(String adminPath, String userPath) {
+        ADMIN_CSV_PATH = adminPath;
+        USER_CSV_PATH = userPath;
         clearCSV();
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
@@ -37,11 +36,11 @@ public class UserRepository implements DatabaseAccess, Subject {
         loadCSV();
     }
 
-    public static UserRepository getInstance() {
+    public static UserRepository getInstance(String adminPath, String userPath) {
         if (userRepositoryInstance == null) {
             synchronized (UserRepository.class) {
                 if (userRepositoryInstance == null) {
-                    userRepositoryInstance = new UserRepository();
+                    userRepositoryInstance = new UserRepository(adminPath, userPath);
                 }
             }
         }
@@ -114,54 +113,18 @@ public class UserRepository implements DatabaseAccess, Subject {
         updateCSV();
     }
 
-    public boolean changeUsername(String newUsername, String oldUsername) {
-        if (userAccounts.containsKey(oldUsername)) {
-            if (validateUsername(newUsername)) {
+    public void changeUsername(String newUsername, String oldUsername) {
+        // replace user
+        User u = userAccounts.get(oldUsername);
+        u.setUsername(newUsername);
+        userAccounts.remove(oldUsername);
+        userAccounts.put(newUsername, u);
 
-                // replace user
-                User u = userAccounts.get(oldUsername);
-                u.setUsername(newUsername);
-                userAccounts.remove(oldUsername);
-                userAccounts.put(newUsername, u);
-
-                // replace address
-                Address a = getAddressRepository().getAddress(oldUsername);
-                if (a != null) {
-                    a.setUsername(newUsername);
-                    getAddressRepository().deleteAddress(oldUsername);
-                    getAddressRepository().saveAddress(a);
-                }
-
-                // replace card
-                CreditCard c = getBillingRepository().getCreditCard(oldUsername);
-                if (c != null) {
-                    c.setUsername(newUsername);
-                    getBillingRepository().updateCreditCard(c);
-                    getBillingRepository().deleteCreditCard(oldUsername);
-                    getBillingRepository().saveCreditCard(c);
-                }
-
-                // replace orders
-                List<Order> orders = getOrderRepository().getOrdersByCustomer(oldUsername);
-                if (orders != null) {
-                    for (Order o : orders) {
-                        o.setUsername(newUsername);
-                        getOrderRepository().updateOrder(o.getOrderId(), o);
-                    }
-                }
-
-                // set logged in user
-                if (loggedInUser != null) {
-                    loggedInUser.setUsername(newUsername);
-                }
-                updateCSV();
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+        // set logged in user
+        if (loggedInUser != null) {
+            loggedInUser.setUsername(newUsername);
         }
+        updateCSV();
     }
 
     public boolean changePassword(String newPassword, String username) {
@@ -198,17 +161,11 @@ public class UserRepository implements DatabaseAccess, Subject {
         }
     }
 
-    public boolean checkUserExists(String barcode) {
-        return userAccounts.containsKey(barcode);
+    public boolean checkUserExists(String username) {
+        return userAccounts.containsKey(username);
     }
 
     public void deleteUser(String username) {
-        getAddressRepository().deleteAddress(username);
-        getBillingRepository().deleteCreditCard(username);
-        List<Order> userOrders = getOrderRepository().getOrdersByCustomer(username);
-        for (Order o : userOrders) {
-            getOrderRepository().deleteOrder(o.getOrderId());
-        }
         userAccounts.remove(username);
         updateCSV();
     }
@@ -278,14 +235,9 @@ public class UserRepository implements DatabaseAccess, Subject {
         return false;
     }
 
-    private boolean validateUsername(String username) {
-       return username != null &&
-                !username.equals("") &&
-                !userAccounts.containsKey(username);
-    }
 
     private boolean validateNewUserRegistration(User newUser) {
-        return validateUsername(newUser.getUsername()) && validatePassword(newUser.getPassword())
+        return newUser != null && !newUser.getUsername().equals("") && validatePassword(newUser.getPassword())
                 && validateEmail(newUser.getEmailAddress()) && !newUser.getAccountType().equals("");
     }
 
@@ -295,18 +247,6 @@ public class UserRepository implements DatabaseAccess, Subject {
 
     private boolean validateEmail(String email) {
         return email != null && !email.equals("");
-    }
-
-    private AddressRepository getAddressRepository() {
-        return AddressRepository.getInstance();
-    }
-
-    private BillingRepository getBillingRepository() {
-        return BillingRepository.getInstance();
-    }
-
-    private OrderRepository getOrderRepository() {
-        return OrderRepository.getInstance();
     }
 
     @Override

@@ -2,7 +2,8 @@ package view.shoppanels;
 
 import controllers.AccountController;
 import database.Observer;
-import database.UserRepository;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.cards.AccountCards;
 
 import javax.swing.*;
@@ -20,18 +21,22 @@ public class AccountPanel extends JPanel implements Observer {
 
     private final JLabel loyaltyPoints;
 
+    private final UserServiceImpl userService;
+
     public AccountPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
 
+        userService = StoreFront.getUserService();
+
         AccountController accountController = new AccountController(this);
 
-        String customerName = UserRepository.getInstance().getLoggedInUser().getUsername();
-        String customerPassword = UserRepository.getInstance().getLoggedInUser().getPassword();
-        String customerEmail = UserRepository.getInstance().getLoggedInUser().getEmailAddress();
-        int customerLoyaltyPoints = UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints();
+        String customerName = userService.getLoggedInUser().getUsername();
+        String customerPassword = userService.getLoggedInUser().getPassword();
+        String customerEmail = userService.getLoggedInUser().getEmailAddress();
+        int customerLoyaltyPoints = userService.getLoggedInUser().getLoyaltyPoints();
 
-        UserRepository.getInstance().registerObserver(this);
+        userService.registerObserver(this);
 
         JLabel username = new JLabel("Username:");
         nameInput = new JTextField(20);
@@ -123,7 +128,7 @@ public class AccountPanel extends JPanel implements Observer {
         Box box = Box.createVerticalBox();
         box.add(accountInformation);
         box.add(Box.createVerticalStrut(verticalStrutSize));
-        if (!UserRepository.getInstance().isAdmin()) {
+        if (!userService.isAdmin()) {
             box.add(lpPanel);
             box.add(Box.createVerticalStrut(verticalStrutSize));
         }
@@ -133,7 +138,7 @@ public class AccountPanel extends JPanel implements Observer {
         box.add(Box.createVerticalStrut(verticalStrutSize));
         box.add(changeEmail);
         box.add(Box.createVerticalStrut(verticalStrutSize));
-        if (!UserRepository.getInstance().isAdmin()) {
+        if (!userService.isAdmin()) {
             box.add(buttons);
         }
 
@@ -172,6 +177,6 @@ public class AccountPanel extends JPanel implements Observer {
 
     @Override
     public void update() {
-        loyaltyPoints.setText(String.valueOf(UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints()));
+        loyaltyPoints.setText(String.valueOf(userService.getLoggedInUser().getLoyaltyPoints()));
     }
 }

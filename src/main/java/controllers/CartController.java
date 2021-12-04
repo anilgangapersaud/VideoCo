@@ -1,12 +1,13 @@
 package controllers;
 
-import database.AddressRepository;
-import database.BillingRepository;
-import database.OrderRepository;
-import database.UserRepository;
 import model.*;
 import model.payments.LoyaltyPoints;
 import model.payments.PaymentService;
+import services.AddressServiceImpl;
+import services.BillingServiceImpl;
+import services.OrderServiceImpl;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.shoppanels.CartPanel;
 
 import javax.swing.*;
@@ -16,21 +17,21 @@ import java.awt.event.ActionListener;
 public class CartController implements ActionListener {
 
     private final CartPanel view;
-    private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
-    private final BillingRepository billingRepository;
-    private final OrderRepository orderRepository;
+    private final UserServiceImpl userService;
+    private final AddressServiceImpl addressService;
+    private final BillingServiceImpl billingService;
+    private final OrderServiceImpl orderService;
 
     public CartController(CartPanel view) {
         this.view = view;
-        userRepository = UserRepository.getInstance();
-        addressRepository = AddressRepository.getInstance();
-        billingRepository = BillingRepository.getInstance();
-        orderRepository = OrderRepository.getInstance();
+        userService = StoreFront.getUserService();
+        addressService = StoreFront.getAddressService();
+        billingService = StoreFront.getBillingService();
+        orderService = StoreFront.getOrderService();
     }
 
     private void removeMovieFromCart(int[] selected) {
-        Cart userCart = userRepository.getLoggedInUser().getCart();
+        Cart userCart = userService.getLoggedInUser().getCart();
         for (int row : selected) {
             Movie m = new Movie();
             m.setBarcode((String) view.getTable().getValueAt(row,0));
@@ -41,8 +42,8 @@ public class CartController implements ActionListener {
     }
 
     private void performCheckout() {
-        User u = userRepository.getLoggedInUser();
-        Address userAddress = addressRepository.getAddress(u.getUsername());
+        User u = userService.getLoggedInUser();
+        Address userAddress = addressService.getAddress(u.getUsername());
         ButtonModel buttonModel = view.getPaymentServices().getSelection();
         if (buttonModel != null) {
             if (u.getCart().getMoviesInCart().size() == 0) {
@@ -54,12 +55,12 @@ public class CartController implements ActionListener {
                 if (buttonModel.getActionCommand().equals("loyaltyPoints")) {
                     paymentMethod = new LoyaltyPoints(u.getLoyaltyPoints());
                 } else if (buttonModel.getActionCommand().equals("creditCard")) {
-                    paymentMethod = billingRepository.getCreditCard(u.getUsername());
+                    paymentMethod = billingService.getCreditCard(u.getUsername());
                 }
                 if (paymentMethod == null) {
                     view.displayErrorMessage("No credit card on file\nAdd a credit card in Account Details");
                 } else {
-                    Order paymentAccepted = orderRepository.createOrder(u.getCart(), paymentMethod);
+                    Order paymentAccepted = orderService.createOrder(u.getCart(), paymentMethod);
                     if (paymentAccepted != null) {
                         view.displayMessage("Created Order");
                         u.getCart().clearCart();
@@ -83,7 +84,7 @@ public class CartController implements ActionListener {
     }
 
     private void clearCart() {
-        userRepository.getLoggedInUser().getCart().clearCart();
+        userService.getLoggedInUser().getCart().clearCart();
     }
 
     @Override

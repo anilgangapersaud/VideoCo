@@ -1,7 +1,8 @@
 package controllers;
 
-import database.AddressRepository;
 import model.Address;
+import services.AddressServiceImpl;
+import view.StoreFront;
 import view.shoppanels.AddressPanel;
 
 import java.awt.*;
@@ -11,11 +12,11 @@ import java.awt.event.ActionListener;
 public class AddressController implements ActionListener {
 
     private final AddressPanel view;
-    private final AddressRepository addressRepository;
+    private final AddressServiceImpl addressService;
 
     public AddressController(AddressPanel view) {
         this.view = view;
-        addressRepository = AddressRepository.getInstance();
+        addressService = StoreFront.getAddressService();
     }
 
     private void saveAddress() {
@@ -27,9 +28,9 @@ public class AddressController implements ActionListener {
         a.setPostalCode(view.getPostalCode());
         boolean result;
         if (view.getCustomerAddress() == null) {
-            result = addressRepository.saveAddress(a);
+            result = addressService.saveAddress(a);
         } else {
-            result = addressRepository.updateAddress(a);
+            result = addressService.updateAddress(a);
         }
         if (!result) {
             view.displayErrorMessage("Invalid Address Information\nCheck fields and try again");

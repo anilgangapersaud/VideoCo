@@ -1,7 +1,8 @@
 package controllers;
 
-import database.UserRepository;
 import model.User;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.accountpanels.RegisterPanel;
 
 import javax.swing.*;
@@ -11,16 +12,16 @@ import java.awt.event.ActionListener;
 
 public class RegisterController implements ActionListener {
 
-    private final UserRepository userRepository;
+    private final UserServiceImpl userService;
     private final RegisterPanel view;
 
     public RegisterController(RegisterPanel view) {
         this.view = view;
-        userRepository = UserRepository.getInstance();
+        userService = StoreFront.getUserService();
     }
 
     private boolean serviceRegister(User u) {
-       return userRepository.register(u);
+       return userService.register(u);
     }
 
     private void signup() {

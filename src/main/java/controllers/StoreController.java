@@ -1,10 +1,11 @@
 package controllers;
 
-import database.MovieRepository;
-import database.UserRepository;
 import model.Cart;
 import model.Movie;
 import model.User;
+import services.MovieServiceImpl;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.dialogs.AddMovieDialog;
 import view.dialogs.EditMovieDialog;
 import view.shoppanels.StorePanel;
@@ -19,18 +20,18 @@ import java.util.Map;
 public class StoreController implements ActionListener {
 
     private final StorePanel view;
-    private final MovieRepository movieRepository;
-    private final UserRepository userRepository;
+    private final MovieServiceImpl movieService;
+    private final UserServiceImpl userService;
 
     public StoreController(StorePanel view) {
         this.view = view;
-        movieRepository = MovieRepository.getInstance();
-        userRepository = UserRepository.getInstance();
+        movieService = StoreFront.getMovieService();
+        userService = StoreFront.getUserService();
     }
 
     private void searchTitle() {
         Map<Movie,Integer> result;
-        result = movieRepository.findMovieByTitle(view.getSearchInput().getText());
+        result = movieService.getMovieByTitle(view.getSearchInput().getText());
         if (result.isEmpty()) {
             view.displayMessage("No movies match the desired search");
         }
@@ -41,7 +42,7 @@ public class StoreController implements ActionListener {
         Map<Movie,Integer> result = new HashMap<>();
         String category = (String) view.getCategoryList().getSelectedItem();
         if (category != null) {
-            result = movieRepository.getMoviesByCategory(category.toLowerCase());
+            result = movieService.getMoviesByCategory(category.toLowerCase());
         }
         if (result.isEmpty()) {
             view.displayMessage("No movies match the desired search");
@@ -51,7 +52,7 @@ public class StoreController implements ActionListener {
 
     private void searchAll() {
         Map<Movie,Integer> result;
-        result = movieRepository.getAllMovies();
+        result = movieService.getAllMovies();
         view.getSearchInput().setText("");
         if (result.isEmpty()) {
             view.displayMessage("No movies match the desired search");
@@ -64,7 +65,7 @@ public class StoreController implements ActionListener {
         if (selected.length == 0) {
             view.displayMessage("Select a movie");
         } else {
-            User u = userRepository.getLoggedInUser();
+            User u = userService.getLoggedInUser();
             Cart cart = u.getCart();
             for (int row : selected) {
                 int stock = Integer.parseInt((String) view.getTable().getValueAt(row, 5));
@@ -91,7 +92,7 @@ public class StoreController implements ActionListener {
         } else {
             for (int j : selected) {
                 String barcode = (String) view.getTable().getValueAt(j, 0);
-                movieRepository.returnMovie(barcode);
+                movieService.returnMovie(barcode);
             }
         }
     }
@@ -103,7 +104,7 @@ public class StoreController implements ActionListener {
         } else {
             for (int j : selected) {
                 String barcode = (String) view.getTable().getValueAt(j, 0);
-                movieRepository.removeStock(barcode);
+                movieService.removeStock(barcode);
             }
         }
     }
@@ -119,7 +120,7 @@ public class StoreController implements ActionListener {
                 barcodes.add(barcode);
             }
             for (String barcode : barcodes) {
-                movieRepository.deleteMovie(barcode);
+                movieService.deleteMovie(barcode);
             }
         }
     }
@@ -130,7 +131,7 @@ public class StoreController implements ActionListener {
             view.displayMessage("Select a movie");
         } else {
             String barcode = (String)view.getTable().getValueAt(selected[0],0);
-            Movie m = movieRepository.getMovie(barcode);
+            Movie m = movieService.getMovie(barcode);
             new EditMovieDialog(m);
         }
     }

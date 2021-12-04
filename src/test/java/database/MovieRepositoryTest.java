@@ -16,7 +16,7 @@ class MovieRepositoryTest {
 
     @BeforeEach
     void setup() {
-        underTest = MovieRepository.getInstance();
+        underTest = MovieRepository.getInstance(TestConfigs.MOVIE_CSV_TEST_PATH);
     }
 
     @AfterEach
@@ -124,7 +124,7 @@ class MovieRepositoryTest {
         Map<Movie,Integer> expected = new HashMap<>();
         expected.put(newMovie,2);
 
-        Map<Movie,Integer> result = underTest.findMovieByTitle("te");
+        Map<Movie,Integer> result = underTest.getMovieByTitle("te");
 
         assertThat(result).isEqualTo(expected);
 

@@ -2,24 +2,26 @@ package scheduled_tasks;
 
 import database.OrderRepository;
 import model.Order;
+import services.OrderServiceImpl;
+import view.StoreFront;
 
 import java.util.List;
 import java.util.TimerTask;
 
 public class ShipOrders extends TimerTask {
 
-    private final OrderRepository orderRepository;
+    private final OrderServiceImpl orderService;
 
     public ShipOrders() {
-        orderRepository = OrderRepository.getInstance();
+        orderService = StoreFront.getOrderService();
     }
 
     @Override
     public void run() {
-        List<Order> orders = orderRepository.getAllOrders();
+        List<Order> orders = orderService.getAllOrders();
         for (Order o : orders) {
             if (o.getOrderStatus().equals("PROCESSED")) {
-                orderRepository.changeOrderStatus(o.getOrderId(), "SHIPPED");
+                orderService.changeOrderStatus(o.getOrderId(), "SHIPPED");
                 System.out.println("Shipping order number " + o.getOrderId());
             }
         }

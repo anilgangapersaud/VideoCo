@@ -1,7 +1,8 @@
 package controllers;
 
-import database.BillingRepository;
 import model.payments.CreditCard;
+import services.BillingServiceImpl;
+import view.StoreFront;
 import view.shoppanels.BillingPanel;
 
 import java.awt.*;
@@ -11,11 +12,11 @@ import java.awt.event.ActionListener;
 public class BillingController implements ActionListener {
 
     private final BillingPanel view;
-    private final BillingRepository billingRepository;
+    private final BillingServiceImpl billingService;
 
     public BillingController(BillingPanel view) {
         this.view = view;
-        billingRepository = BillingRepository.getInstance();
+        billingService = StoreFront.getBillingService();
     }
 
     private void saveBilling() {
@@ -27,10 +28,10 @@ public class BillingController implements ActionListener {
         boolean result;
         if (view.getCustomerCreditCard() == null) {
             c.setBalance(0.00D);
-            result = billingRepository.saveCreditCard(c);
+            result = billingService.saveCreditCard(c);
         } else {
             c.setBalance(view.getCustomerCreditCard().getBalance());
-            result = billingRepository.updateCreditCard(c);
+            result = billingService.updateCreditCard(c);
         }
         if (!result) {
             view.displayErrorMessage("Invalid Billing Information\nCheck fields and try again");

@@ -3,6 +3,7 @@ package view.tablemodels;
 import database.Observer;
 import database.UserRepository;
 import model.User;
+import view.StoreFront;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -15,11 +16,11 @@ public class AccountTableModel extends DefaultTableModel implements Observer {
     }
 
     private void subscribe() {
-        UserRepository.getInstance().registerObserver(this);
+        StoreFront.getUserService().registerObserver(this);
     }
 
     private void updateTable() {
-        List<User> customerAccounts = UserRepository.getInstance().getAllCustomers();
+        List<User> customerAccounts = StoreFront.getUserService().getAllCustomers();
         String[][] data = new String[customerAccounts.size()][3];
         String[] column = {"USERNAME", "PASSWORD", "EMAIL"};
         for (int i = 0; i < customerAccounts.size(); i++) {

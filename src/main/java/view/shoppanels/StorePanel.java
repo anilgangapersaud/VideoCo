@@ -5,6 +5,7 @@ import database.MovieRepository;
 import database.UserRepository;
 
 import model.Movie;
+import view.StoreFront;
 import view.tablemodels.StoreTableModel;
 
 import javax.swing.*;
@@ -41,7 +42,7 @@ public class StorePanel extends JPanel {
     }
 
     private void constructSouthBarView(StoreController controller) {
-        if (UserRepository.getInstance().getLoggedInUser().isAdmin()) {
+        if (StoreFront.getUserService().getLoggedInUser().isAdmin()) {
             JPanel southBar = new JPanel();
             JButton editMovie = new JButton("Edit Movie");
             editMovie.addActionListener(controller);
@@ -64,7 +65,7 @@ public class StorePanel extends JPanel {
     private void constructCenterTable() {
         table = new JTable();
         tableModel = new StoreTableModel();
-        MovieRepository.getInstance().registerObserver(tableModel);
+        StoreFront.getMovieService().registerObserver(tableModel);
         table.setModel(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
@@ -95,7 +96,7 @@ public class StorePanel extends JPanel {
         north.add(categoryList);
         north.add(searchMoviesButton);
 
-        if (!UserRepository.getInstance().getLoggedInUser().isAdmin()) {
+        if (!StoreFront.getUserService().getLoggedInUser().isAdmin()) {
             JButton addMovieButton = new JButton("Add to Cart");
             addMovieButton.setActionCommand("addMovie");
             addMovieButton.addActionListener(controller);

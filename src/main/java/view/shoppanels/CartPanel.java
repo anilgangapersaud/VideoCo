@@ -2,7 +2,8 @@ package view.shoppanels;
 
 import controllers.CartController;
 import database.Observer;
-import database.UserRepository;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.tablemodels.CartTableModel;
 
 import javax.swing.*;
@@ -17,16 +18,17 @@ public class CartPanel extends JPanel implements Observer {
 
     private final ButtonGroup paymentServices;
 
-    /**
-     * Components for displaying data
-     */
     private final JTable table;
+
+    private UserServiceImpl userService;
 
     public CartPanel() {
         setLayout(new BorderLayout(20, 10));
         CartController cartController = new CartController(this);
-        UserRepository.getInstance().registerObserver(this);
-        UserRepository.getInstance().getLoggedInUser().getCart().registerObserver(this);
+        userService = StoreFront.getUserService();
+
+        userService.registerObserver(this);
+        userService.getLoggedInUser().getCart().registerObserver(this);
 
         JLabel paymentLabel = new JLabel("Choose your payment method:");
         JRadioButton loyaltyPointsOption = new JRadioButton("Loyalty Points");
@@ -52,7 +54,7 @@ public class CartPanel extends JPanel implements Observer {
         checkout.setActionCommand("checkout");
 
         JLabel loyaltyPointsLabel = new JLabel("Loyalty Points:");
-        int customerLoyaltyPoints = UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints();
+        int customerLoyaltyPoints = userService.getLoggedInUser().getLoyaltyPoints();
         displayLoyaltyPoints = new JLabel(String.valueOf(customerLoyaltyPoints));
 
         table = new JTable();
@@ -102,7 +104,7 @@ public class CartPanel extends JPanel implements Observer {
 
     @Override
     public void update() {
-        displayLoyaltyPoints.setText(String.valueOf(UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints()));
-        totalCost.setText(String.format("Total: %.2f$", UserRepository.getInstance().getLoggedInUser().getCart().getTotal()));
+        displayLoyaltyPoints.setText(String.valueOf(userService.getLoggedInUser().getLoyaltyPoints()));
+        totalCost.setText(String.format("Total: %.2f$", userService.getLoggedInUser().getCart().getTotal()));
     }
 }

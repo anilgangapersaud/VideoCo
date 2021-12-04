@@ -1,25 +1,26 @@
 package scheduled_tasks;
 
-import database.OrderRepository;
 import model.Order;
+import services.OrderServiceImpl;
+import view.StoreFront;
 
 import java.util.List;
 import java.util.TimerTask;
 
 public class DeliverOrders extends TimerTask {
 
-    private OrderRepository orderRepository;
+    private final OrderServiceImpl orderService;
 
     public DeliverOrders() {
-        orderRepository = OrderRepository.getInstance();
+        orderService = StoreFront.getOrderService();
     }
 
     @Override
     public void run() {
-        List<Order> orders = orderRepository.getAllOrders();
+        List<Order> orders = orderService.getAllOrders();
         for (Order o : orders) {
             if (o.getOrderStatus().equals("SHIPPED")) {
-                orderRepository.changeOrderStatus(o.getOrderId(), "DELIVERED");
+                orderService.changeOrderStatus(o.getOrderId(), "DELIVERED");
                 System.out.println("Delivered order " + o.getOrderId());
             }
         }

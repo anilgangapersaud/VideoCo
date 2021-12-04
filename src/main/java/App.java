@@ -13,20 +13,20 @@ public class App {
 
     private static final long SHIP_TIME = 900000;
 
+
     public App() {
         initializeApp();
     }
 
     public static void main(String[] args) {
+        new App();
         Timer timer = new Timer();
         timer.schedule(new CheckOverdueOrders(), Calendar.getInstance().getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
         timer.schedule(new DeliverOrders(), Calendar.getInstance().getTime(), DELIVERY_TIME);
         timer.schedule(new ShipOrders(), Calendar.getInstance().getTime(), SHIP_TIME);
-        new App();
     }
 
     private void initializeApp() {
         new StoreFront();
     }
-
 }

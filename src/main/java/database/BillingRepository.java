@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import view.StoreFront;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -22,20 +23,21 @@ public class BillingRepository implements DatabaseAccess, Subject {
 
     private final List<Observer> observers;
 
-    private static final String BILLING_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/billing.csv";
+    private static String BILLING_CSV_PATH;
 
-    private BillingRepository() {
+    private BillingRepository(String path) {
+        BILLING_CSV_PATH = path;
         clearCSV();
         billingDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    public static BillingRepository getInstance() {
+    public static BillingRepository getInstance(String path) {
         if (billingRepositoryInstance == null) {
             synchronized (BillingRepository.class) {
                 if (billingRepositoryInstance == null) {
-                    billingRepositoryInstance = new BillingRepository();
+                    billingRepositoryInstance = new BillingRepository(path);
                 }
             }
         }
@@ -98,7 +100,7 @@ public class BillingRepository implements DatabaseAccess, Subject {
     }
 
     public boolean saveCreditCard(CreditCard c) {
-        if (validateCreditCard(c) && getUserRepository().checkUserExists(c.getUsername())) {
+        if (validateCreditCard(c)) {
             billingDatabase.put(c.getUsername(), c);
             updateCSV();
             return true;
@@ -111,11 +113,6 @@ public class BillingRepository implements DatabaseAccess, Subject {
         billingDatabase.remove(username);
     }
 
-    /**
-     * update a credit card in the database
-     * @param c the credit card to update
-     * @return true if successful, false otherwise
-     */
     public boolean updateCreditCard(CreditCard c) {
         if (validateCreditCard(c)) {
             billingDatabase.replace(c.getUsername(), c);
@@ -167,9 +164,5 @@ public class BillingRepository implements DatabaseAccess, Subject {
                         !c.getCsv().equals("") && !c.getExpiry().equals("");
             }
         }
-    }
-
-    private UserRepository getUserRepository() {
-        return UserRepository.getInstance();
     }
 }

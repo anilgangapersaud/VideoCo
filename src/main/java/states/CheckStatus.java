@@ -1,18 +1,19 @@
 package states;
 
-import database.OrderRepository;
 import model.Order;
+import services.OrderServiceImpl;
+import view.StoreFront;
 
 import java.util.Scanner;
 
 public class CheckStatus implements State {
 
     private final DialInService dialInService;
-    private final OrderRepository orderRepository;
+    private final OrderServiceImpl orderService;
 
     public CheckStatus(DialInService dialInService) {
         this.dialInService = dialInService;
-        orderRepository = OrderRepository.getInstance();
+        orderService = StoreFront.getOrderService();
     }
 
     @Override
@@ -26,7 +27,7 @@ public class CheckStatus implements State {
             Scanner scan = new Scanner(System.in);
             System.out.println("Enter the order number you would like to check");
             int orderNumber = scan.nextInt();
-            Order o = orderRepository.getOrder(orderNumber);
+            Order o = orderService.getOrder(orderNumber);
             if (o != null) {
                 System.out.println("Order Status: " + o.getOrderStatus());
                 System.out.println("Due Date: " + o.getDueDate());

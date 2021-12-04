@@ -5,6 +5,7 @@ import model.Order;
 import model.payments.CreditCard;
 import model.payments.LoyaltyPoints;
 import org.junit.jupiter.api.*;
+import services.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,51 +14,53 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class OrderRepositoryTest {
 
-    private static OrderRepository testOrderRepository;
-    private static MovieRepository testMovieRepository;
-    private static UserRepository testUserRepository;
-    private static BillingRepository testBillingRepository;
-    private static AddressRepository testAddressRepository;
-    private static RentedRepository testRentedRepository;
+    private static OrderServiceImpl testOrderService;
+    private static MovieServiceImpl testMovieService;
+    private static UserServiceImpl testUserService;
+    private static BillingServiceImpl testBillingService;
+    private static AddressServiceImpl testAddressService;
+    private static RentedServiceImpl testRentedService;
 
     @BeforeEach
     void setup() {
-        testMovieRepository = MovieRepository.getInstance();
-        testUserRepository = UserRepository.getInstance();
-        testOrderRepository = OrderRepository.getInstance();
-        testBillingRepository = BillingRepository.getInstance();
-        testAddressRepository = AddressRepository.getInstance();
-        testRentedRepository = RentedRepository.getInstance();
+        MovieServiceImpl.setCsvPath(TestConfigs.MOVIE_CSV_TEST_PATH);
+        UserServiceImpl.setCsvPath(TestConfigs.ADMIN_CSV_TEST_PATH, TestConfigs.USER_CSV_TEST_PATH);
+        OrderServiceImpl.setCsvPath(TestConfigs.ORDER_CSV__TEST_PATH);
+        BillingServiceImpl.setCsvPath(TestConfigs.BILLING_CSV_TEST_PATH);
+        AddressServiceImpl.setCsvPath(TestConfigs.ADDRESS_CSV_TEST_PATH);
+        RentedServiceImpl.setCsvPath(TestConfigs.RENTED_CSV_TEST_PATH);
+
+        testMovieService = MovieServiceImpl.getInstance();
+        testUserService = UserServiceImpl.getInstance();
+        testOrderService = OrderServiceImpl.getInstance();
+        testBillingService = BillingServiceImpl.getInstance();
+        testAddressService = AddressServiceImpl.getInstance();
+        testRentedService = RentedServiceImpl.getInstance();
     }
 
     @AfterEach
     void teardown() {
-        testAddressRepository.clearCSV();
-        testMovieRepository.clearCSV();
-        testUserRepository.clearCSV();
-        testOrderRepository.clearCSV();
-        testBillingRepository.clearCSV();
-        testRentedRepository.clearCSV();
+
     }
 
     @Test
     void testCancelOrderSuccess() {
         Order order = createOrderCreditCard("username1");
-        boolean cancelResult = testOrderRepository.cancelOrder(order.getOrderId());
+        boolean cancelResult = testOrderService.cancelOrder(order.getOrderId());
         assertThat(cancelResult).isTrue();
     }
 
     @Test
     void testCancelOrderStatusNotProcessed() {
         Order order = createOrderCreditCard("username2");
-        testOrderRepository.changeOrderStatus(order.getOrderId(), "DELIVERED");
-        boolean cancelResult = testOrderRepository.cancelOrder(order.getOrderId());
+        testOrderService.changeOrderStatus(order.getOrderId(), "DELIVERED");
+        boolean cancelResult = testOrderService.cancelOrder(order.getOrderId());
         assertThat(cancelResult).isFalse();
     }
 
     @Test
     void testCancelOrderNotExist() {
-        boolean result = testOrderRepository.cancelOrder(24);
+        boolean result = testOrderService.cancelOrder(24);
         assertThat(result).isFalse();
     }
 
@@ -83,7 +86,7 @@ class OrderRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
@@ -101,25 +104,25 @@ class OrderRepositoryTest {
         u.setPassword("username5");
         u.setEmailAddress("");
 
-        boolean saveGuestResult = testUserRepository.saveGuestAccount(u);
+        boolean saveGuestResult = testUserService.saveGuestAccount(u);
         assertThat(saveGuestResult).isEqualTo(true);
 
-        boolean saveBillingResult = testBillingRepository.saveCreditCard(c);
+        boolean saveBillingResult = testBillingService.saveCreditCard(c);
         assertThat(saveBillingResult).isEqualTo(true);
 
-        Order order = testOrderRepository.createOrder(cart, c);
+        Order order = testOrderService.createOrder(cart, c);
         assertThat(order).isNull();
     }
 
     @Test
     void testDeleteNotExistingOrder() {
-        testOrderRepository.deleteOrder(35);
+        testOrderService.deleteOrder(35);
     }
 
     @Test
     void testDeleteExistingOrder() {
         Order order = createOrderCreditCard("username6");
-        testOrderRepository.deleteOrder(order.getOrderId());
+        testOrderService.deleteOrder(order.getOrderId());
     }
 
     @Test
@@ -128,7 +131,7 @@ class OrderRepositoryTest {
         Order order = createOrderCreditCard("username6");
         List<Order> expected = new ArrayList<>();
         expected.add(order);
-        List<Order> result = testOrderRepository.getAllOrders();
+        List<Order> result = testOrderService.getAllOrders();
         assertThat(result).isEqualTo(expected);
     }
 
@@ -141,7 +144,7 @@ class OrderRepositoryTest {
         List<Order> ordersByCustomer = new ArrayList<>();
         ordersByCustomer.add(o1);
 
-        List<Order> result = testOrderRepository.getOrdersByCustomer("username7");
+        List<Order> result = testOrderService.getOrdersByCustomer("username7");
 
         assertThat(result).isEqualTo(ordersByCustomer);
     }
@@ -149,7 +152,7 @@ class OrderRepositoryTest {
     @Test
     void testGetOrder() {
         Order expected = createOrderCreditCard("username8");
-        Order result = testOrderRepository.getOrder(expected.getOrderId());
+        Order result = testOrderService.getOrder(expected.getOrderId());
         assertThat(result).isEqualTo(expected);
     }
 
@@ -160,14 +163,14 @@ class OrderRepositoryTest {
         createOrderCreditCard("username2");
         createOrderCreditCard("username3");
 
-        assertThat(testOrderRepository.getTotalOrders()).isEqualTo(3);
+        assertThat(testOrderService.getTotalOrders()).isEqualTo(3);
     }
 
     @Test
     void testUpdateOrder() {
         Order o = createOrderCreditCard("username10");
         o.setOrderStatus("DELIVERED");
-        boolean updateResult = testOrderRepository.updateOrder(o.getOrderId(), o);
+        boolean updateResult = testOrderService.updateOrder(o.getOrderId(), o);
         assertThat(updateResult).isTrue();
     }
 
@@ -175,7 +178,7 @@ class OrderRepositoryTest {
     void testUpdateOrderFailed() {
         Order o = createOrderCreditCard("username11");
         o.setOrderStatus("");
-        boolean updateResult = testOrderRepository.updateOrder(o.getOrderId(), o);
+        boolean updateResult = testOrderService.updateOrder(o.getOrderId(), o);
         assertThat(updateResult).isFalse();
     }
 
@@ -183,20 +186,20 @@ class OrderRepositoryTest {
     void testReturnOrderSuccess() {
         Order o = createOrderCreditCard("username12");
         o.setOrderStatus("DELIVERED");
-        boolean returnResult = testOrderRepository.returnOrder(o.getOrderId());
+        boolean returnResult = testOrderService.returnOrder(o.getOrderId());
         assertThat(returnResult).isTrue();
     }
 
     @Test
     void testReturnOrderFailed() {
         Order o = createOrderCreditCard("username13");
-        boolean returnResult = testOrderRepository.returnOrder(o.getOrderId());
+        boolean returnResult = testOrderService.returnOrder(o.getOrderId());
         assertThat(returnResult).isFalse();
     }
 
     @Test
     void testReturnOrderFailedNoOrder() {
-        boolean returnResult = testOrderRepository.returnOrder(320);
+        boolean returnResult = testOrderService.returnOrder(320);
         assertThat(returnResult).isFalse();
     }
 
@@ -208,7 +211,7 @@ class OrderRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
@@ -233,15 +236,15 @@ class OrderRepositoryTest {
         u.setPassword(username);
         u.setEmailAddress("");
 
-        boolean saveAddressResult = testAddressRepository.saveAddress(a);
+        boolean saveAddressResult = testAddressService.saveAddress(a);
         assertThat(saveAddressResult).isEqualTo(true);
 
-        boolean saveGuestResult = testUserRepository.saveGuestAccount(u);
+        boolean saveGuestResult = testUserService.saveGuestAccount(u);
         assertThat(saveGuestResult).isEqualTo(true);
 
-        boolean saveBillingResult = testBillingRepository.saveCreditCard(c);
+        boolean saveBillingResult = testBillingService.saveCreditCard(c);
         assertThat(saveBillingResult).isEqualTo(true);
-        return testOrderRepository.createOrder(cart, c);
+        return testOrderService.createOrder(cart, c);
     }
 
     @Test
@@ -259,7 +262,7 @@ class OrderRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
@@ -279,13 +282,13 @@ class OrderRepositoryTest {
         u.setPassword("userrname23");
         u.setEmailAddress("");
 
-        boolean saveAddressResult = testAddressRepository.saveAddress(a);
+        boolean saveAddressResult = testAddressService.saveAddress(a);
         assertThat(saveAddressResult).isEqualTo(true);
 
-        boolean saveGuestResult = testUserRepository.saveGuestAccount(u);
+        boolean saveGuestResult = testUserService.saveGuestAccount(u);
         assertThat(saveGuestResult).isEqualTo(true);
 
-        Order o = testOrderRepository.createOrder(cart, lp);
+        Order o = testOrderService.createOrder(cart, lp);
         assertThat(o).isNull();
     }
 
@@ -297,7 +300,7 @@ class OrderRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
@@ -317,12 +320,12 @@ class OrderRepositoryTest {
         u.setPassword(username);
         u.setEmailAddress("");
 
-        boolean saveAddressResult = testAddressRepository.saveAddress(a);
+        boolean saveAddressResult = testAddressService.saveAddress(a);
         assertThat(saveAddressResult).isEqualTo(true);
 
-        boolean saveGuestResult = testUserRepository.saveGuestAccount(u);
+        boolean saveGuestResult = testUserService.saveGuestAccount(u);
         assertThat(saveGuestResult).isEqualTo(true);
 
-        return testOrderRepository.createOrder(cart, lp);
+        return testOrderService.createOrder(cart, lp);
     }
 }

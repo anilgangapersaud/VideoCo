@@ -1,25 +1,26 @@
 package states;
 
-import database.MovieRepository;
-import database.OrderRepository;
 import model.Address;
 import model.Cart;
 import model.Movie;
 import model.Order;
 import model.payments.CreditCard;
+import services.MovieServiceImpl;
+import services.OrderServiceImpl;
+import view.StoreFront;
 
 import java.util.Scanner;
 
 public class PlaceOrder implements State {
 
     private final DialInService dialInService;
-    private final MovieRepository movieRepository;
-    private final OrderRepository orderRepository;
+    private final MovieServiceImpl movieService;
+    private final OrderServiceImpl orderService;
 
     public PlaceOrder(DialInService dialIn) {
         dialInService = dialIn;
-        movieRepository = MovieRepository.getInstance();
-        orderRepository = OrderRepository.getInstance();
+        movieService = StoreFront.getMovieService();
+        orderService = StoreFront.getOrderService();
     }
 
     @Override
@@ -71,9 +72,9 @@ public class PlaceOrder implements State {
                 if (barcode.equals("done")) {
                     break;
                 }
-                Movie m = movieRepository.getMovie(barcode);
+                Movie m = movieService.getMovie(barcode);
                 if (m != null) {
-                    int stock = movieRepository.getStockForMovie(barcode);
+                    int stock = movieService.getStockForMovie(barcode);
                     if (stock != 0) {
                         System.out.println(m.getTitle() + ": " + stock + " in stock, " + "price: " + m.getPrice());
                         System.out.println("Enter the quantity you would like to order");
@@ -96,7 +97,7 @@ public class PlaceOrder implements State {
                 System.out.println("Press 0 to cancel order");
                 int userInput = scan.nextInt();
                 if (userInput == 1) {
-                    Order o = orderRepository.createOrder(cart, c);
+                    Order o = orderService.createOrder(cart, c);
                     if (o == null) {
                         System.out.println("There was a service error creating order, please try again");
                         scan.close();

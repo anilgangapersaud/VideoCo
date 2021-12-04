@@ -13,7 +13,7 @@ class AddressRepositoryTest {
 
     @BeforeEach
     void setup() {
-        underTest = AddressRepository.getInstance();
+        underTest = AddressRepository.getInstance(TestConfigs.ADDRESS_CSV_TEST_PATH);
     }
 
     @AfterEach
@@ -41,6 +41,13 @@ class AddressRepositoryTest {
         address.setProvince("Ontario");
         boolean exists = underTest.saveAddress(address);
         assertThat(exists).isEqualTo(false);
+    }
+
+    @Test
+    void testSaveNullAddressFailed() {
+        Address address = null;
+        boolean result = underTest.saveAddress(address);
+        assertThat(result).isEqualTo(false);
     }
 
     @Test

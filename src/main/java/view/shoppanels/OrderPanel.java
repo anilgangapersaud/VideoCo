@@ -1,7 +1,7 @@
 package view.shoppanels;
 
 import controllers.OrderController;
-import database.UserRepository;
+import view.StoreFront;
 import view.tablemodels.OrderTableModel;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ public class OrderPanel extends JPanel {
 
         JPanel northBar = new JPanel();
 
-        if (!UserRepository.getInstance().getLoggedInUser().isAdmin()) {
+        if (!StoreFront.getUserService().getLoggedInUser().isAdmin()) {
             JButton cancelOrder = new JButton("Cancel Order");
             cancelOrder.addActionListener(orderController);
             cancelOrder.setActionCommand("cancel");

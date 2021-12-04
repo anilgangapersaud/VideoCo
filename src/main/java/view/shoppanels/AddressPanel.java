@@ -5,6 +5,7 @@ import database.AddressRepository;
 import database.Observer;
 import database.UserRepository;
 import model.Address;
+import view.StoreFront;
 import view.cards.AccountCards;
 
 import javax.swing.*;
@@ -31,10 +32,10 @@ public class AddressPanel extends JPanel implements Observer {
     public AddressPanel(AccountCards cards) {
         this.cards = cards;
         setLayout(new GridBagLayout());
-        username = UserRepository.getInstance().getLoggedInUser().getUsername();
-        customerAddress = AddressRepository.getInstance().getAddress(username);
+        username = StoreFront.getUserService().getLoggedInUser().getUsername();
+        customerAddress = StoreFront.getAddressService().getAddress(username);
         AddressController addressController = new AddressController(this);
-        AddressRepository.getInstance().registerObserver(this);
+        StoreFront.getAddressService().registerObserver(this);
 
         // address
         JLabel streetLabel = new JLabel("Street:");
@@ -154,7 +155,7 @@ public class AddressPanel extends JPanel implements Observer {
 
     @Override
     public void update() {
-        customerAddress = AddressRepository.getInstance().getAddress(UserRepository.getInstance().getLoggedInUser().getUsername());
+        customerAddress = StoreFront.getAddressService().getAddress(StoreFront.getUserService().getLoggedInUser().getUsername());
         if (customerAddress != null) {
             streetInput.setText(customerAddress.getLineAddress());
             cityInput.setText(customerAddress.getCity());

@@ -5,6 +5,7 @@ import model.payments.CreditCard;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import services.*;
 
 import java.util.List;
 
@@ -12,31 +13,33 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class UserRepositoryTest {
 
-    private static OrderRepository testOrderRepository;
-    private static MovieRepository testMovieRepository;
-    private static UserRepository testUserRepository;
-    private static BillingRepository testBillingRepository;
-    private static AddressRepository testAddressRepository;
-    private static RentedRepository testRentedRepository;
+    private static OrderServiceImpl testOrderService;
+    private static MovieServiceImpl testMovieService;
+    private static UserServiceImpl testUserService;
+    private static BillingServiceImpl testBillingService;
+    private static AddressServiceImpl testAddressService;
+    private static RentedServiceImpl testRentedService;
+
 
     @BeforeEach
     void setup() {
-        testMovieRepository = MovieRepository.getInstance();
-        testUserRepository = UserRepository.getInstance();
-        testOrderRepository = OrderRepository.getInstance();
-        testBillingRepository = BillingRepository.getInstance();
-        testAddressRepository = AddressRepository.getInstance();
-        testRentedRepository = RentedRepository.getInstance();
+        MovieServiceImpl.setCsvPath(TestConfigs.MOVIE_CSV_TEST_PATH);
+        UserServiceImpl.setCsvPath(TestConfigs.ADMIN_CSV_TEST_PATH, TestConfigs.USER_CSV_TEST_PATH);
+        OrderServiceImpl.setCsvPath(TestConfigs.ORDER_CSV__TEST_PATH);
+        BillingServiceImpl.setCsvPath(TestConfigs.BILLING_CSV_TEST_PATH);
+        AddressServiceImpl.setCsvPath(TestConfigs.ADDRESS_CSV_TEST_PATH);
+        RentedServiceImpl.setCsvPath(TestConfigs.RENTED_CSV_TEST_PATH);
+
+        testMovieService = MovieServiceImpl.getInstance();
+        testUserService = UserServiceImpl.getInstance();
+        testOrderService = OrderServiceImpl.getInstance();
+        testBillingService = BillingServiceImpl.getInstance();
+        testAddressService = AddressServiceImpl.getInstance();
+        testRentedService = RentedServiceImpl.getInstance();
     }
 
     @AfterEach
     void teardown() {
-        testAddressRepository.clearCSV();
-        testMovieRepository.clearCSV();
-        testUserRepository.clearCSV();
-        testOrderRepository.clearCSV();
-        testBillingRepository.clearCSV();
-        testRentedRepository.clearCSV();
     }
 
     @Test
@@ -47,9 +50,9 @@ class UserRepositoryTest {
         u.setEmailAddress("username");
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
-        testUserRepository.register(u);
-        testUserRepository.login("username1", "password");
-        boolean result = testUserRepository.changeUsername("username123", "username1");
+        testUserService.register(u);
+        testUserService.login("username1", "password");
+        boolean result = testUserService.changeUsername("username123", "username1");
         assertThat(result).isTrue();
     }
 
@@ -62,11 +65,11 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
-        testUserRepository.login("username3", "password");
+        testUserService.login("username3", "password");
 
-        boolean result = testUserRepository.changeUsername("username3", "username3");
+        boolean result = testUserService.changeUsername("username3", "username3");
         assertThat(result).isFalse();
     }
 
@@ -93,9 +96,9 @@ class UserRepositoryTest {
         c.setCsv("324");
         c.setExpiry("01/13");
 
-        testAddressRepository.saveAddress(a);
-        testUserRepository.register(u);
-        testBillingRepository.saveCreditCard(c);
+        testAddressService.saveAddress(a);
+        testUserService.register(u);
+        testBillingService.saveCreditCard(c);
 
         Movie m = new Movie();
         m.setBarcode("1");
@@ -104,22 +107,22 @@ class UserRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
         cart.setUsername("username12");
 
-        testOrderRepository.createOrder(cart, c);
+        testOrderService.createOrder(cart, c);
 
-        testUserRepository.login("username12", "password");
+        testUserService.login("username12", "password");
 
-        boolean result = testUserRepository.changeUsername("username123", "username12");
+        boolean result = testUserService.changeUsername("username123", "username12");
         assertThat(result).isTrue();
 
-        Address result1 = testAddressRepository.getAddress("username123");
-        CreditCard result2 = testBillingRepository.getCreditCard("username123");
-        List<Order> result3 = testOrderRepository.getOrdersByCustomer("username123");
+        Address result1 = testAddressService.getAddress("username123");
+        CreditCard result2 = testBillingService.getCreditCard("username123");
+        List<Order> result3 = testOrderService.getOrdersByCustomer("username123");
 
         assertThat(result1).isNotNull();
         assertThat(result2).isNotNull();
@@ -128,7 +131,7 @@ class UserRepositoryTest {
 
     @Test
     void testChangeUsernameFailedNoUser() {
-        boolean result = testUserRepository.changeUsername("idontexist", "idontexisteither");
+        boolean result = testUserService.changeUsername("idontexist", "idontexisteither");
         assertThat(result).isEqualTo(false);
     }
 
@@ -141,11 +144,11 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
-        testUserRepository.login("username54", "password");
+        testUserService.login("username54", "password");
 
-        boolean result = testUserRepository.changePassword("password123", "username54");
+        boolean result = testUserService.changePassword("password123", "username54");
         assertThat(result).isTrue();
     }
 
@@ -158,17 +161,17 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
-        testUserRepository.login("username67", "password");
+        testUserService.login("username67", "password");
 
-        boolean result = testUserRepository.changePassword("", "username67");
+        boolean result = testUserService.changePassword("", "username67");
         assertThat(result).isFalse();
     }
 
     @Test
     void testChangePasswordFailedNoUser() {
-        testUserRepository.changePassword("newPass", "nonexistant");
+        testUserService.changePassword("newPass", "nonexistant");
     }
 
     @Test
@@ -180,11 +183,11 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
-        testUserRepository.login("username83", "password");
+        testUserService.login("username83", "password");
 
-        boolean result = testUserRepository.changeEmail("a.gangapersaud@gmail.com", "username83");
+        boolean result = testUserService.changeEmail("a.gangapersaud@gmail.com", "username83");
         assertThat(result).isTrue();
     }
 
@@ -197,15 +200,15 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
-        boolean result = testUserRepository.changeEmail("", "username345");
+        boolean result = testUserService.changeEmail("", "username345");
         assertThat(result).isFalse();
     }
 
     @Test
     void testChangeEmailFailedNoUser() {
-        testUserRepository.changeEmail("newEmail", "nouser");
+        testUserService.changeEmail("newEmail", "nouser");
     }
 
 
@@ -218,7 +221,7 @@ class UserRepositoryTest {
         u.setAccountType("customer");
         u.setLoyaltyPoints(0);
 
-        testUserRepository.register(u);
+        testUserService.register(u);
 
         Address a = new Address();
         a.setUsername("username3454");
@@ -234,9 +237,9 @@ class UserRepositoryTest {
         c.setCsv("324");
         c.setExpiry("01/13");
 
-        testAddressRepository.saveAddress(a);
-        testUserRepository.register(u);
-        testBillingRepository.saveCreditCard(c);
+        testAddressService.saveAddress(a);
+        testUserService.register(u);
+        testBillingService.saveCreditCard(c);
 
         Movie m = new Movie();
         m.setBarcode("1");
@@ -245,15 +248,15 @@ class UserRepositoryTest {
         m.setGenre("Kids");
         m.setReleaseDate("01/01/01");
 
-        testMovieRepository.addMovie(m,5);
+        testMovieService.addMovie(m,5);
 
         Cart cart = new Cart();
         cart.addMovieToCart(m, 2);
         cart.setUsername("username3454");
 
-        testOrderRepository.createOrder(cart, c);
+        testOrderService.createOrder(cart, c);
 
-        testUserRepository.deleteUser("username3454");
+        testUserService.deleteUser("username3454");
     }
 
     @Test

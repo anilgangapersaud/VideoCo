@@ -1,6 +1,8 @@
 package controllers;
 
 import database.UserRepository;
+import services.UserServiceImpl;
+import view.StoreFront;
 import view.shoppanels.AccountPanel;
 
 import java.awt.*;
@@ -10,11 +12,11 @@ import java.awt.event.ActionListener;
 public class AccountController implements ActionListener {
 
     private final AccountPanel view;
-    private final UserRepository userRepository;
+    private final UserServiceImpl userService;
 
     public AccountController(AccountPanel view) {
         this.view = view;
-        userRepository = UserRepository.getInstance();
+        userService = StoreFront.getUserService();
     }
 
     private void editName() {
@@ -23,7 +25,7 @@ public class AccountController implements ActionListener {
 
     private void saveName() {
         view.getNameInput().setEditable(false);
-        if (userRepository.changeUsername(view.getNameInput().getText(), userRepository.getLoggedInUser().getUsername())) {
+        if (userService.changeUsername(view.getNameInput().getText(), userService.getLoggedInUser().getUsername())) {
             view.displayMessage("Username changed");
         } else {
             view.displayErrorMessage("Invalid username");
@@ -38,7 +40,7 @@ public class AccountController implements ActionListener {
     private void savePassword() {
         view.getPasswordInput().setEditable(false);
         view.getPasswordInput().setEchoChar('*');
-        if (userRepository.changePassword(new String(view.getPasswordInput().getPassword()), userRepository.getLoggedInUser().getUsername())) {
+        if (userService.changePassword(new String(view.getPasswordInput().getPassword()), userService.getLoggedInUser().getUsername())) {
             view.displayMessage("Password Changed");
         } else {
             view.displayErrorMessage("Invalid Password");
@@ -51,7 +53,7 @@ public class AccountController implements ActionListener {
 
     private void saveEmail() {
         view.getEmailInput().setEditable(false);
-        if (userRepository.changeEmail(view.getEmailInput().getText(), userRepository.getLoggedInUser().getUsername())) {
+        if (userService.changeEmail(view.getEmailInput().getText(), userService.getLoggedInUser().getUsername())) {
             view.displayMessage("Email Changed");
         } else {
             view.displayErrorMessage("Invalid Email");

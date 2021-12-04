@@ -1,10 +1,10 @@
 package view.shoppanels;
 
 import controllers.BillingController;
-import database.BillingRepository;
 import database.Observer;
 import database.UserRepository;
 import model.payments.CreditCard;
+import view.StoreFront;
 import view.cards.AccountCards;
 
 import javax.swing.*;
@@ -30,9 +30,9 @@ public class BillingPanel extends JPanel implements Observer {
         this.cards = cards;
         setLayout(new GridBagLayout());
 
-        username =  UserRepository.getInstance().getLoggedInUser().getUsername();
-        customerCreditCard = BillingRepository.getInstance().getCreditCard(username);
-        BillingRepository.getInstance().registerObserver(this);
+        username =  StoreFront.getUserService().getLoggedInUser().getUsername();
+        customerCreditCard = StoreFront.getBillingService().getCreditCard(username);
+        StoreFront.getBillingService().registerObserver(this);
         BillingController billingController = new BillingController(this);
 
         // credit card
@@ -149,7 +149,7 @@ public class BillingPanel extends JPanel implements Observer {
 
     @Override
     public void update() {
-        customerCreditCard = BillingRepository.getInstance().getCreditCard(username);
+        customerCreditCard = StoreFront.getBillingService().getCreditCard(username);
         if (customerCreditCard != null) {
             cardNumberInput.setText(customerCreditCard.getCardNumber());
             expiryInput.setText(customerCreditCard.getExpiry());

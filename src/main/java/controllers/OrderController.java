@@ -1,6 +1,8 @@
 package controllers;
 
 import database.OrderRepository;
+import services.OrderServiceImpl;
+import view.StoreFront;
 import view.shoppanels.OrderPanel;
 
 import javax.swing.*;
@@ -11,11 +13,11 @@ public class OrderController implements ActionListener {
 
     private final OrderPanel view;
 
-    private final OrderRepository orderRepository;
+    private final OrderServiceImpl orderService;
 
     public OrderController(OrderPanel view) {
         this.view = view;
-        orderRepository = OrderRepository.getInstance();
+        orderService = StoreFront.getOrderService();
 
     }
 
@@ -25,7 +27,7 @@ public class OrderController implements ActionListener {
             view.displayMessage("Select an order to cancel");
         } else {
             int orderNumber = Integer.parseInt((String) view.getTable().getValueAt(selected[0],0));
-            if (orderRepository.cancelOrder(orderNumber)) {
+            if (orderService.cancelOrder(orderNumber)) {
                 view.displayMessage("Order cancelled");
             } else {
                 view.displayErrorMessage("Failed to cancel order");
@@ -39,7 +41,7 @@ public class OrderController implements ActionListener {
             view.displayMessage("Select an order");
         } else {
             int orderNumber = Integer.parseInt((String)view.getTable().getValueAt(selected[0],0));
-            if (orderRepository.returnOrder(orderNumber)) {
+            if (orderService.returnOrder(orderNumber)) {
                 view.displayMessage("Thanks for shopping with VideoCo!");
             } else {
                 view.displayErrorMessage("Status must be DELIVERED");
@@ -52,7 +54,7 @@ public class OrderController implements ActionListener {
         int[] selected = view.getTable().getSelectedRows();
         if (selected.length == 1) {
             int orderNumber = Integer.parseInt((String) view.getTable().getValueAt(selected[0], 0));
-            orderRepository.changeOrderStatus(orderNumber, status);
+            orderService.changeOrderStatus(orderNumber, status);
         }
     }
 

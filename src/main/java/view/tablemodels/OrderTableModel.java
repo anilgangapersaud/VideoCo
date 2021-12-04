@@ -1,9 +1,10 @@
 package view.tablemodels;
 
 import database.Observer;
-import database.OrderRepository;
-import database.UserRepository;
 import model.Order;
+import services.OrderServiceImpl;
+import services.UserServiceImpl;
+import view.StoreFront;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,33 +15,33 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
 
     private final JTable view;
     private final JComboBox<String> orderStatus;
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final OrderServiceImpl orderService;
+    private final UserServiceImpl userService;
 
     public OrderTableModel(JTable table, JComboBox<String> orderStatus) {
         view = table;
-        orderRepository = OrderRepository.getInstance();
-        userRepository = UserRepository.getInstance();
+        orderService = StoreFront.getOrderService();
+        userService = StoreFront.getUserService();
         this.orderStatus = orderStatus;
         subscribe();
         updateTable();
     }
 
     private void subscribe() {
-        OrderRepository.getInstance().registerObserver(this);
+        StoreFront.getOrderService().registerObserver(this);
     }
 
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == 1 && userRepository.getLoggedInUser().isAdmin();
+        return column == 1 && userService.getLoggedInUser().isAdmin();
     }
 
     private void updateTable() {
         List<Order> orders;
-        if (userRepository.getLoggedInUser().isAdmin()) {
-            orders = orderRepository.getAllOrders();
+        if (userService.getLoggedInUser().isAdmin()) {
+            orders = orderService.getAllOrders();
         } else {
-            orders = orderRepository.getOrdersByCustomer(userRepository.getLoggedInUser().getUsername());
+            orders = orderService.getOrdersByCustomer(userService.getLoggedInUser().getUsername());
         }
         String[][] data = new String[orders.size()][5];
         String[] column = {"NUMBER","STATUS","DATE","DUEDATE","OVERDUE"};

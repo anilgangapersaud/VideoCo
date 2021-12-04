@@ -21,21 +21,21 @@ public class MovieRepository implements DatabaseAccess, Subject {
 
     private final List<Observer> observers;
 
-    private static final String MOVIE_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/movies.csv";
+    private final String MOVIE_CSV_PATH;
 
-    private MovieRepository() {
-        clearCSV();
+    private MovieRepository(String path) {
+        MOVIE_CSV_PATH = path;
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    public static MovieRepository getInstance() {
+    public static MovieRepository getInstance(String path) {
         if (movieRepositoryInstance == null) {
             synchronized (MovieRepository.class) {
                 if (movieRepositoryInstance == null) {
-                    movieRepositoryInstance = new MovieRepository();
+                    movieRepositoryInstance = new MovieRepository(path);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class MovieRepository implements DatabaseAccess, Subject {
         updateCSV();
     }
 
-    public Map<Movie,Integer> findMovieByTitle(String movieTitle) {
+    public Map<Movie,Integer> getMovieByTitle(String movieTitle) {
         Map<Movie,Integer> titleMatches = new HashMap<>();
         for (Map.Entry<Movie, Integer> entry : movieDatabase.entrySet()) {
             Movie m = entry.getKey();

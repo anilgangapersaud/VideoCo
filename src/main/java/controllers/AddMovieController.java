@@ -2,6 +2,8 @@ package controllers;
 
 import database.MovieRepository;
 import model.Movie;
+import services.MovieServiceImpl;
+import view.StoreFront;
 import view.dialogs.AddMovieDialog;
 
 import java.awt.event.ActionEvent;
@@ -9,12 +11,12 @@ import java.awt.event.ActionListener;
 
 public class AddMovieController implements ActionListener {
 
-    private final MovieRepository movieRepository;
+    private final MovieServiceImpl movieService;
 
     private final AddMovieDialog view;
 
     public AddMovieController(AddMovieDialog addMovieDialog) {
-        movieRepository = MovieRepository.getInstance();
+        movieService = StoreFront.getMovieService();
         view = addMovieDialog;
     }
 
@@ -25,7 +27,7 @@ public class AddMovieController implements ActionListener {
         m.setPrice(Double.parseDouble(view.getPriceInput()));
         m.setGenre(view.getCategory());
         m.setReleaseDate(view.getReleaseDateInput());
-        if (movieRepository.addMovie(m, Integer.parseInt(view.getQuantityInput()))) {
+        if (movieService.addMovie(m, Integer.parseInt(view.getQuantityInput()))) {
             view.dispose();
         } else {
             view.displayErrorMessage("Error adding movie\nCheck all fields");

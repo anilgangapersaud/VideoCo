@@ -3,6 +3,7 @@ package view.tablemodels;
 import database.MovieRepository;
 import database.Observer;
 import model.Movie;
+import view.StoreFront;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class StoreTableModel extends DefaultTableModel implements Observer {
     }
 
     private void subscribe() {
-        MovieRepository.getInstance().registerObserver(this);
+        StoreFront.getMovieService().registerObserver(this);
     }
 
     public void filterTable(Map<Movie,Integer> movies) {
@@ -38,7 +39,7 @@ public class StoreTableModel extends DefaultTableModel implements Observer {
     }
 
     private void updateTable() {
-        Map<Movie,Integer> movies = MovieRepository.getInstance().getAllMovies();
+        Map<Movie,Integer> movies = StoreFront.getMovieService().getAllMovies();
         String[][] data = new String[movies.size()][6];
         String[] column = {"BARCODE", "TITLE", "GENRE", "RELEASE", "PRICE", "STOCK"};
 

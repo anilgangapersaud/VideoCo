@@ -1,6 +1,7 @@
 package database;
 
 import model.Movie;
+import model.Order;
 import model.RentedMovie;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -20,27 +21,24 @@ public class RentedRepository implements DatabaseAccess {
 
     private volatile static RentedRepository rentedRepositoryInstance;
 
-    private static final String RENTED_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/rented.csv";
+    private final String RENTED_CSV_PATH;
 
-    private RentedRepository() {
+    private RentedRepository(String path) {
+        RENTED_CSV_PATH = path;
         clearCSV();
         rentedMovies = new ArrayList<>();
         loadCSV();
     }
 
-    public static RentedRepository getInstance() {
+    public static RentedRepository getInstance(String path) {
         if (rentedRepositoryInstance == null) {
             synchronized (RentedRepository.class) {
                 if (rentedRepositoryInstance == null) {
-                    rentedRepositoryInstance = new RentedRepository();
+                    rentedRepositoryInstance = new RentedRepository(path);
                 }
             }
         }
         return rentedRepositoryInstance;
-    }
-
-    public MovieRepository getMovieRepository() {
-        return MovieRepository.getInstance();
     }
 
     @Override
@@ -88,30 +86,20 @@ public class RentedRepository implements DatabaseAccess {
         }
     }
 
-    /**
-     * store the rented movies in this database
-     * @param orderNumber the order number to associate with the rented movies
-     * @param movies the movies to rent
-     */
-    public void storeMovies(int orderNumber, Map<Movie,Integer> movies) {
-        for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
+    public void storeMovies(Order order) {
+        for (Map.Entry<Movie,Integer> entry : order.getMovies().entrySet()) {
             for (int i = 0; i < entry.getValue(); i++) {
-                rentedMovies.add(new RentedMovie(orderNumber, entry.getKey().getBarcode()));
+                rentedMovies.add(new RentedMovie(order.getOrderId(), entry.getKey().getBarcode()));
             }
         }
         updateCSV();
     }
 
-    /**
-     * return the movies to the movie repository
-     * @param orderNumber the order number to return
-     */
-    public void returnMovies(int orderNumber) {
-        for (RentedMovie movie : rentedMovies) {
-            if (movie.getOrderId() == orderNumber) {
-                getMovieRepository().returnMovie(movie.getBarcode());
-            }
-        }
+    public List<RentedMovie> getAllRentedMovies() {
+        return rentedMovies;
+    }
+
+    public void deleteRentedMoviesFromOrder(int orderNumber) {
         rentedMovies.removeIf(r -> r.getOrderId() == orderNumber);
         updateCSV();
     }
@@ -125,17 +113,4 @@ public class RentedRepository implements DatabaseAccess {
         }
         return count;
     }
-
-    public double getOrderTotal(int orderNumber) {
-        double total = 0;
-        for (RentedMovie r : rentedMovies) {
-            if (orderNumber == r.getOrderId()) {
-                String barcode = r.getBarcode();
-                Movie m = getMovieRepository().getMovie(barcode);
-                total += m.getPrice();
-            }
-        }
-        return total;
-    }
-
 }

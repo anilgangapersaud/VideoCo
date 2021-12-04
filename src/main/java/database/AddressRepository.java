@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class AddressRepository implements DatabaseAccess, Subject {
 
-    private static final String ADDRESS_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/addresses.csv";
+    private final String ADDRESS_CSV_PATH;
 
     private volatile static AddressRepository addressRepositoryInstance;
 
@@ -24,18 +24,19 @@ public class AddressRepository implements DatabaseAccess, Subject {
 
     private final List<Observer> observers;
 
-    private AddressRepository() {
+    private AddressRepository(String path) {
+        ADDRESS_CSV_PATH = path;
         clearCSV();
         addressDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    public static AddressRepository getInstance() {
+    public static AddressRepository getInstance(String path) {
         if (addressRepositoryInstance == null) {
             synchronized (AddressRepository.class) {
                 if (addressRepositoryInstance == null) {
-                    addressRepositoryInstance = new AddressRepository();
+                    addressRepositoryInstance = new AddressRepository(path);
                 }
             }
         }
@@ -121,6 +122,22 @@ public class AddressRepository implements DatabaseAccess, Subject {
 
     public boolean checkAddressExists(String username) { return addressDatabase.containsKey(username); }
 
+
+    private boolean validateAddress(Address address) {
+        if (address == null) {
+            return false;
+        } else {
+            if (address.getLineAddress() == null || address.getCity() == null || address.getProvince() == null
+                    || address.getPostalCode() == null || address.getUsername() == null) {
+                return false;
+            } else {
+                return !address.getLineAddress().equals("") && !address.getCity().equals("")
+                        && !address.getProvince().equals("") && !address.getPostalCode().equals("")
+                        && !address.getUsername().equals("");
+            }
+        }
+    }
+
     @Override
     public void registerObserver(Observer o) {
         observers.add(o);
@@ -135,21 +152,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
     public void notifyObservers() {
         for (Observer o : observers) {
             o.update();
-        }
-    }
-
-    private boolean validateAddress(Address address) {
-        if (address == null) {
-            return false;
-        } else {
-            if (address.getLineAddress() == null || address.getCity() == null || address.getProvince() == null
-                || address.getPostalCode() == null || address.getUsername() == null) {
-                return false;
-            } else {
-                return !address.getLineAddress().equals("") && !address.getCity().equals("")
-                        && !address.getProvince().equals("") && !address.getPostalCode().equals("")
-                        && !address.getUsername().equals("");
-            }
         }
     }
 }

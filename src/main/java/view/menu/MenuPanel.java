@@ -1,7 +1,9 @@
 package view.menu;
 
 import database.UserRepository;
+import view.StoreFront;
 import view.cards.ShopCards;
+import view.cards.StoreFrontCards;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -27,7 +29,7 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         // third panel
         JButton store;
-        if (UserRepository.getInstance().isAdmin()) {
+        if (StoreFront.getUserService().isAdmin()) {
             store = new JButton("Manage Inventory");
         } else {
             store = new JButton("Shop");
@@ -37,7 +39,7 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         // fourth panel
         JButton fourthPanel;
-        if (UserRepository.getInstance().isAdmin()) {
+        if (StoreFront.getUserService().isAdmin()) {
             fourthPanel = new JButton("Manage Accounts");
             fourthPanel.setActionCommand("manageAccounts");
         } else {
@@ -48,7 +50,7 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         // fifth panel
         JButton orders;
-        if (UserRepository.getInstance().isAdmin()) {
+        if (StoreFront.getUserService().isAdmin()) {
             orders = new JButton("Manage Orders");
         } else {
             orders = new JButton("Orders");
@@ -56,8 +58,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         orders.setActionCommand("orders");
         orders.addActionListener(this);
 
-
-        welcomeMessage = new JLabel("Welcome " + UserRepository.getInstance().getLoggedInUser().getUsername() + "!");
+        welcomeMessage = new JLabel("Welcome " + StoreFront.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
         add(account);
