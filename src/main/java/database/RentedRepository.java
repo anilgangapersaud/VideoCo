@@ -14,35 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Maintains the repository of rented movies
- */
 public class RentedRepository implements DatabaseAccess {
 
-    /**
-     * the database of movies out for rent
-     */
     private final List<RentedMovie> rentedMovies;
 
-    /**
-     * singleton instance
-     */
     private volatile static RentedRepository rentedRepositoryInstance;
 
-    /**
-     * configs
-     */
-    private static final String RENTED_FILE_PATH = "/src/main/resources/rented.csv";
-    private static final String rentedPath = System.getProperty("user.dir") + RENTED_FILE_PATH;
+    private static final String RENTED_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/rented.csv";
 
     private RentedRepository() {
+        clearCSV();
         rentedMovies = new ArrayList<>();
         loadCSV();
     }
 
-    /**
-     * @return get the singleton instance of this class
-     */
     public static RentedRepository getInstance() {
         if (rentedRepositoryInstance == null) {
             synchronized (RentedRepository.class) {
@@ -59,8 +44,8 @@ public class RentedRepository implements DatabaseAccess {
     }
 
     @Override
-    public void updateCSV() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(rentedPath, false),
+    public synchronized void updateCSV() {
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(RENTED_CSV_PATH, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader("orderNumber",
                                 "barcode"
@@ -74,9 +59,9 @@ public class RentedRepository implements DatabaseAccess {
     }
 
     @Override
-    public void loadCSV() {
+    public synchronized void loadCSV() {
         try {
-            CSVParser parser = new CSVParser(new FileReader(RentedRepository.rentedPath), CSVFormat.RFC4180
+            CSVParser parser = new CSVParser(new FileReader(RENTED_CSV_PATH), CSVFormat.RFC4180
                     .withDelimiter(',')
                     .withHeader(
                             "orderNumber",
@@ -88,6 +73,16 @@ public class RentedRepository implements DatabaseAccess {
                 String barcode = records.get(i).get("barcode");
                 rentedMovies.add(new RentedMovie(orderNo, barcode));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void clearCSV() {
+        try {
+            FileWriter fw = new FileWriter(RENTED_CSV_PATH, false);
+            fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -118,7 +118,9 @@ public class StoreController implements ActionListener {
                 String barcode = (String) view.getTable().getValueAt(j, 0);
                 barcodes.add(barcode);
             }
-            movieRepository.deleteMovies(barcodes);
+            for (String barcode : barcodes) {
+                movieRepository.deleteMovie(barcode);
+            }
         }
     }
 

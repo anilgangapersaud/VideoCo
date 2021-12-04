@@ -23,7 +23,7 @@ public class AccountController implements ActionListener {
 
     private void saveName() {
         view.getNameInput().setEditable(false);
-        if (userRepository.changeUsername(view.getNameInput().getText())) {
+        if (userRepository.changeUsername(view.getNameInput().getText(), userRepository.getLoggedInUser().getUsername())) {
             view.displayMessage("Username changed");
         } else {
             view.displayErrorMessage("Invalid username");
@@ -38,7 +38,7 @@ public class AccountController implements ActionListener {
     private void savePassword() {
         view.getPasswordInput().setEditable(false);
         view.getPasswordInput().setEchoChar('*');
-        if (userRepository.changePassword(new String(view.getPasswordInput().getPassword()))) {
+        if (userRepository.changePassword(new String(view.getPasswordInput().getPassword()), userRepository.getLoggedInUser().getUsername())) {
             view.displayMessage("Password Changed");
         } else {
             view.displayErrorMessage("Invalid Password");
@@ -51,7 +51,7 @@ public class AccountController implements ActionListener {
 
     private void saveEmail() {
         view.getEmailInput().setEditable(false);
-        if (userRepository.changeEmail(view.getEmailInput().getText())) {
+        if (userRepository.changeEmail(view.getEmailInput().getText(), userRepository.getLoggedInUser().getUsername())) {
             view.displayMessage("Email Changed");
         } else {
             view.displayErrorMessage("Invalid Email");

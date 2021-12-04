@@ -22,10 +22,10 @@ public class BillingRepository implements DatabaseAccess, Subject {
 
     private final List<Observer> observers;
 
-    private static final String BILLING_FILE_PATH = "/src/main/resources/billing.csv";
-    private static final String billingPath = System.getProperty("user.dir") + BILLING_FILE_PATH;
+    private static final String BILLING_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/billing.csv";
 
     private BillingRepository() {
+        clearCSV();
         billingDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
@@ -43,8 +43,8 @@ public class BillingRepository implements DatabaseAccess, Subject {
     }
 
     @Override
-    public void loadCSV() {
-        try (CSVParser parser = new CSVParser(new FileReader(BillingRepository.billingPath), CSVFormat.RFC4180
+    public synchronized void loadCSV() {
+        try (CSVParser parser = new CSVParser(new FileReader(BILLING_CSV_PATH), CSVFormat.RFC4180
                 .withDelimiter(',')
                 .withHeader("username","cardNumber","expiry","csv","balance"))) {
             List<CSVRecord> records = parser.getRecords();
@@ -63,8 +63,8 @@ public class BillingRepository implements DatabaseAccess, Subject {
     }
 
     @Override
-    public void updateCSV() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(billingPath, false),
+    public synchronized void updateCSV() {
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(BILLING_CSV_PATH, false),
             CSVFormat.RFC4180.withDelimiter(',')
                     .withHeader(
                             "username",
@@ -83,22 +83,22 @@ public class BillingRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * Get a users credit card
-     * @param username the user
-     * @return the users credit card
-     */
+    @Override
+    public synchronized void clearCSV() {
+        try {
+            FileWriter fw = new FileWriter(BILLING_CSV_PATH, false);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public CreditCard getCreditCard(String username) {
         return billingDatabase.get(username);
     }
 
-    /**
-     * save a credit card in the billing database
-     * @param c the credit card to save
-     * @return true if successful, false otherwise
-     */
     public boolean saveCreditCard(CreditCard c) {
-        if (validateCreditCard(c)) {
+        if (validateCreditCard(c) && getUserRepository().checkUserExists(c.getUsername())) {
             billingDatabase.put(c.getUsername(), c);
             updateCSV();
             return true;
@@ -107,10 +107,6 @@ public class BillingRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * Delete a credit card from the database
-     * @param username the user of the credit card
-     */
     public void deleteCreditCard(String username) {
         billingDatabase.remove(username);
     }
@@ -173,4 +169,7 @@ public class BillingRepository implements DatabaseAccess, Subject {
         }
     }
 
+    private UserRepository getUserRepository() {
+        return UserRepository.getInstance();
+    }
 }

@@ -1,17 +1,34 @@
 package database;
 
+import model.User;
 import model.payments.CreditCard;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class BillingRepositoryTest {
 
     private static BillingRepository underTest;
+    private static UserRepository testUserRepository;
 
-    @BeforeAll
-    static void setup() {
+    @BeforeEach
+    void setup() {
         underTest = BillingRepository.getInstance();
+        testUserRepository = UserRepository.getInstance();
+
+        User u = new User();
+        u.setUsername("username");
+        u.setAccountType("guest");
+
+        testUserRepository.saveGuestAccount(u);
+
+    }
+
+    @AfterEach
+    void teardown() {
+        underTest.clearCSV();
+        testUserRepository.clearCSV();
     }
 
     @Test
@@ -27,8 +44,6 @@ class BillingRepositoryTest {
 
         CreditCard result = underTest.getCreditCard("username");
         assertThat(result).isEqualTo(expected);
-
-        underTest.deleteCreditCard("username");
     }
 
     @Test
@@ -42,8 +57,6 @@ class BillingRepositoryTest {
 
         boolean result = underTest.saveCreditCard(c);
         assertThat(result).isEqualTo(true);
-
-        underTest.deleteCreditCard(c.getUsername());
     }
 
     @Test
@@ -53,8 +66,6 @@ class BillingRepositoryTest {
 
         boolean result = underTest.saveCreditCard(c);
         assertThat(result).isEqualTo(false);
-
-        underTest.deleteCreditCard(c.getUsername());
     }
 
     @Test
@@ -85,8 +96,6 @@ class BillingRepositoryTest {
         CreditCard result = underTest.getCreditCard("username");
 
         assertThat(result).isEqualTo(expected);
-
-        underTest.deleteCreditCard(expected.getUsername());
     }
 
     @Test
@@ -106,8 +115,6 @@ class BillingRepositoryTest {
         boolean result = underTest.updateCreditCard(expected);
 
         assertThat(result).isEqualTo(false);
-
-        underTest.deleteCreditCard("username");
     }
 
     @Test
@@ -128,8 +135,6 @@ class BillingRepositoryTest {
 
         CreditCard result = underTest.getCreditCard("username");
         assertThat(result.getBalance()).isEqualTo(expected);
-
-        underTest.deleteCreditCard("username");
     }
 
     @Test
@@ -150,8 +155,6 @@ class BillingRepositoryTest {
         CreditCard result = underTest.getCreditCard("username");
 
         assertThat(result.getBalance()).isEqualTo(expected);
-
-        underTest.deleteCreditCard("username");
     }
 
 }

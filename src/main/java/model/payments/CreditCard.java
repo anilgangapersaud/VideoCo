@@ -1,5 +1,6 @@
 package model.payments;
 
+import model.Cart;
 import model.Movie;
 
 import java.util.Map;
@@ -73,8 +74,8 @@ public class CreditCard implements PaymentService {
     }
 
     @Override
-    public boolean acceptPayment(PaymentVisitor visitor, Map<Movie,Integer> movies) {
-        return visitor.visitCreditCard(this, movies);
+    public boolean acceptPayment(PaymentVisitor visitor, Cart cart) {
+        return visitor.visitCreditCard(this, cart);
     }
 
 }

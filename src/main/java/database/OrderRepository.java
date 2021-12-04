@@ -1,9 +1,6 @@
 package database;
 
-import model.Address;
-import model.Cart;
-import model.Movie;
-import model.Order;
+import model.*;
 import model.payments.CreditCard;
 import model.payments.LoyaltyPoints;
 import model.payments.PaymentService;
@@ -20,38 +17,24 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/**
- * The repository to manage orders and common operations on orders
- */
 public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor {
 
-    /**
-     * the order database
-     */
+
     private final Map<Integer, Order> orderDatabase;
 
-    /**
-     * configs
-     */
-    private static final String ORDER_FILE_PATH = "/src/main/resources/orders.csv";
-    private static final String orderPath = System.getProperty("user.dir") + ORDER_FILE_PATH;
+    private static final String ORDER_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/orders.csv";
 
-    /**
-     * singleton instance
-     */
     private volatile static OrderRepository orderRepositoryInstance;
 
     private final List<Observer> observers;
 
     private OrderRepository() {
+        clearCSV();
         orderDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    /**
-     * @return the singleton instance of this class
-     */
     public static OrderRepository getInstance() {
         if (orderRepositoryInstance == null) {
             synchronized (OrderRepository.class) {
@@ -66,7 +49,7 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
     @Override
     public void loadCSV() {
         try {
-            CSVParser parser = new CSVParser(new FileReader(OrderRepository.orderPath), CSVFormat.RFC4180
+            CSVParser parser = new CSVParser(new FileReader(ORDER_CSV_PATH), CSVFormat.RFC4180
                     .withDelimiter(',')
                     .withHeader(
                             "orderNumber",
@@ -94,7 +77,7 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
 
     @Override
     public void updateCSV() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(orderPath, false),
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(ORDER_CSV_PATH, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader("orderNumber",
                                     "username",
@@ -114,32 +97,32 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         }
     }
 
-    /**
-     * cancel an order
-     * @param orderNumber the order number of the order to be canceled
-     * @return true if successful, false otherwise
-     */
-    public boolean cancelOrder(int orderNumber) {
-        Order o = orderDatabase.get(orderNumber);
-        if (o == null) {
-            return false;
-        }
-        if (!o.getOrderStatus().equals("PROCESSED")) {
-            return false;
-        } else {
-            getBillingRepository().refundCustomer(o.getUsername(), getRentedRepository().getOrderTotal(orderNumber));
-            orderDatabase.remove(orderNumber);
-            getRentedRepository().returnMovies(orderNumber);
-            updateCSV();
-            return true;
+    @Override
+    public void clearCSV() {
+        try {
+            FileWriter fw = new FileWriter(ORDER_CSV_PATH, false);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Update an order's status
-     * @param orderNumber the order number to update
-     * @param status the new order status
-     */
+    public boolean cancelOrder(int orderNumber) {
+        if (orderDatabase.containsKey(orderNumber)) {
+            Order o = orderDatabase.get(orderNumber);
+            if (o == null || !o.getOrderStatus().equals("PROCESSED")) {
+                return false;
+            } else {
+                getBillingRepository().refundCustomer(o.getUsername(), getRentedRepository().getOrderTotal(orderNumber));
+                orderDatabase.remove(orderNumber);
+                getRentedRepository().returnMovies(orderNumber);
+                updateCSV();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void changeOrderStatus(int orderNumber, String status) {
         Order o = orderDatabase.get(orderNumber);
         o.setOrderStatus(status);
@@ -147,72 +130,45 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         updateCSV();
     }
 
-    /**
-     * create an order
-     */
-    public boolean createOrder(Cart cart, PaymentService paymentMethod, Address shipping) {
-        if (paymentMethod.acceptPayment(this, cart.getMoviesInCart())) {
-            if (getMovieRepository().rentMovies(cart.getMoviesInCart())) {
-                getUserRepository().awardLoyaltyPoint(shipping.getUsername());
-                Order o = new Order();
-                o.setOrderId(getTotalOrders());
-                o.setOrderDate(getDate());
-                o.setOrderStatus("PROCESSED");
-                o.setUsername(shipping.getUsername());
-                o.setOverdue(false);
-                o.setDueDate(getDueDate());
-                o.setMovies(cart.getMoviesInCart());
-                orderDatabase.put(o.getOrderId(), o);
-                getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
-                updateCSV();
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+    public Order createOrder(Cart cart, PaymentService paymentMethod) {
+        User u = getUserRepository().getLoggedInUser();
+        String username;
+        if (u != null) {
+            username = u.getUsername();
+        }  else {
+            username = cart.getUsername();
         }
-    }
-
-    public Order createOrder(Map<Movie,Integer> movies, PaymentService paymentMethod, Address shipping) {
-        if (paymentMethod.acceptPayment(this, movies)) {
-            if (getMovieRepository().rentMovies(movies)) {
-                Order o = new Order();
-                o.setOrderId(getTotalOrders());
-                o.setOrderDate(getDate());
-                o.setOrderStatus("PROCESSED");
-                o.setUsername(shipping.getUsername());
-                o.setOverdue(false);
-                o.setDueDate(getDueDate());
-                o.setMovies(movies);
-                orderDatabase.put(o.getOrderId(), o);
-                getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
-                updateCSV();
-                return o;
-            } else {
-                return null;
+        if (getAddressRepository().checkAddressExists(username)) {
+            if (paymentMethod.acceptPayment(this, cart)) {
+                if (getMovieRepository().rentMovies(cart.getMoviesInCart())) {
+                    Order o = new Order();
+                    o.setUsername(username);
+                    o.setOrderId(getTotalOrders());
+                    o.setOrderDate(getDate());
+                    o.setOrderStatus("PROCESSED");
+                    o.setOverdue(false);
+                    o.setDueDate(getDueDate());
+                    o.setMovies(cart.getMoviesInCart());
+                    orderDatabase.put(o.getOrderId(), o);
+                    getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
+                    // award a loyalty point
+                    getUserRepository().awardLoyaltyPoint(username);
+                    updateCSV();
+                    return o;
+                }
             }
-        } else {
-            return null;
         }
-    }
-
-
-    public void createOrder(Order o) {
-        orderDatabase.put(o.getOrderId(), o);
-        getRentedRepository().storeMovies(o.getOrderId(), o.getMovies());
-        updateCSV();
+        return null;
     }
 
     public void deleteOrder(int orderNumber) {
-        getRentedRepository().returnMovies(orderNumber);
-        orderDatabase.remove(orderNumber);
-        updateCSV();
+        if (orderDatabase.containsKey(orderNumber)) {
+            getRentedRepository().returnMovies(orderNumber);
+            orderDatabase.remove(orderNumber);
+            updateCSV();
+        }
     }
 
-    /**
-     * @return all orders in the system
-     */
     public List<Order> getAllOrders() {
         List<Order> allOrders = new ArrayList<>();
         for (Map.Entry<Integer, Order> entry : orderDatabase.entrySet()) {
@@ -221,11 +177,6 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         return allOrders;
     }
 
-    /**
-     * get all orders for a specific user
-     * @param username the user
-     * @return a list of orders connected to this customer
-     */
     public List<Order> getOrdersByCustomer(String username) {
         List<Order> orders = new ArrayList<>();
         for (Map.Entry<Integer, Order> entry : orderDatabase.entrySet()) {
@@ -240,39 +191,37 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
     public Order getOrder(int orderNumber) {
         return orderDatabase.get(orderNumber);
     }
-    /**
-     * get the total number of orders in the system
-     * @return total orders
-     */
+
     public int getTotalOrders() {
         return orderDatabase.size();
     }
 
-    public void updateOrder(int orderNumber, Order o) {
-        orderDatabase.replace(orderNumber, o);
-        updateCSV();
-    }
-
-    /**
-     * Return movies to the system
-     * @param orderNumber the order to return
-     * @return true if successful, false otherwise
-     */
-    public boolean returnOrder(int orderNumber) {
-        Order o = orderDatabase.get(orderNumber);
-        if (o == null) {
-            return false;
-        }
-        if (!o.getOrderStatus().equals("DELIVERED")) {
-            return false;
-        } else {
-            getRentedRepository().returnMovies(orderNumber);
-            o.setDueDate("");
-            o.setOrderStatus("COMPLETED");
-            o.setOverdue(false);
+    public boolean updateOrder(int orderNumber, Order o) {
+        if (validateOrder(o) && orderDatabase.containsKey(orderNumber)) {
             orderDatabase.replace(orderNumber, o);
             updateCSV();
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean returnOrder(int orderNumber) {
+        if (orderDatabase.containsKey(orderNumber)) {
+            Order o = orderDatabase.get(orderNumber);
+            if (o == null || !o.getOrderStatus().equals("DELIVERED")) {
+                return false;
+            } else {
+                getRentedRepository().returnMovies(orderNumber);
+                o.setDueDate("");
+                o.setOrderStatus("COMPLETED");
+                o.setOverdue(false);
+                orderDatabase.replace(orderNumber, o);
+                updateCSV();
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -294,15 +243,16 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
     }
 
     @Override
-    public boolean visitLoyaltyPoints(LoyaltyPoints loyaltyPoints, Map<Movie,Integer> movies) {
+    public boolean visitLoyaltyPoints(LoyaltyPoints loyaltyPoints, Cart cart) {
         int totalMovies = 0;
-        for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
+        for (Map.Entry<Movie,Integer> entry : cart.getMoviesInCart().entrySet()) {
             totalMovies += entry.getValue();
         }
         if (loyaltyPoints.getLoyaltyPoints() >= totalMovies * 10) {
             int deduction = totalMovies * 10;
-            getUserRepository().getLoggedInUser().setLoyaltyPoints(loyaltyPoints.getLoyaltyPoints() - deduction);
-            getUserRepository().updateUser(getUserRepository().getLoggedInUser());
+            User u = getUserRepository().getUser(cart.getUsername());
+            u.setLoyaltyPoints(loyaltyPoints.getLoyaltyPoints() - deduction);
+            getUserRepository().updateUser(u);
             return true;
         } else {
             return false;
@@ -310,8 +260,8 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
     }
 
     @Override
-    public boolean visitCreditCard(CreditCard creditCard, Map<Movie, Integer> movies) {
-        for (Map.Entry<Movie, Integer> entry : movies.entrySet()) {
+    public boolean visitCreditCard(CreditCard creditCard, Cart cart) {
+        for (Map.Entry<Movie, Integer> entry : cart.getMoviesInCart().entrySet()) {
             creditCard.charge(entry.getKey().getPrice() * entry.getValue());
             getBillingRepository().updateCreditCard(creditCard);
         }
@@ -335,6 +285,21 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         return df.format(today.getTime());
     }
 
+    private boolean validateOrder(Order o) {
+        if (o == null) {
+            return false;
+        } else {
+            if (o.getOrderId() < 0 || o.getOrderStatus() == null
+            || o.getOrderDate() == null || o.getDueDate() == null || o.getUsername() == null
+        || o.getMovies() == null) {
+                return false;
+            } else {
+                return !o.getOrderStatus().equals("") && !o.getOrderDate().equals("")
+                        && !o.getUsername().equals("") && !o.getDueDate().equals("");
+            }
+        }
+    }
+
     private BillingRepository getBillingRepository() {
         return BillingRepository.getInstance();
     }
@@ -350,6 +315,8 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
     private UserRepository getUserRepository() {
         return UserRepository.getInstance();
     }
+
+    private AddressRepository getAddressRepository() { return AddressRepository.getInstance(); }
 
 }
 

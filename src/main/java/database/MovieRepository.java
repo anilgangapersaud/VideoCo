@@ -11,48 +11,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Maintain the movie database and provide common operations on movies
- */
 public class MovieRepository implements DatabaseAccess, Subject {
 
-    /**
-     * Maintains the current list of movies in the system
-     */
     private final Map<Movie, Integer> movieDatabase;
 
-    /**
-     * Barcode to movie mapping
-     */
     private final Map<String, Movie> barcodeToMovieMap;
 
-    /**
-     * Singleton instance
-     */
     private volatile static MovieRepository movieRepositoryInstance;
 
     private final List<Observer> observers;
 
-    /**
-     * Configurations for the csv file
-     */
-    private static final String MOVIE_FILE_PATH = "/src/main/resources/movies.csv";
-    private static final String path = System.getProperty("user.dir") + MOVIE_FILE_PATH;
+    private static final String MOVIE_CSV_PATH = System.getProperty("user.dir") + "/src/main/resources/movies.csv";
 
-    /**
-     * Construct a MovieRepository class
-     */
     private MovieRepository() {
+        clearCSV();
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    /**
-     * Return the singleton instance of this class
-     * @return the single MovieRepository
-     */
     public static MovieRepository getInstance() {
         if (movieRepositoryInstance == null) {
             synchronized (MovieRepository.class) {
@@ -65,9 +43,9 @@ public class MovieRepository implements DatabaseAccess, Subject {
     }
 
     @Override
-    public void loadCSV() {
+    public synchronized void loadCSV() {
         try {
-            CSVParser parser = new CSVParser(new FileReader(MovieRepository.path), CSVFormat.RFC4180
+            CSVParser parser = new CSVParser(new FileReader(MOVIE_CSV_PATH), CSVFormat.RFC4180
                     .withDelimiter(',')
                     .withHeader("barcode", "title", "genre", "releaseDate",
                             "quantity", "cost"));
@@ -89,8 +67,8 @@ public class MovieRepository implements DatabaseAccess, Subject {
     }
 
     @Override
-    public void updateCSV() {
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(path, false),
+    public synchronized void updateCSV() {
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(MOVIE_CSV_PATH, false),
                 CSVFormat.RFC4180
                         .withDelimiter(',')
                         .withHeader(
@@ -111,13 +89,19 @@ public class MovieRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * Add a movie to the database
-     * @param movie the movie to add
-     * @return {@code true} if the movie was added successfully, {@code false} otherwise
-     */
+    @Override
+    public synchronized void clearCSV() {
+        try {
+            FileWriter fw = new FileWriter(MOVIE_CSV_PATH, false);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public boolean addMovie(Movie movie, Integer quantity) {
-        if (validateMovieAdd(movie)) {
+        if (validateMovie(movie)) {
             if (movieDatabase.containsKey(movie)) {
                 movieDatabase.replace(movie,movieDatabase.get(movie)+quantity);
             } else {
@@ -131,23 +115,13 @@ public class MovieRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * Delete movies from the database
-     * @param barcodes the ids of movies to delete
-     */
-    public void deleteMovies(List<String> barcodes) {
-        for (String barcode : barcodes) {
-            Movie m = barcodeToMovieMap.get(barcode);
-            movieDatabase.remove(m);
-        }
+    public void deleteMovie(String barcode) {
+        Movie m = barcodeToMovieMap.get(barcode);
+        barcodeToMovieMap.remove(barcode);
+        movieDatabase.remove(m);
         updateCSV();
     }
 
-    /**
-     * Get all movies with matching titles from the database
-     * @param movieTitle the title to search
-     * @return a list of movies matching the title search
-     */
     public Map<Movie,Integer> findMovieByTitle(String movieTitle) {
         Map<Movie,Integer> titleMatches = new HashMap<>();
         for (Map.Entry<Movie, Integer> entry : movieDatabase.entrySet()) {
@@ -159,18 +133,10 @@ public class MovieRepository implements DatabaseAccess, Subject {
         return titleMatches;
     }
 
-    /**
-     * @return a list of all movies in the database
-     */
     public Map<Movie,Integer> getAllMovies() {
         return movieDatabase;
     }
 
-    /**
-     * Get all movies with matching category from the database
-     * @param genre the genre to match
-     * @return a list of movies matching the category search
-     */
     public Map<Movie,Integer> getMoviesByCategory(String genre) {
         Map<Movie,Integer> genreMatches = new HashMap<>();
         for (Map.Entry<Movie,Integer> entry : movieDatabase.entrySet()) {
@@ -182,25 +148,19 @@ public class MovieRepository implements DatabaseAccess, Subject {
         return genreMatches;
     }
 
-    /**
-     * Get movie by barcode
-     * @param barcode the barcode id of the movie
-     * @return the movie
-     */
     public Movie getMovie(String barcode) {
         return barcodeToMovieMap.get(barcode);
     }
 
     public int getStockForMovie(String barcode) {
         Movie m = barcodeToMovieMap.get(barcode);
-        return movieDatabase.get(m);
+        if (m == null) {
+            return 0;
+        } else {
+            return movieDatabase.get(m);
+        }
     }
 
-    /**
-     * Given a map of movies and quantities to rent, update the database accordingly
-     * @param movies the movies to rent
-     * @return true if successful, false otherwise
-     */
     public boolean rentMovies(Map<Movie,Integer> movies) {
         for (Map.Entry<Movie,Integer> entry : movies.entrySet()) {
             if (movieDatabase.containsKey(entry.getKey())) {
@@ -217,20 +177,12 @@ public class MovieRepository implements DatabaseAccess, Subject {
         return true;
     }
 
-    /**
-     * return a single movie to the database given the barcode of the movie
-     * @param barcode the barcode of movie to return
-     */
     public void returnMovie(String barcode) {
         Movie m = barcodeToMovieMap.get(barcode);
         movieDatabase.replace(m, movieDatabase.get(m) + 1);
         updateCSV();
     }
 
-    /**
-     * Remove stock for a particular movie
-     * @param barcode the id of the movie to remove stock
-     */
     public void removeStock(String barcode) {
         Movie m = barcodeToMovieMap.get(barcode);
         if (movieDatabase.get(m) <= 0) {
@@ -241,13 +193,8 @@ public class MovieRepository implements DatabaseAccess, Subject {
         updateCSV();
     }
 
-    /**
-     * Update a movie in the database
-     * @param movie the movie to update
-     * @return true if successful, false otherwise
-     */
     public boolean updateMovie(Movie movie) {
-        if (validateMovieUpdate(movie)) {
+        if (validateMovie(movie) && barcodeToMovieMap.containsKey(movie.getBarcode())) {
             Movie oldMovie = barcodeToMovieMap.get(movie.getBarcode());
             Integer oldMovieQuantity = movieDatabase.get(oldMovie);
             movieDatabase.remove(oldMovie);
@@ -260,18 +207,17 @@ public class MovieRepository implements DatabaseAccess, Subject {
         }
     }
 
-    private boolean validateMovieAdd(Movie m) {
-        if (barcodeToMovieMap.containsKey(m.getBarcode())) {
+    private boolean validateMovie(Movie m) {
+        if (m == null) {
             return false;
         } else {
-            return validateMovieUpdate(m);
+            if (m.getBarcode() != null && m.getTitle() != null && m.getPrice() >= 0 && m.getGenre() != null && m.getReleaseDate() != null) {
+                return !m.getGenre().equals("") && !m.getTitle().equals("") && !m.getBarcode().equals("") && !m.getReleaseDate().equals("");
+            } else {
+                return false;
+            }
         }
     }
-
-    private boolean validateMovieUpdate(Movie m) {
-        return !m.getTitle().equals("") && m.getPrice() >= 0.00D;
-    }
-
 
     @Override
     public void registerObserver(Observer o) {

@@ -13,6 +13,7 @@ public class Cart implements Subject {
     private final Map<Movie, Integer> cart;
     private final List<Observer> observers;
     private double total;
+    private String username;
 
     public Cart() {
         cart = new HashMap<>();
@@ -51,6 +52,14 @@ public class Cart implements Subject {
 
     public double getTotal() {
         return total;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     /**

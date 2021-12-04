@@ -3,12 +3,11 @@ package states;
 import database.MovieRepository;
 import database.OrderRepository;
 import model.Address;
+import model.Cart;
 import model.Movie;
 import model.Order;
 import model.payments.CreditCard;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class PlaceOrder implements State {
@@ -64,7 +63,8 @@ public class PlaceOrder implements State {
 
             System.out.println("Thank you for entering your shipping/billing");
             System.out.println("Please enter the barcodes of the movie(s) you wish to order. Enter the word 'done' to complete your order");
-            Map<Movie,Integer> movies = new HashMap<>();
+            Cart cart = new Cart();
+            cart.setUsername(username);
             double orderTotal = 0;
             while (true) {
                 String barcode = scan.nextLine();
@@ -79,7 +79,7 @@ public class PlaceOrder implements State {
                         System.out.println("Enter the quantity you would like to order");
                         int quantity = scan.nextInt();
                         if (quantity >= 0 && quantity <= stock) {
-                            movies.put(m, quantity);
+                            cart.addMovieToCart(m, quantity);
                             orderTotal += m.getPrice() * quantity;
                             System.out.println("Added " + quantity + " " + m.getTitle() + " to your cart");
                         } else {
@@ -90,13 +90,13 @@ public class PlaceOrder implements State {
                     }
                 }
             }
-            if (movies.size() > 0) {
+            if (cart.getMoviesInCart().size() > 0) {
                 System.out.println("Order Total: " + String.format("%.2f", orderTotal));
                 System.out.println("Press 1 to confirm order");
                 System.out.println("Press 0 to cancel order");
                 int userInput = scan.nextInt();
                 if (userInput == 1) {
-                    Order o = orderRepository.createOrder(movies, c, a);
+                    Order o = orderRepository.createOrder(cart, c);
                     if (o == null) {
                         System.out.println("There was a service error creating order, please try again");
                         scan.close();

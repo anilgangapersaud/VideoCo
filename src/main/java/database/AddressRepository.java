@@ -25,14 +25,12 @@ public class AddressRepository implements DatabaseAccess, Subject {
     private final List<Observer> observers;
 
     private AddressRepository() {
+        clearCSV();
         addressDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();
     }
 
-    /**
-     * @return the singleton instance of this class
-     */
     public static AddressRepository getInstance() {
         if (addressRepositoryInstance == null) {
             synchronized (AddressRepository.class) {
@@ -45,7 +43,7 @@ public class AddressRepository implements DatabaseAccess, Subject {
     }
 
     @Override
-    public void loadCSV() {
+    public synchronized void loadCSV() {
         try (CSVParser parser = new CSVParser(new FileReader(ADDRESS_CSV_PATH), CSVFormat.RFC4180
                 .withDelimiter(',')
                 .withHeader("username", "street", "city", "province", "postalCode"))) {
@@ -63,11 +61,18 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * update the csv file
-     */
     @Override
-    public void updateCSV() {
+    public synchronized void clearCSV() {
+        try {
+            FileWriter fw = new FileWriter(ADDRESS_CSV_PATH, false);
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public synchronized void updateCSV() {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(ADDRESS_CSV_PATH, false),
                 CSVFormat.RFC4180.withDelimiter(',')
                         .withHeader(
@@ -85,11 +90,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     *  save a new address to the database
-     * @param address the address to save
-     * @return if true
-     */
     public boolean saveAddress(Address address) {
         if (validateAddress(address)) {
             addressDatabase.put(address.getUsername(), address);
@@ -100,29 +100,15 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * delete the address associated with user
-     * @param username user address
-     */
     public void deleteAddress(String username) {
         addressDatabase.remove(username);
         updateCSV();
     }
 
-    /**
-     * Get an address from the database
-     * @param username the username to get
-     * @return the users address
-     */
     public Address getAddress(String username) {
         return addressDatabase.getOrDefault(username, null);
     }
 
-    /**
-     * update the address in database
-     * @param address the updated address
-     * @return true if successful
-     */
     public boolean updateAddress(Address address) {
         if (validateAddress(address)) {
             addressDatabase.replace(address.getUsername(), address);
@@ -132,6 +118,8 @@ public class AddressRepository implements DatabaseAccess, Subject {
             return false;
         }
     }
+
+    public boolean checkAddressExists(String username) { return addressDatabase.containsKey(username); }
 
     @Override
     public void registerObserver(Observer o) {
@@ -150,11 +138,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    /**
-     * validate address fields checks if any empty fields
-     * @param address the address to validate
-     * @return validation
-     */
     private boolean validateAddress(Address address) {
         if (address == null) {
             return false;

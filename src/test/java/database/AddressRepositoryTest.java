@@ -1,7 +1,8 @@
 package database;
 
 import model.Address;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -10,9 +11,14 @@ class AddressRepositoryTest {
 
     private static AddressRepository underTest;
 
-    @BeforeAll
-    static void setup() {
+    @BeforeEach
+    void setup() {
         underTest = AddressRepository.getInstance();
+    }
+
+    @AfterEach
+    void teardown() {
+        underTest.clearCSV();
     }
 
     @Test
@@ -27,8 +33,6 @@ class AddressRepositoryTest {
         boolean exists = underTest.saveAddress(address);
 
         assertThat(exists).isEqualTo(true);
-
-        underTest.deleteAddress(address.getUsername());
     }
 
     @Test
@@ -37,7 +41,6 @@ class AddressRepositoryTest {
         address.setProvince("Ontario");
         boolean exists = underTest.saveAddress(address);
         assertThat(exists).isEqualTo(false);
-        underTest.deleteAddress(address.getUsername());
     }
 
     @Test
@@ -57,8 +60,6 @@ class AddressRepositoryTest {
 
         Address result = underTest.getAddress("username");
         assertThat(result).isEqualTo(expected);
-
-        underTest.deleteAddress(expected.getUsername());
     }
 
     @Test
@@ -91,8 +92,6 @@ class AddressRepositoryTest {
         Address result = underTest.getAddress("username");
 
         assertThat(result).isEqualTo(updatedAddress);
-
-        underTest.deleteAddress("username");
     }
 
     @Test
@@ -114,7 +113,5 @@ class AddressRepositoryTest {
         boolean updateResult = underTest.updateAddress(updatedAddress);
 
         assertThat(updateResult).isEqualTo(false);
-
-        underTest.deleteAddress(expected.getUsername());
     }
 }

@@ -15,4 +15,9 @@ public interface DatabaseAccess {
      */
     void loadCSV();
 
+    /**
+     * erase all the contents of the csv
+     */
+    void clearCSV();
+
 }
