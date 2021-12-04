@@ -103,6 +103,6 @@ public class CartPanel extends JPanel implements Observer {
     @Override
     public void update() {
         displayLoyaltyPoints.setText(String.valueOf(UserRepository.getInstance().getLoggedInUser().getLoyaltyPoints()));
-        totalCost.setText(String.format("%.2f$", UserRepository.getInstance().getLoggedInUser().getCart().getTotal()));
+        totalCost.setText(String.format("Total: %.2f$", UserRepository.getInstance().getLoggedInUser().getCart().getTotal()));
     }
 }
