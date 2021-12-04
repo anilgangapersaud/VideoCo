@@ -12,7 +12,7 @@ public class MainMenu implements State {
 
     @Override
     public void mainMenu() {
-        System.out.println("Hello! My name is Vid-San!\nPress 1 to place an order\nPress 2 to check the status of your order\nPress 3 to exit the dial-in service");
+        System.out.println("Hello! Welcome to Video-Co's Dial-In Service!\nPress 1 to place an order\nPress 2 to check the status of your order\nPress 3 to exit the dial-in service");
         try {
             Scanner scan = new Scanner(System.in);
             int input = scan.nextInt();
