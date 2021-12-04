@@ -38,7 +38,7 @@ public class CheckOverdueOrders extends TimerTask {
                 try {
                     Date todaysDate = Calendar.getInstance().getTime();
                     Date dueDateP = new SimpleDateFormat("yyyy/MM/dd").parse(dueDate);
-                    if (dueDateP.before(todaysDate)) {
+                    if (todaysDate.before(dueDateP)) {
                         if (!o.getOverdue()) {
                             o.setOverdue(true);
                             System.out.println(o.getUsername() + "'s order is overdue");
@@ -60,13 +60,13 @@ public class CheckOverdueOrders extends TimerTask {
         }
 
         for (Order o : orders) {
-            if (o.getOrderStatus().equals("DELIVERED") && o.getOverdue()) {
+            if (o.getOverdue()) {
                 CreditCard c = billingRepository.getCreditCard(o.getUsername());
                 int totalMovies = rentedRepository.countMoviesInOrder(o.getOrderId());
                 double charge = 1.00D * totalMovies;
                 c.charge(charge);
                 billingRepository.updateCreditCard(c);
-                System.out.println("Charging " + o.getUsername() + " " + charge + " for an overdue order");
+                System.out.println("Charging " + o.getUsername() + " " + charge + "$ for an overdue order");
             }
         }
     }

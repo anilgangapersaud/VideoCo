@@ -44,7 +44,7 @@ public class EntrancePanel extends JPanel implements ActionListener {
 
         southBar.add(new LoginCards(this));
         if (dialIn != null) {
-            southBar.add(dialIn);
+            add(dialIn, BorderLayout.NORTH);
         }
         add(southBar, BorderLayout.SOUTH);
         setVisible(true);

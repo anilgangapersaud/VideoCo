@@ -174,8 +174,7 @@ public class UserRepository implements DatabaseAccess, Subject {
             if (orders != null) {
                 for (Order o : orders) {
                     o.setUsername(newUsername);
-                    getOrderRepository().cancelOrder(o.getOrderId());
-                    getOrderRepository().createOrder(o);
+                    getOrderRepository().updateOrder(o.getOrderId(), o);
                 }
             }
 
@@ -335,7 +334,7 @@ public class UserRepository implements DatabaseAccess, Subject {
 
     private boolean validateNewUserRegistration(User newUser) {
         return validateUsername(newUser.getUsername()) && validatePassword(newUser.getPassword())
-                && validateEmail(newUser.getEmailAddress());
+                && validateEmail(newUser.getEmailAddress()) && !newUser.getAccountType().equals("");
     }
 
     private boolean validatePassword(String password) {

@@ -248,6 +248,11 @@ public class OrderRepository implements DatabaseAccess, Subject, PaymentVisitor 
         return orderDatabase.size();
     }
 
+    public void updateOrder(int orderNumber, Order o) {
+        orderDatabase.replace(orderNumber, o);
+        updateCSV();
+    }
+
     /**
      * Return movies to the system
      * @param orderNumber the order to return
