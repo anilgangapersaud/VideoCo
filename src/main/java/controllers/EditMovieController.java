@@ -1,8 +1,7 @@
 package controllers;
 
-import database.MovieRepository;
 import model.Movie;
-import services.MovieServiceImpl;
+import services.MovieService;
 import view.StoreFront;
 import view.dialogs.EditMovieDialog;
 
@@ -12,7 +11,7 @@ import java.awt.event.ActionListener;
 public class EditMovieController implements ActionListener {
 
     private final EditMovieDialog view;
-    private final MovieServiceImpl movieService;
+    private final MovieService movieService;
 
     public EditMovieController(EditMovieDialog view) {
         this.view = view;

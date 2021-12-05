@@ -17,23 +17,23 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-public class OrderServiceImpl implements PaymentVisitor {
+public class OrderService implements PaymentVisitor {
 
     private final OrderRepository orderRepository;
 
     private static String ORDER_CSV_PATH;
 
-    private volatile static OrderServiceImpl instance;
+    private volatile static OrderService instance;
 
-    private OrderServiceImpl() {
+    private OrderService() {
         orderRepository = OrderRepository.getInstance(ORDER_CSV_PATH);
     }
 
-    public static OrderServiceImpl getInstance() {
+    public static OrderService getInstance() {
         if (instance == null) {
-            synchronized (OrderServiceImpl.class) {
+            synchronized (OrderService.class) {
                 if (instance == null) {
-                    instance = new OrderServiceImpl();
+                    instance = new OrderService();
                 }
             }
         }
@@ -64,7 +64,7 @@ public class OrderServiceImpl implements PaymentVisitor {
         } else {
             username = cart.getUsername();
         }
-        if (getAddressService().checkAddressExists(username)) {
+        if (getAddressService().getAddress(username) != null) {
             if (paymentService.acceptPayment(this, cart)) {
                 if (getMovieService().rentMovies(cart.getMoviesInCart())) {
                     Order o = new Order();
@@ -189,23 +189,23 @@ public class OrderServiceImpl implements PaymentVisitor {
     }
 
 
-    private BillingServiceImpl getBillingService() {
-        return BillingServiceImpl.getInstance();
+    private BillingService getBillingService() {
+        return BillingService.getInstance();
     }
 
-    private RentedServiceImpl getRentedService() {
-        return RentedServiceImpl.getInstance();
+    private RentedService getRentedService() {
+        return RentedService.getInstance();
     }
 
-    private UserServiceImpl getUserService() {
-        return UserServiceImpl.getInstance();
+    private UserService getUserService() {
+        return UserService.getInstance();
     }
 
-    private AddressServiceImpl getAddressService() {
-        return AddressServiceImpl.getInstance();
+    private AddressService getAddressService() {
+        return AddressService.getInstance();
     }
 
-    private MovieServiceImpl getMovieService() {
-        return MovieServiceImpl.getInstance();
+    private MovieService getMovieService() {
+        return MovieService.getInstance();
     }
 }

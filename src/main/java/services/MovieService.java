@@ -6,23 +6,23 @@ import model.Movie;
 
 import java.util.Map;
 
-public class MovieServiceImpl {
+public class MovieService {
 
     private static String MOVIE_CSV_PATH;
 
-    private volatile static MovieServiceImpl instance;
+    private volatile static MovieService instance;
 
     private final MovieRepository movieRepository;
 
-    private MovieServiceImpl() {
+    private MovieService() {
         movieRepository = MovieRepository.getInstance(MOVIE_CSV_PATH);
     }
 
-    public static MovieServiceImpl getInstance() {
+    public static MovieService getInstance() {
         if (instance == null) {
-            synchronized (MovieServiceImpl.class) {
+            synchronized (MovieService.class) {
                 if (instance == null) {
-                    instance = new MovieServiceImpl();
+                    instance = new MovieService();
                 }
             }
         }

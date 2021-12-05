@@ -1,7 +1,7 @@
 package controllers;
 
 import model.User;
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.accountpanels.RegisterPanel;
 
@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class RegisterController implements ActionListener {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final RegisterPanel view;
 
     public RegisterController(RegisterPanel view) {
@@ -25,8 +25,12 @@ public class RegisterController implements ActionListener {
     }
 
     private void signup() {
-        if (serviceRegister(new User(
-                view.getUsernameInput(), view.getPasswordInput(), view.getEmailInput(), view.getAccountType()))) {
+        User u = new User();
+        u.setUsername(view.getUsernameInput());
+        u.setEmailAddress(view.getEmailInput());
+        u.setAccountType(view.getAccountType());
+        u.setPassword(view.getPasswordInput());
+        if (serviceRegister(u)) {
             JOptionPane.showMessageDialog(view, "Registration Successful!\nLogin with your credentials to start shopping");
             view.clearInputs();
             view.getCards().getLayout().show(view.getCards(), "lp");

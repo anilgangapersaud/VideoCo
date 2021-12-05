@@ -1,6 +1,5 @@
 package view;
 
-import model.Movie;
 import services.*;
 import view.cards.StoreFrontCards;
 
@@ -23,12 +22,12 @@ public class StoreFront extends JFrame {
     private static final int windowHeight = 500;
 
     public StoreFront() {
-        MovieServiceImpl.setCsvPath(MOVIE_CSV_PATH);
-        UserServiceImpl.setCsvPath(ADMIN_CSV_PATH, USER_CSV_PATH);
-        AddressServiceImpl.setCsvPath(ADDRESS_CSV_PATH);
-        BillingServiceImpl.setCsvPath(BILLING_CSV_PATH);
-        RentedServiceImpl.setCsvPath(RENTED_CSV_PATH);
-        OrderServiceImpl.setCsvPath(ORDER_CSV_PATH);
+        MovieService.setCsvPath(MOVIE_CSV_PATH);
+        UserService.setCsvPath(ADMIN_CSV_PATH, USER_CSV_PATH);
+        AddressService.setCsvPath(ADDRESS_CSV_PATH);
+        BillingService.setCsvPath(BILLING_CSV_PATH);
+        RentedService.setCsvPath(RENTED_CSV_PATH);
+        OrderService.setCsvPath(ORDER_CSV_PATH);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(windowWidth, windowHeight);
@@ -41,19 +40,19 @@ public class StoreFront extends JFrame {
         setVisible(true);
     }
 
-    public static MovieServiceImpl getMovieService() {
-        return MovieServiceImpl.getInstance();
+    public static MovieService getMovieService() {
+        return MovieService.getInstance();
     }
-    public static RentedServiceImpl getRentedService() {
-        return RentedServiceImpl.getInstance();
+    public static RentedService getRentedService() {
+        return RentedService.getInstance();
     }
 
-    public static UserServiceImpl getUserService() { return UserServiceImpl.getInstance(); }
+    public static UserService getUserService() { return UserService.getInstance(); }
 
-    public static BillingServiceImpl getBillingService() { return BillingServiceImpl.getInstance(); }
+    public static BillingService getBillingService() { return BillingService.getInstance(); }
 
-    public static AddressServiceImpl getAddressService() { return AddressServiceImpl.getInstance(); }
+    public static AddressService getAddressService() { return AddressService.getInstance(); }
 
-    public static OrderServiceImpl getOrderService() { return OrderServiceImpl.getInstance(); }
+    public static OrderService getOrderService() { return OrderService.getInstance(); }
 
 }

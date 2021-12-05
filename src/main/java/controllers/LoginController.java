@@ -1,6 +1,6 @@
 package controllers;
 
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.accountpanels.LoginPanel;
 
@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 public class LoginController implements ActionListener {
 
     private final LoginPanel view;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     public LoginController(LoginPanel view) {
         this.view = view;

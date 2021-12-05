@@ -161,10 +161,6 @@ public class UserRepository implements DatabaseAccess, Subject {
         }
     }
 
-    public boolean checkUserExists(String username) {
-        return userAccounts.containsKey(username);
-    }
-
     public void deleteUser(String username) {
         userAccounts.remove(username);
         updateCSV();
@@ -235,20 +231,6 @@ public class UserRepository implements DatabaseAccess, Subject {
         return false;
     }
 
-
-    private boolean validateNewUserRegistration(User newUser) {
-        return newUser != null && !newUser.getUsername().equals("") && validatePassword(newUser.getPassword())
-                && validateEmail(newUser.getEmailAddress()) && !newUser.getAccountType().equals("");
-    }
-
-    private boolean validatePassword(String password) {
-        return password != null && !password.equals("");
-    }
-
-    private boolean validateEmail(String email) {
-        return email != null && !email.equals("");
-    }
-
     @Override
     public void registerObserver(Observer o) {
         observers.add(o);
@@ -265,4 +247,18 @@ public class UserRepository implements DatabaseAccess, Subject {
             o.update();
         }
     }
+
+    private boolean validateNewUserRegistration(User newUser) {
+        return newUser != null && !newUser.getUsername().equals("") && validatePassword(newUser.getPassword())
+                && validateEmail(newUser.getEmailAddress()) && !newUser.getAccountType().equals("");
+    }
+
+    private boolean validatePassword(String password) {
+        return password != null && !password.equals("");
+    }
+
+    private boolean validateEmail(String email) {
+        return email != null && !email.equals("");
+    }
+
 }

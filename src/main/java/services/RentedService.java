@@ -7,23 +7,23 @@ import model.RentedMovie;
 
 import java.util.List;
 
-public class RentedServiceImpl {
+public class RentedService {
 
     private final RentedRepository rentedRepository;
 
     private static String RENTED_CSV_PATH;
 
-    private volatile static RentedServiceImpl instance;
+    private volatile static RentedService instance;
 
-    public RentedServiceImpl() {
+    public RentedService() {
         rentedRepository = RentedRepository.getInstance(RENTED_CSV_PATH);
     }
 
-    public static RentedServiceImpl getInstance() {
+    public static RentedService getInstance() {
         if (instance == null) {
-            synchronized (RentedServiceImpl.class) {
+            synchronized (RentedService.class) {
                 if (instance == null) {
-                    instance = new RentedServiceImpl();
+                    instance = new RentedService();
                 }
             }
         }
@@ -69,7 +69,7 @@ public class RentedServiceImpl {
     }
 
 
-    private MovieServiceImpl getMovieService() {
-        return MovieServiceImpl.getInstance();
+    private MovieService getMovieService() {
+        return MovieService.getInstance();
     }
 }

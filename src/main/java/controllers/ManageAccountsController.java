@@ -1,7 +1,7 @@
 package controllers;
 
 import model.User;
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.shoppanels.ManageAccountsPanel;
 
@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 public class ManageAccountsController implements ActionListener {
 
     private final ManageAccountsPanel view;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     public ManageAccountsController(ManageAccountsPanel view) {
         this.view = view;

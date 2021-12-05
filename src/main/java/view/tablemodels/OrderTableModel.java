@@ -2,8 +2,8 @@ package view.tablemodels;
 
 import database.Observer;
 import model.Order;
-import services.OrderServiceImpl;
-import services.UserServiceImpl;
+import services.OrderService;
+import services.UserService;
 import view.StoreFront;
 
 import javax.swing.*;
@@ -15,8 +15,8 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
 
     private final JTable view;
     private final JComboBox<String> orderStatus;
-    private final OrderServiceImpl orderService;
-    private final UserServiceImpl userService;
+    private final OrderService orderService;
+    private final UserService userService;
 
     public OrderTableModel(JTable table, JComboBox<String> orderStatus) {
         view = table;

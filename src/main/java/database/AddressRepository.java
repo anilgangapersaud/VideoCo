@@ -120,24 +120,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
         }
     }
 
-    public boolean checkAddressExists(String username) { return addressDatabase.containsKey(username); }
-
-
-    private boolean validateAddress(Address address) {
-        if (address == null) {
-            return false;
-        } else {
-            if (address.getLineAddress() == null || address.getCity() == null || address.getProvince() == null
-                    || address.getPostalCode() == null || address.getUsername() == null) {
-                return false;
-            } else {
-                return !address.getLineAddress().equals("") && !address.getCity().equals("")
-                        && !address.getProvince().equals("") && !address.getPostalCode().equals("")
-                        && !address.getUsername().equals("");
-            }
-        }
-    }
-
     @Override
     public void registerObserver(Observer o) {
         observers.add(o);
@@ -154,4 +136,20 @@ public class AddressRepository implements DatabaseAccess, Subject {
             o.update();
         }
     }
+
+    private boolean validateAddress(Address address) {
+        if (address == null) {
+            return false;
+        } else {
+            if (address.getLineAddress() == null || address.getCity() == null || address.getProvince() == null
+                    || address.getPostalCode() == null || address.getUsername() == null) {
+                return false;
+            } else {
+                return !address.getLineAddress().equals("") && !address.getCity().equals("")
+                        && !address.getProvince().equals("") && !address.getPostalCode().equals("")
+                        && !address.getUsername().equals("");
+            }
+        }
+    }
+
 }

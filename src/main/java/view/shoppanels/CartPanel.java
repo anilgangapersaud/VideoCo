@@ -2,7 +2,7 @@ package view.shoppanels;
 
 import controllers.CartController;
 import database.Observer;
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.tablemodels.CartTableModel;
 
@@ -20,7 +20,7 @@ public class CartPanel extends JPanel implements Observer {
 
     private final JTable table;
 
-    private UserServiceImpl userService;
+    private UserService userService;
 
     public CartPanel() {
         setLayout(new BorderLayout(20, 10));

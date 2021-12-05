@@ -3,10 +3,10 @@ package controllers;
 import model.*;
 import model.payments.LoyaltyPoints;
 import model.payments.PaymentService;
-import services.AddressServiceImpl;
-import services.BillingServiceImpl;
-import services.OrderServiceImpl;
-import services.UserServiceImpl;
+import services.AddressService;
+import services.BillingService;
+import services.OrderService;
+import services.UserService;
 import view.StoreFront;
 import view.shoppanels.CartPanel;
 
@@ -17,10 +17,10 @@ import java.awt.event.ActionListener;
 public class CartController implements ActionListener {
 
     private final CartPanel view;
-    private final UserServiceImpl userService;
-    private final AddressServiceImpl addressService;
-    private final BillingServiceImpl billingService;
-    private final OrderServiceImpl orderService;
+    private final UserService userService;
+    private final AddressService addressService;
+    private final BillingService billingService;
+    private final OrderService orderService;
 
     public CartController(CartPanel view) {
         this.view = view;

@@ -1,4 +1,4 @@
-package states;
+package dialin;
 
 public interface State {
 

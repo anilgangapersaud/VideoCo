@@ -3,8 +3,8 @@ package controllers;
 import model.Cart;
 import model.Movie;
 import model.User;
-import services.MovieServiceImpl;
-import services.UserServiceImpl;
+import services.MovieService;
+import services.UserService;
 import view.StoreFront;
 import view.dialogs.AddMovieDialog;
 import view.dialogs.EditMovieDialog;
@@ -20,8 +20,8 @@ import java.util.Map;
 public class StoreController implements ActionListener {
 
     private final StorePanel view;
-    private final MovieServiceImpl movieService;
-    private final UserServiceImpl userService;
+    private final MovieService movieService;
+    private final UserService userService;
 
     public StoreController(StorePanel view) {
         this.view = view;

@@ -3,10 +3,10 @@ package scheduled_tasks;
 import model.Address;
 import model.Order;
 import model.payments.CreditCard;
-import services.AddressServiceImpl;
-import services.BillingServiceImpl;
-import services.OrderServiceImpl;
-import services.RentedServiceImpl;
+import services.AddressService;
+import services.BillingService;
+import services.OrderService;
+import services.RentedService;
 import view.StoreFront;
 
 import java.text.ParseException;
@@ -18,10 +18,10 @@ import java.util.TimerTask;
 
 public class CheckOverdueOrders extends TimerTask {
 
-    private final OrderServiceImpl orderService;
-    private final AddressServiceImpl addressService;
-    private final BillingServiceImpl billingService;
-    private final RentedServiceImpl rentedService;
+    private final OrderService orderService;
+    private final AddressService addressService;
+    private final BillingService billingService;
+    private final RentedService rentedService;
 
     public CheckOverdueOrders() {
         orderService = StoreFront.getOrderService();

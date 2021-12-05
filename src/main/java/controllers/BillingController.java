@@ -1,7 +1,7 @@
 package controllers;
 
 import model.payments.CreditCard;
-import services.BillingServiceImpl;
+import services.BillingService;
 import view.StoreFront;
 import view.shoppanels.BillingPanel;
 
@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 public class BillingController implements ActionListener {
 
     private final BillingPanel view;
-    private final BillingServiceImpl billingService;
+    private final BillingService billingService;
 
     public BillingController(BillingPanel view) {
         this.view = view;

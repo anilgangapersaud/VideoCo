@@ -9,24 +9,24 @@ import model.payments.CreditCard;
 
 import java.util.List;
 
-public class UserServiceImpl {
+public class UserService {
 
     private final UserRepository userRepository;
 
-    private volatile static UserServiceImpl instance;
+    private volatile static UserService instance;
 
     private static String ADMIN_CSV_PATH;
     private static String USER_CSV_PATH;
 
-    private UserServiceImpl() {
+    private UserService() {
         userRepository = UserRepository.getInstance(ADMIN_CSV_PATH, USER_CSV_PATH);
     }
 
-    public static UserServiceImpl getInstance() {
+    public static UserService getInstance() {
         if (instance == null) {
-            synchronized (UserServiceImpl.class) {
+            synchronized (UserService.class) {
                 if (instance == null) {
-                    instance = new UserServiceImpl();
+                    instance = new UserService();
                 }
             }
         }
@@ -87,10 +87,6 @@ public class UserServiceImpl {
         return userRepository.changeEmail(newEmail, username);
     }
 
-    public boolean checkUserExists(String username) {
-        return userRepository.checkUserExists(username);
-    }
-
     public void deleteUser(String username) {
         getAddressService().deleteAddress(username);
         getBillingService().deleteCreditCard(username);
@@ -146,15 +142,15 @@ public class UserServiceImpl {
         userRepository.removeObserver(o);
     }
 
-    private AddressServiceImpl getAddressService() {
-        return AddressServiceImpl.getInstance();
+    private AddressService getAddressService() {
+        return AddressService.getInstance();
     }
 
-    private BillingServiceImpl getBillingService() {
-        return BillingServiceImpl.getInstance();
+    private BillingService getBillingService() {
+        return BillingService.getInstance();
     }
 
-    private OrderServiceImpl getOrderService() {
-        return OrderServiceImpl.getInstance();
+    private OrderService getOrderService() {
+        return OrderService.getInstance();
     }
 }

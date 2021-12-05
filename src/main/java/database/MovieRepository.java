@@ -25,6 +25,7 @@ public class MovieRepository implements DatabaseAccess, Subject {
 
     private MovieRepository(String path) {
         MOVIE_CSV_PATH = path;
+        clearCSV();
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
         observers = new ArrayList<>();
@@ -207,18 +208,6 @@ public class MovieRepository implements DatabaseAccess, Subject {
         }
     }
 
-    private boolean validateMovie(Movie m) {
-        if (m == null) {
-            return false;
-        } else {
-            if (m.getBarcode() != null && m.getTitle() != null && m.getPrice() >= 0 && m.getGenre() != null && m.getReleaseDate() != null) {
-                return !m.getGenre().equals("") && !m.getTitle().equals("") && !m.getBarcode().equals("") && !m.getReleaseDate().equals("");
-            } else {
-                return false;
-            }
-        }
-    }
-
     @Override
     public void registerObserver(Observer o) {
         observers.add(o);
@@ -233,6 +222,18 @@ public class MovieRepository implements DatabaseAccess, Subject {
     public void notifyObservers() {
         for (Observer o : observers) {
             o.update();
+        }
+    }
+
+    private boolean validateMovie(Movie m) {
+        if (m == null) {
+            return false;
+        } else {
+            if (m.getBarcode() != null && m.getTitle() != null && m.getPrice() >= 0 && m.getGenre() != null && m.getReleaseDate() != null) {
+                return !m.getGenre().equals("") && !m.getTitle().equals("") && !m.getBarcode().equals("") && !m.getReleaseDate().equals("");
+            } else {
+                return false;
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 package controllers;
 
-import database.UserRepository;
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.shoppanels.AccountPanel;
 
@@ -12,7 +11,7 @@ import java.awt.event.ActionListener;
 public class AccountController implements ActionListener {
 
     private final AccountPanel view;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     public AccountController(AccountPanel view) {
         this.view = view;

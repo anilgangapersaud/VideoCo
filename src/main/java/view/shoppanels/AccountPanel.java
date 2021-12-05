@@ -2,7 +2,7 @@ package view.shoppanels;
 
 import controllers.AccountController;
 import database.Observer;
-import services.UserServiceImpl;
+import services.UserService;
 import view.StoreFront;
 import view.cards.AccountCards;
 
@@ -21,7 +21,7 @@ public class AccountPanel extends JPanel implements Observer {
 
     private final JLabel loyaltyPoints;
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     public AccountPanel(AccountCards cards) {
         this.cards = cards;

@@ -1,41 +1,21 @@
 package database;
 
-import model.User;
 import model.payments.CreditCard;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class BillingRepositoryTest {
 
     private static BillingRepository underTest;
-    private static UserRepository testUserRepository;
 
     @BeforeAll
     static void setup2() {
         underTest = BillingRepository.getInstance(TestConfigs.BILLING_CSV_TEST_PATH);
-        testUserRepository = UserRepository.getInstance(TestConfigs.ADMIN_CSV_TEST_PATH, TestConfigs.USER_CSV_TEST_PATH);
-    }
-
-    @BeforeEach
-    void setup() {
-        User u = new User();
-        u.setUsername("username");
-        u.setAccountType("guest");
-
-        testUserRepository.saveGuestAccount(u);
-    }
-
-    @AfterEach
-    void teardown() {
-        underTest.clearCSV();
-        testUserRepository.clearCSV();
     }
 
     @Test
-    void getCreditCard() {
+    void testGetCreditCard() {
         CreditCard expected = new CreditCard();
         expected.setUsername("username");
         expected.setCardNumber("123");

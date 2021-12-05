@@ -21,7 +21,6 @@ class MovieRepositoryTest {
 
     @AfterEach
     void teardown() {
-        underTest.clearCSV();
     }
 
     @Test

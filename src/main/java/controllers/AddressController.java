@@ -1,7 +1,7 @@
 package controllers;
 
 import model.Address;
-import services.AddressServiceImpl;
+import services.AddressService;
 import view.StoreFront;
 import view.shoppanels.AddressPanel;
 
@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 public class AddressController implements ActionListener {
 
     private final AddressPanel view;
-    private final AddressServiceImpl addressService;
+    private final AddressService addressService;
 
     public AddressController(AddressPanel view) {
         this.view = view;

@@ -1,12 +1,12 @@
-package states;
+package dialin;
 
 import model.Address;
 import model.Cart;
 import model.Movie;
 import model.Order;
 import model.payments.CreditCard;
-import services.MovieServiceImpl;
-import services.OrderServiceImpl;
+import services.MovieService;
+import services.OrderService;
 import view.StoreFront;
 
 import java.util.Scanner;
@@ -14,8 +14,8 @@ import java.util.Scanner;
 public class PlaceOrder implements State {
 
     private final DialInService dialInService;
-    private final MovieServiceImpl movieService;
-    private final OrderServiceImpl orderService;
+    private final MovieService movieService;
+    private final OrderService orderService;
 
     public PlaceOrder(DialInService dialIn) {
         dialInService = dialIn;

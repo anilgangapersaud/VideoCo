@@ -1,6 +1,6 @@
 package view;
 
-import states.DialInService;
+import dialin.DialInService;
 import view.cards.LoginCards;
 import view.cards.StoreFrontCards;
 

@@ -4,23 +4,23 @@ import database.BillingRepository;
 import database.Observer;
 import model.payments.CreditCard;
 
-public class BillingServiceImpl {
+public class BillingService {
 
     private static  String BILLING_CSV_PATH;
 
     private final BillingRepository billingRepository;
 
-    private volatile static BillingServiceImpl instance;
+    private volatile static BillingService instance;
 
-    private BillingServiceImpl() {
+    private BillingService() {
         billingRepository = BillingRepository.getInstance(BILLING_CSV_PATH);
     }
 
-    public static BillingServiceImpl getInstance() {
+    public static BillingService getInstance() {
         if (instance == null) {
-            synchronized (BillingServiceImpl.class) {
+            synchronized (BillingService.class) {
                 if (instance == null) {
-                    instance = new BillingServiceImpl();
+                    instance = new BillingService();
                 }
             }
         }
@@ -49,10 +49,6 @@ public class BillingServiceImpl {
 
     public void refundCustomer(String username, double amount) {
         billingRepository.refundCustomer(username, amount);
-    }
-
-    public void chargeCustomer(String username, double amount) {
-        billingRepository.chargeCustomer(username, amount);
     }
 
     public void registerObserver(Observer o) {

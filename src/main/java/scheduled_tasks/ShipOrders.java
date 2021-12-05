@@ -1,8 +1,7 @@
 package scheduled_tasks;
 
-import database.OrderRepository;
 import model.Order;
-import services.OrderServiceImpl;
+import services.OrderService;
 import view.StoreFront;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.TimerTask;
 
 public class ShipOrders extends TimerTask {
 
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
 
     public ShipOrders() {
         orderService = StoreFront.getOrderService();

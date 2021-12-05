@@ -107,10 +107,12 @@ public class OrderRepository implements DatabaseAccess, Subject {
     }
 
     public void changeOrderStatus(int orderNumber, String status) {
-        Order o = orderDatabase.get(orderNumber);
-        o.setOrderStatus(status);
-        orderDatabase.replace(orderNumber, o);
-        updateCSV();
+        if (orderDatabase.containsKey(orderNumber)) {
+            Order o = orderDatabase.get(orderNumber);
+            o.setOrderStatus(status);
+            orderDatabase.replace(orderNumber, o);
+            updateCSV();
+        }
     }
 
     public void createOrder(Order o) {
@@ -160,10 +162,9 @@ public class OrderRepository implements DatabaseAccess, Subject {
         }
     }
 
-    public boolean returnOrder(Order order) {
+    public void returnOrder(Order order) {
         orderDatabase.replace(order.getOrderId(), order);
         updateCSV();
-        return true;
     }
 
     @Override

@@ -9,14 +9,6 @@ public class User {
     private Cart cart;
     private int loyaltyPoints;
 
-    public User(String username, String password, String emailAddress, String accountType) {
-        this.username = username;
-        this.password = password;
-        this.emailAddress = emailAddress;
-        this.accountType = accountType;
-        loyaltyPoints = 0;
-    }
-
     public User() {}
 
     public String getUsername() {

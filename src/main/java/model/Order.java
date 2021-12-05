@@ -61,10 +61,6 @@ public class Order {
         this.dueDate = dueDate;
     }
 
-    public boolean isOverdue() {
-        return isOverdue;
-    }
-
     public void setOverdue(boolean overdue) {
         isOverdue = overdue;
     }

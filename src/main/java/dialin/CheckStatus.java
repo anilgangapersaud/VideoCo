@@ -1,7 +1,7 @@
-package states;
+package dialin;
 
 import model.Order;
-import services.OrderServiceImpl;
+import services.OrderService;
 import view.StoreFront;
 
 import java.util.Scanner;
@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class CheckStatus implements State {
 
     private final DialInService dialInService;
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
 
     public CheckStatus(DialInService dialInService) {
         this.dialInService = dialInService;

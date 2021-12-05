@@ -4,23 +4,23 @@ import database.AddressRepository;
 import database.Observer;
 import model.Address;
 
-public class AddressServiceImpl {
+public class AddressService {
 
     private static String ADDRESS_CSV_PATH;
 
     private final AddressRepository addressRepository;
 
-    private volatile static AddressServiceImpl instance;
+    private volatile static AddressService instance;
 
-    private AddressServiceImpl() {
+    private AddressService() {
         addressRepository = AddressRepository.getInstance(ADDRESS_CSV_PATH);
     }
 
-    public static AddressServiceImpl getInstance() {
+    public static AddressService getInstance() {
         if (instance == null) {
-            synchronized (AddressServiceImpl.class) {
+            synchronized (AddressService.class) {
                 if (instance == null) {
-                    instance = new AddressServiceImpl();
+                    instance = new AddressService();
                 }
             }
         }
@@ -45,10 +45,6 @@ public class AddressServiceImpl {
 
     public boolean updateAddress(Address address) {
         return addressRepository.updateAddress(address);
-    }
-
-    public boolean checkAddressExists(String username) {
-        return addressRepository.checkAddressExists(username);
     }
 
     public void registerObserver(Observer o) {

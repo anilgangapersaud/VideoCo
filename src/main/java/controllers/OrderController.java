@@ -1,7 +1,6 @@
 package controllers;
 
-import database.OrderRepository;
-import services.OrderServiceImpl;
+import services.OrderService;
 import view.StoreFront;
 import view.shoppanels.OrderPanel;
 
@@ -13,7 +12,7 @@ public class OrderController implements ActionListener {
 
     private final OrderPanel view;
 
-    private final OrderServiceImpl orderService;
+    private final OrderService orderService;
 
     public OrderController(OrderPanel view) {
         this.view = view;
