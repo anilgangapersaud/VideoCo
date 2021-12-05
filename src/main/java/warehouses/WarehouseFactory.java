@@ -6,7 +6,7 @@ import services.AddressService;
 
 public class WarehouseFactory {
 
-    private AddressService addressService;
+    private final AddressService addressService;
 
     public WarehouseFactory() {
         addressService = AddressService.getInstance();

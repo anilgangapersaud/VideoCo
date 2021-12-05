@@ -1,6 +1,5 @@
 package view.storefrontpanels;
 
-import database.UserRepository;
 import view.StoreFront;
 import view.cards.ShopCards;
 import view.cards.StoreFrontCards;

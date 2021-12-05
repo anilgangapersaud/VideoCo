@@ -20,7 +20,7 @@ public class CartPanel extends JPanel implements Observer {
 
     private final JTable table;
 
-    private UserService userService;
+    private final UserService userService;
 
     public CartPanel() {
         setLayout(new BorderLayout(20, 10));

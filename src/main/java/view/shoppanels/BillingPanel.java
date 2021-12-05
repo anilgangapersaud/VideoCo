@@ -2,7 +2,6 @@ package view.shoppanels;
 
 import controllers.BillingController;
 import database.Observer;
-import database.UserRepository;
 import model.payments.CreditCard;
 import view.StoreFront;
 import view.cards.AccountCards;

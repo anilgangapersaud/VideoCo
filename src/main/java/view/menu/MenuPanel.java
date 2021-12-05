@@ -1,9 +1,7 @@
 package view.menu;
 
-import database.UserRepository;
 import view.StoreFront;
 import view.cards.ShopCards;
-import view.cards.StoreFrontCards;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -11,7 +9,6 @@ import java.awt.event.ActionListener;
 
 public class MenuPanel extends JPanel implements ActionListener {
 
-    private JLabel welcomeMessage;
     private final ShopCards shopCards;
 
     public MenuPanel(ShopCards cards) {
@@ -58,7 +55,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         orders.setActionCommand("orders");
         orders.addActionListener(this);
 
-        welcomeMessage = new JLabel("Welcome " + StoreFront.getUserService().getLoggedInUser().getUsername() + "!");
+        JLabel welcomeMessage = new JLabel("Welcome " + StoreFront.getUserService().getLoggedInUser().getUsername() + "!");
 
         add(logout);
         add(account);

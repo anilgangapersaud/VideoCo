@@ -9,20 +9,12 @@ import java.awt.*;
 
 public class AccountCards extends JPanel {
 
-   protected CardLayout cl;
-
-   private final AccountPanel eacp;
-
-   private final AddressPanel eadp;
-
-   private final BillingPanel ebp;
-
-   public AccountCards() {
-       cl = new CardLayout();
+    public AccountCards() {
+       CardLayout cl = new CardLayout();
        setLayout(cl);
-       eacp = new AccountPanel(this);
-       eadp = new AddressPanel(this);
-       ebp = new BillingPanel(this);
+       AccountPanel eacp = new AccountPanel(this);
+       AddressPanel eadp = new AddressPanel(this);
+        BillingPanel ebp = new BillingPanel(this);
 
        add(eacp, "eacp");
        add(ebp, "ebp");
@@ -33,15 +25,4 @@ public class AccountCards extends JPanel {
        setVisible(true);
    }
 
-   public AccountPanel getAccountPanel() {
-       return eacp;
-   }
-
-   public BillingPanel getBillingPanel() {
-       return ebp;
-   }
-
-   public AddressPanel getAddressPanel() {
-       return eadp;
-   }
 }
