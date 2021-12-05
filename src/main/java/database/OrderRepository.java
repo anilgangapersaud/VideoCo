@@ -145,7 +145,7 @@ public class OrderRepository implements DatabaseAccess, Subject {
     }
 
     public Order getOrder(int orderNumber) {
-        return orderDatabase.get(orderNumber);
+        return orderDatabase.getOrDefault(orderNumber, null);
     }
 
     public int getTotalOrders() {

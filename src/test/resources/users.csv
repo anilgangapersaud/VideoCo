@@ -1,9 +1,2 @@
 email,username,password,account,loyaltyPoints
-username,username345,password,customer,0
-username,username123,password,customer,0
-username,username3,password,customer,0
-"a,gapsdo",hello,,guest,0
-a.gangapersaud@gmail.com,username83,password,customer,0
-username,username67,password,customer,0
-username,username54,password123,customer,0
-a.gangapersaud@gmail.com,username,password,admin,0
+a.gangapersaud@gmail.com,username3,password,customer,50

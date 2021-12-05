@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class BillingServiceTest {
 
     private BillingService billingService;
@@ -70,7 +68,4 @@ class BillingServiceTest {
         assertThat(billingService.getCreditCard("username").getBalance()).isEqualTo(25);
     }
 
-    @Test
-    void chargeCustomer() {
-    }
 }

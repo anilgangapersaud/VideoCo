@@ -72,10 +72,13 @@ public class OrderService implements PaymentVisitor {
                     o.setOrderId(orderRepository.getTotalOrders());
                     o.setOrderDate(getDate());
                     o.setDueDate(getDueDate());
+                    o.setOrderStatus("PROCESSED");
                     o.setMovies(cart.getMoviesInCart());
                     orderRepository.createOrder(o);
                     getRentedService().storeMovies(o);
-                    getUserService().awardLoyaltyPoint(username);
+                    if (u != null) {
+                        getUserService().awardLoyaltyPoint(username);
+                    }
                     return o;
                 } else {
                     return null;
@@ -116,10 +119,6 @@ public class OrderService implements PaymentVisitor {
         return orderRepository.getOrder(orderNumber);
     }
 
-    public int getTotalOrders() {
-        return orderRepository.getTotalOrders();
-    }
-
     public boolean returnOrder(int orderNumber) {
         Order o = orderRepository.getOrder(orderNumber);
         if (o == null || !o.getOrderStatus().equals("DELIVERED")) {
@@ -134,8 +133,8 @@ public class OrderService implements PaymentVisitor {
         }
     }
 
-    public boolean updateOrder(int orderNumber, Order o) {
-        return orderRepository.updateOrder(orderNumber, o);
+    public void updateOrder(int orderNumber, Order o) {
+        orderRepository.updateOrder(orderNumber, o);
     }
 
     private String getDate() {
