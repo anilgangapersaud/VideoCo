@@ -9,9 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 public class App {
 
-    private static final long DELIVERY_TIME = 600000;
+    private static final long DELIVERY_TIME = 200000;
 
-    private static final long SHIP_TIME = 900000;
+    private static final long SHIP_TIME = 100000;
 
 
     public App() {

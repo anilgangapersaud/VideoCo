@@ -55,9 +55,10 @@ public class OrderTableModel extends DefaultTableModel implements Observer {
             i++;
         }
         setDataVector(data,column);
-        view.setModel(this);
-        TableColumn statusColumn = view.getColumnModel().getColumn(1);
-        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
+        if (userService.getLoggedInUser().isAdmin()) {
+            TableColumn statusColumn = view.getColumnModel().getColumn(1);
+            statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
+        }
     }
 
     @Override

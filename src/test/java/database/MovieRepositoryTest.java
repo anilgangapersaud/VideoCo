@@ -17,10 +17,12 @@ class MovieRepositoryTest {
     @BeforeEach
     void setup() {
         underTest = MovieRepository.getInstance(TestConfigs.MOVIE_CSV_TEST_PATH);
+        underTest.clearCSV();
     }
 
     @AfterEach
     void teardown() {
+        underTest.clearCSV();
     }
 
     @Test

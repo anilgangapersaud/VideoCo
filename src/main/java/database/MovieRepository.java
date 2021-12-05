@@ -25,7 +25,6 @@ public class MovieRepository implements DatabaseAccess, Subject {
 
     private MovieRepository(String path) {
         MOVIE_CSV_PATH = path;
-        clearCSV();
         movieDatabase = new HashMap<>();
         barcodeToMovieMap = new HashMap<>();
         observers = new ArrayList<>();

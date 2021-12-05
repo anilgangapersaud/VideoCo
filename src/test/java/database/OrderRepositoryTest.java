@@ -17,6 +17,12 @@ class OrderRepositoryTest {
     @BeforeEach
     void setup() {
         underTest = OrderRepository.getInstance(TestConfigs.ORDER_CSV__TEST_PATH);
+        underTest.clearCSV();
+    }
+
+    @AfterEach
+    void teardown() {
+        underTest.clearCSV();
     }
 
     @Test

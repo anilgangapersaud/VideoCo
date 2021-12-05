@@ -4,7 +4,6 @@ import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 
 
 import java.util.ArrayList;
@@ -16,14 +15,15 @@ class UserRepositoryTest {
 
     private UserRepository underTest;
 
-
     @BeforeEach
     void setup() {
         underTest = UserRepository.getInstance(TestConfigs.ADMIN_CSV_TEST_PATH, TestConfigs.USER_CSV_TEST_PATH);
+        underTest.clearCSV();
     }
 
     @AfterEach
     void teardown() {
+        underTest.clearCSV();
     }
 
     @Test

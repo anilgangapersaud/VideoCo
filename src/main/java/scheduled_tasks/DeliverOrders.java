@@ -21,7 +21,7 @@ public class DeliverOrders extends TimerTask {
         for (Order o : orders) {
             if (o.getOrderStatus().equals("SHIPPED")) {
                 orderService.changeOrderStatus(o.getOrderId(), "DELIVERED");
-                System.out.println("Delivered order " + o.getOrderId());
+                System.out.println("Delivered Order " + o.getOrderId() + " to " + o.getUsername());
             }
         }
     }

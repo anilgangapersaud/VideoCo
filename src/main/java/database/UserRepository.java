@@ -29,7 +29,6 @@ public class UserRepository implements DatabaseAccess, Subject {
     private UserRepository(String adminPath, String userPath) {
         ADMIN_CSV_PATH = adminPath;
         USER_CSV_PATH = userPath;
-        clearCSV();
         adminEmails = new HashSet<>();
         userAccounts = new HashMap<>();
         observers = new ArrayList<>();

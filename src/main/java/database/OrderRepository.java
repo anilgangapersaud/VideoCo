@@ -23,7 +23,6 @@ public class OrderRepository implements DatabaseAccess, Subject {
 
     private OrderRepository(String path) {
         ORDER_CSV_PATH = path;
-        clearCSV();
         orderDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();

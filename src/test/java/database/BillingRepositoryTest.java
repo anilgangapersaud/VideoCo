@@ -1,7 +1,9 @@
 package database;
 
 import model.payments.CreditCard;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -9,9 +11,15 @@ class BillingRepositoryTest {
 
     private static BillingRepository underTest;
 
-    @BeforeAll
-    static void setup2() {
+    @BeforeEach
+    void setup2() {
         underTest = BillingRepository.getInstance(TestConfigs.BILLING_CSV_TEST_PATH);
+        underTest.clearCSV();
+    }
+
+    @AfterEach
+    void teardown() {
+        underTest.clearCSV();
     }
 
     @Test

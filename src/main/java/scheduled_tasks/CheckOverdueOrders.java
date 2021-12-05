@@ -39,7 +39,7 @@ public class CheckOverdueOrders extends TimerTask {
                 try {
                     Date todaysDate = Calendar.getInstance().getTime();
                     Date dueDateP = new SimpleDateFormat("yyyy/MM/dd").parse(dueDate);
-                    if (todaysDate.before(dueDateP)) {
+                    if (dueDateP.before(todaysDate)) {
                         if (!o.getOverdue()) {
                             o.setOverdue(true);
                             System.out.println(o.getUsername() + "'s order is overdue");

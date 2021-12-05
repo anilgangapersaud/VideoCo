@@ -27,7 +27,6 @@ public class BillingRepository implements DatabaseAccess, Subject {
 
     private BillingRepository(String path) {
         BILLING_CSV_PATH = path;
-        clearCSV();
         billingDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();

@@ -14,6 +14,7 @@ class AddressRepositoryTest {
     @BeforeEach
     void setup() {
         underTest = AddressRepository.getInstance(TestConfigs.ADDRESS_CSV_TEST_PATH);
+        underTest.clearCSV();
     }
 
     @AfterEach

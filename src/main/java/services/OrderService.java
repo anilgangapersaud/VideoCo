@@ -180,11 +180,11 @@ public class OrderService implements PaymentVisitor {
     }
 
     public void registerObserver(Observer o) {
-        getBillingService().registerObserver(o);
+        orderRepository.registerObserver(o);
     }
 
     public void removeObserver(Observer o) {
-        getBillingService().removeObserver(o);
+        orderRepository.removeObserver(o);
     }
 
 

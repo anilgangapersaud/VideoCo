@@ -65,7 +65,6 @@ public class StorePanel extends JPanel {
     private void constructCenterTable() {
         table = new JTable();
         tableModel = new StoreTableModel();
-        StoreFront.getMovieService().registerObserver(tableModel);
         table.setModel(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);

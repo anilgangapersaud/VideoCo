@@ -18,6 +18,8 @@ public class OrderPanel extends JPanel {
             "PROCESSED", "SHIPPED", "DELIVERED", "COMPLETED",
     };
 
+    private final OrderTableModel otm;
+
     public OrderPanel() {
         setLayout(new BorderLayout(20, 10));
         OrderController orderController = new OrderController(this);
@@ -41,10 +43,9 @@ public class OrderPanel extends JPanel {
         orderStatus.addActionListener(orderController);
 
         table = new JTable();
-        OrderTableModel otm = new OrderTableModel(table, orderStatus);
+        otm = new OrderTableModel(table, orderStatus);
+        table.setModel(otm);
 
-        TableColumn statusColumn = table.getColumnModel().getColumn(1);
-        statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
         JScrollPane scrollPane = new JScrollPane(table);
 
         add(scrollPane, BorderLayout.CENTER);

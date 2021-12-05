@@ -1,6 +1,5 @@
 package view.tablemodels;
 
-import database.MovieRepository;
 import database.Observer;
 import model.Movie;
 import view.StoreFront;
@@ -54,7 +53,6 @@ public class StoreTableModel extends DefaultTableModel implements Observer {
             data[i][5] = String.valueOf(entry.getValue());
             i++;
         }
-
         setDataVector(data, column);
     }
 

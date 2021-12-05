@@ -25,7 +25,6 @@ public class RentedRepository implements DatabaseAccess {
 
     private RentedRepository(String path) {
         RENTED_CSV_PATH = path;
-        clearCSV();
         rentedMovies = new ArrayList<>();
         loadCSV();
     }

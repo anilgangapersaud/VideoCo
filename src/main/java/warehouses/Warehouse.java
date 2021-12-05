@@ -1,9 +1,9 @@
 package warehouses;
 
-import model.Address;
+import model.Order;
 
 public interface Warehouse {
 
-    void ship();
+    void ship(Order o);
 
 }

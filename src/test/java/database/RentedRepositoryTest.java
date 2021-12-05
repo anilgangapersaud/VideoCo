@@ -3,6 +3,7 @@ package database;
 import model.Movie;
 import model.Order;
 import model.RentedMovie;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,12 @@ class RentedRepositoryTest {
     @BeforeAll
     static void setup2() {
         underTest = RentedRepository.getInstance(TestConfigs.RENTED_CSV_TEST_PATH);
+        underTest.clearCSV();
+    }
+
+    @AfterEach
+    void teardown(){
+        underTest.clearCSV();
     }
 
     @Test

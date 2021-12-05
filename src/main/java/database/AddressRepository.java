@@ -26,7 +26,6 @@ public class AddressRepository implements DatabaseAccess, Subject {
 
     private AddressRepository(String path) {
         ADDRESS_CSV_PATH = path;
-        clearCSV();
         addressDatabase = new HashMap<>();
         observers = new ArrayList<>();
         loadCSV();

@@ -24,7 +24,7 @@ public class ShipOrders extends TimerTask {
         for (Order o : orders) {
             if (o.getOrderStatus().equals("PROCESSED")) {
                 // send the order to warehouse to be shipped
-                warehouseFactory.getWarehouse(o).ship();
+                warehouseFactory.getWarehouse(o).ship(o);
                 orderService.changeOrderStatus(o.getOrderId(), "SHIPPED");
             }
         }

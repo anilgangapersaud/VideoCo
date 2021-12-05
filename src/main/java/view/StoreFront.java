@@ -43,6 +43,7 @@ public class StoreFront extends JFrame {
     public static MovieService getMovieService() {
         return MovieService.getInstance();
     }
+
     public static RentedService getRentedService() {
         return RentedService.getInstance();
     }
