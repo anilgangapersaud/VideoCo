@@ -46,6 +46,11 @@ public class OrderPanel extends JPanel {
         otm = new OrderTableModel(table, orderStatus);
         table.setModel(otm);
 
+        if (StoreFront.getUserService().getLoggedInUser().isAdmin()) {
+            TableColumn statusColumn = table.getColumnModel().getColumn(1);
+            statusColumn.setCellEditor(new DefaultCellEditor(orderStatus));
+        }
+
         JScrollPane scrollPane = new JScrollPane(table);
 
         add(scrollPane, BorderLayout.CENTER);

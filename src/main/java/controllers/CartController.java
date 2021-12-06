@@ -60,6 +60,7 @@ public class CartController implements ActionListener {
                 if (paymentMethod == null) {
                     view.displayErrorMessage("No credit card on file\nAdd a credit card in Account Details");
                 } else {
+                    u.getCart().setUsername(u.getUsername());
                     Order paymentAccepted = orderService.createOrder(u.getCart(), paymentMethod);
                     if (paymentAccepted != null) {
                         view.displayMessage("Created Order");
